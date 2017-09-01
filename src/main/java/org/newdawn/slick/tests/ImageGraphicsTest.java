@@ -10,6 +10,7 @@ import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.opengl.pbuffer.GraphicsFactory;
+import org.newdawn.slick.util.Log;
 
 /**
  * A test for rendering to an image
@@ -70,7 +71,7 @@ public class ImageGraphicsTest extends BasicGame {
 			using = "Pbuffer (Pixel Buffers)";
 		}
 		
-		System.out.println(preloaded.getColor(50,50));
+		Log.info(preloaded.getColor(50,50));
 	}
 	
 	/**

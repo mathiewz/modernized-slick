@@ -36,13 +36,7 @@ public class BufferedImageUtil {
 	 */
 	public static Texture getTexture(String resourceName,
 			BufferedImage resourceImage) throws IOException {
-		Texture tex = getTexture(resourceName, resourceImage,
-				SGL.GL_TEXTURE_2D, // target
-				SGL.GL_RGBA8, // dest pixel format
-				SGL.GL_LINEAR, // min filter (unused)
-				SGL.GL_LINEAR);
-
-		return tex;
+		return getTexture(resourceName, resourceImage, SGL.GL_LINEAR);
 	}
 
 	/**
@@ -58,13 +52,7 @@ public class BufferedImageUtil {
 	 */
 	public static Texture getTexture(String resourceName,
 			BufferedImage resourceImage, int filter) throws IOException {
-		Texture tex = getTexture(resourceName, resourceImage,
-				SGL.GL_TEXTURE_2D, // target
-				SGL.GL_RGBA8, // dest pixel format
-				filter, // min filter (unused)
-				filter);
-
-		return tex;
+		return getTexture(resourceName, resourceImage, SGL.GL_TEXTURE_2D, SGL.GL_RGBA8, filter, filter);
 	}
 	
 	/**
@@ -72,7 +60,7 @@ public class BufferedImageUtil {
 	 * 
 	 * @param resourceName
 	 *            The location of the resource to load
-	 * @param resourceimage
+	 * @param resourceImage
 	 *            The BufferedImage we are converting
 	 * @param target
 	 *            The GL target to load the texture against
@@ -87,9 +75,10 @@ public class BufferedImageUtil {
 	 *             Indicates a failure to access the resource
 	 */
 	public static Texture getTexture(String resourceName,
-			BufferedImage resourceimage, int target, int dstPixelFormat,
+			BufferedImage bufferedImage, int target, int dstPixelFormat,
 			int minFilter, int magFilter) throws IOException {
-		ImageIOImageData data = new ImageIOImageData();int srcPixelFormat = 0;
+		ImageIOImageData data = new ImageIOImageData();
+		int srcPixelFormat = 0;
 
 		// create the texture ID for this texture
 		int textureID = InternalTextureLoader.createTextureID();
@@ -101,7 +90,6 @@ public class BufferedImageUtil {
 		// bind this texture
 		Renderer.get().glBindTexture(target, textureID);
 
-		BufferedImage bufferedImage = resourceimage;
 		texture.setWidth(bufferedImage.getWidth());
 		texture.setHeight(bufferedImage.getHeight());
 

@@ -183,7 +183,7 @@ public class ProTracker {
 		if( period < 32 ) {
 			key = 0;
 		} else {
-			oct = LogTable.log_2( 7256 ) - LogTable.log_2( period );
+			oct = LogTable.log2( 7256 ) - LogTable.log2( period );
 			if( oct < 0 ) {
 				key = 0;
 			} else {

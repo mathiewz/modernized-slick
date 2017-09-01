@@ -726,17 +726,17 @@ public class Image implements Renderable {
         }
         
         GL.glBegin(SGL.GL_QUADS); 
-        	init();
-		
-		    GL.glTexCoord2f(textureOffsetX, textureOffsetY);
-			GL.glVertex3f(0, 0, 0);
-			GL.glTexCoord2f(textureOffsetX, textureOffsetY + textureHeight);
-			GL.glVertex3f(hshear, height, 0);
-			GL.glTexCoord2f(textureOffsetX + textureWidth, textureOffsetY
-					+ textureHeight);
-			GL.glVertex3f(width + hshear, height + vshear, 0);
-			GL.glTexCoord2f(textureOffsetX + textureWidth, textureOffsetY);
-			GL.glVertex3f(width, vshear, 0);
+		init();
+
+		GL.glTexCoord2f(textureOffsetX, textureOffsetY);
+		GL.glVertex3f(0, 0, 0);
+		GL.glTexCoord2f(textureOffsetX, textureOffsetY + textureHeight);
+		GL.glVertex3f(hshear, height, 0);
+		GL.glTexCoord2f(textureOffsetX + textureWidth, textureOffsetY
+				+ textureHeight);
+		GL.glVertex3f(width + hshear, height + vshear, 0);
+		GL.glTexCoord2f(textureOffsetX + textureWidth, textureOffsetY);
+		GL.glVertex3f(width, vshear, 0);
         GL.glEnd(); 
         
         if (angle != 0) {
@@ -1050,10 +1050,7 @@ public class Image implements Renderable {
 	        GL.glTranslatef(-centerX, -centerY, 0.0f); 
         }
         GL.glTranslatef(-x, -y, 0);
-        
-//		GL.glBegin(SGL.GL_QUADS);
-//		drawEmbedded(x,y,x2,y2,srcx,srcy,srcx2,srcy2);
-//		GL.glEnd();
+
 	}
 	
 	/**

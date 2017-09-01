@@ -19,31 +19,18 @@ public final class Log {
 	 * logging mode to verbose for games that were released without verbose logging
 	 * value must be "true"
 	 */
-	private static final String forceVerboseProperty = "org.newdawn.slick.forceVerboseLog";
+	private static final String FORCE_VERBOSE_PROPERTY = "org.newdawn.slick.forceVerboseLog";
 	
 	/**
 	 * the verbose property must be set to "true" to switch on verbose logging
 	 */
-	private static final String forceVerbosePropertyOnValue = "true";
+	private static final String FORCE_VERBOSE_PROPERTY_ON_VALUE = "true";
 	
 	/** The log system plugin in use */
 	private static LogSystem logSystem = new DefaultLogSystem();
-	
-	/**
-	 * The log is a simple static utility, no construction
-	 */
+
 	private Log() {
-		
-	}
-	
-	/**
-	 * Set the log system that will have all of the log info 
-	 * sent to it.
-	 * 
-	 * @param system The system to use for logging.
-	 */
-	public static void setLogSystem(LogSystem system) {
-		logSystem = system;
+		//to avoid instantiation
 	}
 	
 	/**
@@ -65,39 +52,28 @@ public final class Log {
 	 */
 	public static void checkVerboseLogSetting() {
 		try {
-			AccessController.doPrivileged(new PrivilegedAction() {
-	            public Object run() {
-					String val = System.getProperty(Log.forceVerboseProperty);
-					if ((val != null) && (val.equalsIgnoreCase(Log.forceVerbosePropertyOnValue))) {
-						Log.setForcedVerboseOn();
-					}
-					
-					return null;
-	            }
-			});
-		} catch (Throwable e) {
-			// ignore, security failure - probably an applet
+			PrivilegedAction<Object> action = () -> {
+                String val = System.getProperty(Log.FORCE_VERBOSE_PROPERTY);
+                if ((val != null) && (val.equalsIgnoreCase(Log.FORCE_VERBOSE_PROPERTY_ON_VALUE))) {
+                    forcedVerbose = true;
+                    verbose = true;
+                }
+                return null;
+            };
+		    AccessController.doPrivileged(action);
+		} catch (Exception e) {
+			Log.error(e);
 		}
-	}
-	
-	/**
-	 * Indicate that we want verbose logging, even if switched off in game code.
-	 * Only be called when system property "org.newdawn.slick.forceVerboseLog" is set to true.
-	 * You must not call this method directly.
-	 */
-	public static void setForcedVerboseOn() {
-		forcedVerbose = true;
-		verbose = true;
 	}
 	
 	/**
 	 * Log an error
 	 * 
-	 * @param message The message describing the error
+	 * @param obj The message describing the error
 	 * @param e The exception causing the error
 	 */
-	public static void error(String message, Throwable e) {
-		logSystem.error(message, e);
+	public static void error(Object obj, Throwable e) {
+		logSystem.error(obj.toString(), e);
 	}
 
 	/**
@@ -112,50 +88,45 @@ public final class Log {
 	/**
 	 * Log an error
 	 * 
-	 * @param message The message describing the error
+	 * @param obj The obj describing the error
 	 */
-	public static void error(String message) {
-		logSystem.error(message);
+	public static void error(Object obj) {
+		logSystem.error(obj.toString());
 	}
 
 	/**
 	 * Log a warning
 	 * 
-	 * @param message The message describing the warning
+	 * @param obj The message describing the warning
 	 */
-	public static void warn(String message) {
-		logSystem.warn(message);
+	public static void warn(Object obj) {
+		logSystem.warn(obj.toString());
 	}
 	
 	/**
 	 * Log a warning
 	 * 
-	 * @param message The message describing the warning
+	 * @param obj The message describing the warning
 	 * @param e The issue causing the warning
 	 */
-	public static void warn(String message, Throwable e) {
-		logSystem.warn(message, e);
-	}
-
-	/**
-	 * Log an information message
-	 * 
-	 * @param message The message describing the infomation
-	 */
-	public static void info(String message) {
-		if (verbose || forcedVerbose) {
-			logSystem.info(message);
-		}
+	public static void warn(Object obj, Throwable e) {
+		logSystem.warn(obj.toString(), e);
 	}
 
 	/**
 	 * Log a debug message
 	 * 
-	 * @param message The message describing the debug
+	 * @param obj The message describing the debug
 	 */
-	public static void debug(String message) {
+	public static void debug(Object obj) {
 		if (verbose || forcedVerbose) {
-			logSystem.debug(message);
+			logSystem.debug(obj.toString());
 		}
+	}
+
+	public static void info(Object obj){
+        if (verbose || forcedVerbose) {
+            logSystem.info(obj.toString());
+        }
 	}
 }

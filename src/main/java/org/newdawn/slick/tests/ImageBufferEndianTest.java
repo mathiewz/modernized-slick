@@ -1,6 +1,4 @@
 package org.newdawn.slick.tests;
-import java.nio.ByteOrder;
-
 import org.newdawn.slick.AppGameContainer;
 import org.newdawn.slick.BasicGame;
 import org.newdawn.slick.Color;
@@ -10,16 +8,14 @@ import org.newdawn.slick.Image;
 import org.newdawn.slick.ImageBuffer;
 import org.newdawn.slick.SlickException;
 
+import java.nio.ByteOrder;
+
 /**
  * Quick test for endianess in image buffers 
  * 
  * @author thaaks
  */
 public class ImageBufferEndianTest extends BasicGame {
-	/** The buffer filled with red pixels */
-   private ImageBuffer redImageBuffer;
-   /** The buffer filled with blue pixels */
-   private ImageBuffer blueImageBuffer;
    /** The image created from red pixels */
    private Image fromRed;
    /** The image create from blue pixels */
@@ -76,10 +72,12 @@ public class ImageBufferEndianTest extends BasicGame {
           } else
              endian = "no idea";
       
-      redImageBuffer = new ImageBuffer(100,100);
+      /* The buffer filled with red pixels */
+      ImageBuffer redImageBuffer = new ImageBuffer(100, 100);
       fillImageBufferWithColor(redImageBuffer, Color.red, 100, 100);
       
-      blueImageBuffer = new ImageBuffer(100,100);
+      /* The buffer filled with blue pixels */
+      ImageBuffer blueImageBuffer = new ImageBuffer(100, 100);
       fillImageBufferWithColor(blueImageBuffer, Color.blue, 100, 100);
       
       fromRed = redImageBuffer.getImage();

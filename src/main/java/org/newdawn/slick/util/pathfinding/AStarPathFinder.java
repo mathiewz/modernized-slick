@@ -1,10 +1,11 @@
 package org.newdawn.slick.util.pathfinding;
 
+import org.newdawn.slick.util.pathfinding.heuristics.ClosestHeuristic;
+
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-
-import org.newdawn.slick.util.pathfinding.heuristics.ClosestHeuristic;
+import java.util.stream.Collectors;
 
 /**
  * A path finder implementation that uses the AStar heuristic based algorithm
@@ -122,10 +123,8 @@ public class AStarPathFinder implements PathFinder, PathFindingContext {
 			current = getFirstInOpen();
 			distance = current.depth;
 			
-			if (current == nodes[tx][ty]) {
-				if (isValidLocation(mover,lx,ly,tx,ty)) {
-					break;
-				}
+			if (current == nodes[tx][ty] && isValidLocation(mover,lx,ly,tx,ty)) {
+				break;
 			}
 			
 			removeFromOpen(current);
@@ -136,16 +135,8 @@ public class AStarPathFinder implements PathFinder, PathFindingContext {
 			for (int x=-1;x<2;x++) {
 				for (int y=-1;y<2;y++) {
 					// not a neighbour, its the current tile
-					if ((x == 0) && (y == 0)) {
+					if (((x == 0) && (y == 0)) || (!allowDiagMovement && x!=0 && y!=0)) {
 						continue;
-					}
-					
-					// if we're not allowing diaganol movement then only 
-					// one of x or y can be set
-					if (!allowDiagMovement) {
-						if ((x != 0) && (y != 0)) {
-							continue;
-						}
 					}
 					
 					// determine the location of the neighbour and evaluate it
@@ -367,7 +358,7 @@ public class AStarPathFinder implements PathFinder, PathFindingContext {
 	 */
 	private class PriorityList {
 		/** The list of elements */
-		private List list = new LinkedList();
+		private List<Comparable> list = new LinkedList<>();
 		
 		/**
 		 * Retrieve the first element from the list
@@ -390,10 +381,10 @@ public class AStarPathFinder implements PathFinder, PathFindingContext {
 		 * 
 		 * @param o The element to add
 		 */
-		public void add(Object o) {
+		public void add(Comparable o) {
 			// float the new entry 
 			for (int i=0;i<list.size();i++) {
-				if (((Comparable) list.get(i)).compareTo(o) > 0) {
+				if (list.get(i).compareTo(o) > 0) {
 					list.add(i, o);
 					break;
 				}
@@ -401,7 +392,6 @@ public class AStarPathFinder implements PathFinder, PathFindingContext {
 			if (!list.contains(o)) {
 				list.add(o);
 			}
-			//Collections.sort(list);
 		}
 		
 		/**
@@ -433,13 +423,7 @@ public class AStarPathFinder implements PathFinder, PathFindingContext {
 		}
 		
 		public String toString() {
-			String temp = "{";
-			for (int i=0;i<size();i++) {
-				temp += list.get(i).toString()+",";
-			}
-			temp += "}";
-			
-			return temp;
+			return "{" + list.stream().map(Object::toString).collect(Collectors.joining(",")) + "}";
 		}
 	}
 	
@@ -491,9 +475,9 @@ public class AStarPathFinder implements PathFinder, PathFindingContext {
 		/**
 		 * @see Comparable#compareTo(Object)
 		 */
-		public int compareTo(Object other) {
-			Node o = (Node) other;
-			
+		public int compareTo(Object obj) {
+            Node o = (Node) obj;
+
 			float f = heuristic + cost;
 			float of = o.heuristic + o.cost;
 			
@@ -505,8 +489,28 @@ public class AStarPathFinder implements PathFinder, PathFindingContext {
 				return 0;
 			}
 		}
-		
-		/**
+
+		@Override
+		public boolean equals(Object obj){
+		    if(!(obj instanceof Node)){
+		        return false;
+            }
+            Node o = (Node) obj;
+
+            float f = heuristic + cost;
+            float of = o.heuristic + o.cost;
+            return f == of;
+        }
+
+
+        @Override
+        public int hashCode() {
+            int result = (cost != +0.0f ? Float.floatToIntBits(cost) : 0);
+            result = 31 * result + (heuristic != +0.0f ? Float.floatToIntBits(heuristic) : 0);
+            return result;
+        }
+
+        /**
 		 * Indicate whether the node is in the open list
 		 * 
 		 * @param open True if the node is in the open list

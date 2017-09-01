@@ -1,9 +1,9 @@
 package org.newdawn.slick.opengl;
 
+import org.newdawn.slick.util.Log;
+
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-
-import org.newdawn.slick.util.Log;
 
 /**
  * A static utility to create the appropriate image data for a particular reference.
@@ -28,21 +28,19 @@ public class ImageDataFactory {
 	private static void checkProperty() {
 		if (!pngLoaderPropertyChecked) {
 			pngLoaderPropertyChecked = true;
+			PrivilegedAction action = () -> {
+				String val = System.getProperty(PNG_LOADER);
+				if ("false".equalsIgnoreCase(val)) {
+					usePngLoader = false;
+				}
 
+				Log.info("Use Java PNG Loader = " + usePngLoader);
+				return null;
+			};
 			try {
-				AccessController.doPrivileged(new PrivilegedAction() {
-		            public Object run() {
-						String val = System.getProperty(PNG_LOADER);
-						if ("false".equalsIgnoreCase(val)) {
-							usePngLoader = false;
-						}
-						
-						Log.info("Use Java PNG Loader = " + usePngLoader);
-						return null;
-		            }
-				});
-			} catch (Throwable e) {
-				// ignore, security failure - probably an applet
+				AccessController.doPrivileged(action);
+			} catch (Exception e) {
+				Log.error(e);
 			}
 		}
 	}
@@ -54,21 +52,19 @@ public class ImageDataFactory {
 	 * @return The image data that can be used to retrieve the data for that resource
 	 */
 	public static LoadableImageData getImageDataFor(String ref) {
-		LoadableImageData imageData;
 		checkProperty();
 		
-		ref = ref.toLowerCase();
+		String refLowered = ref.toLowerCase();
 		
-        if (ref.endsWith(".tga")) {
+        if (refLowered.endsWith(".tga")) {
         	return new TGAImageData();
         } 
-        if (ref.endsWith(".png")) {
+        if (refLowered.endsWith(".png")) {
         	CompositeImageData data = new CompositeImageData();
         	if (usePngLoader) {
         		data.add(new PNGImageData());
         	}
         	data.add(new ImageIOImageData());
-        	
         	return data;
         } 
         

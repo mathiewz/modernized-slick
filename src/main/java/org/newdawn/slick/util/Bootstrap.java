@@ -10,6 +10,10 @@ import org.newdawn.slick.Game;
  */
 public class Bootstrap {
 
+	private Bootstrap(){
+		//To avoid instanciation
+	}
+
 	/**
 	 * Start the game as an application
 	 * 
@@ -23,7 +27,7 @@ public class Bootstrap {
 			AppGameContainer container = new AppGameContainer(game, width, height, fullscreen);
 			container.start();
 		} catch (Exception e) {
-			e.printStackTrace();
+			Log.error(e);
 		}
 	}
 }

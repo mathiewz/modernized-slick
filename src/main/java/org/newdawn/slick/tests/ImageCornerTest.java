@@ -81,7 +81,6 @@ public class ImageCornerTest extends BasicGame {
 	 * @param argv The arguments to pass into the test
 	 */
 	public static void main(String[] argv) {
-		boolean sharedContextTest = false;
 		
 		try {
 			AppGameContainer container = new AppGameContainer(new ImageCornerTest());

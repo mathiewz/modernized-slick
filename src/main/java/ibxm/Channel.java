@@ -18,8 +18,8 @@ public class Channel {
 	private int effect_tick, trigger_tick, fade_out_volume, random_seed;
 
 	private int log_2_sampling_rate, log_2_c2_rate;
-	private static final int LOG_2_29024 = LogTable.log_2( 29024 );
-	private static final int LOG_2_1712 = LogTable.log_2( 1712 );
+	private static final int LOG_2_29024 = LogTable.log2( 29024 );
+	private static final int LOG_2_1712 = LogTable.log2( 1712 );
 
 	private static final int[] sine_table = new int[] {
 		  0, 24 ,  49,  74,  97, 120, 141, 161, 180, 197, 212, 224, 235, 244, 250, 253,
@@ -32,7 +32,7 @@ public class Channel {
 		linear_periods = module.linear_periods;
 		fast_volume_slides = module.fast_volume_slides;
 		current_note = new int[ 5 ];
-		log_2_sampling_rate = LogTable.log_2( sampling_rate );
+		log_2_sampling_rate = LogTable.log2( sampling_rate );
 	}
 	
 	public void reset() {
@@ -769,7 +769,7 @@ public class Channel {
 			if( sample.set_panning ) {
 				set_panning( sample.panning );
 			}
-			log_2_c2_rate = LogTable.log_2( sample.c2_rate );
+			log_2_c2_rate = LogTable.log2( sample.c2_rate );
 			set_envelope_tick( 0 );
 			fade_out_volume = 32768;
 			key_on = true;
@@ -871,7 +871,7 @@ public class Channel {
 			period_out = 7744 - key * 64;
 		} else {
 			log_2_period = LOG_2_29024 - ( key << IBXM.FP_SHIFT ) / 12;
-			period_out = LogTable.raise_2( log_2_period ) >> IBXM.FP_SHIFT;
+			period_out = LogTable.raise2( log_2_period ) >> IBXM.FP_SHIFT;
 		}
 		return period_out;
 	}
@@ -933,10 +933,10 @@ public class Channel {
 		if( linear_periods ) {
 			log_2_freq = log_2_c2_rate + ( 4608 - vibrato_period << IBXM.FP_SHIFT ) / 768;
 		} else {
-			log_2_freq = log_2_c2_rate + LOG_2_1712 - LogTable.log_2( vibrato_period );
+			log_2_freq = log_2_c2_rate + LOG_2_1712 - LogTable.log2( vibrato_period );
 		}
 		log_2_freq += ( ( ( key_add << 7 ) + sample.fine_tune ) << IBXM.FP_SHIFT ) / 1536;
-		step = LogTable.raise_2( log_2_freq - log_2_sampling_rate );
+		step = LogTable.raise2( log_2_freq - log_2_sampling_rate );
 	}
 }
 

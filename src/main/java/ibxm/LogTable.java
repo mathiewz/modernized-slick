@@ -53,7 +53,7 @@ public class LogTable {
 		Calculate log-base-2 of x (non-fixed-point).
 		A fixed point value is returned.
 	*/
-	public static int log_2( int x ) {
+	public static int log2(int x ) {
 		int shift;
 		/* Scale x to range 1.0 <= x < 2.0 */
 		shift = IBXM.FP_SHIFT;
@@ -65,26 +65,24 @@ public class LogTable {
 			x >>= 1;
 			shift++;
 		}
-		return ( IBXM.FP_ONE * shift ) + eval_table( log_2_table, x - IBXM.FP_ONE );
+		return ( IBXM.FP_ONE * shift ) + evalTable( log_2_table, x - IBXM.FP_ONE );
 	}
 
 	/*
 		Raise 2 to the power x (fixed point).
 		A fixed point value is returned.
 	*/
-	public static int raise_2( int x ) {
+	public static int raise2(int x ) {
 		int y;
-		y = eval_table( exp_2_table, x & IBXM.FP_MASK ) << IBXM.FP_SHIFT;
+		y = evalTable( exp_2_table, x & IBXM.FP_MASK ) << IBXM.FP_SHIFT;
 		return y >> IBXM.FP_SHIFT - ( x >> IBXM.FP_SHIFT );
 	}
 
-	private static int eval_table( int[] table, int x ) {
-		int table_idx, table_frac, c, m, y;
-		table_idx = x >> INTERP_SHIFT;
-		table_frac = x & INTERP_MASK;
-		c = table[ table_idx ];
-		m = table[ table_idx + 1 ] - c;
-		y = ( m * table_frac >> INTERP_SHIFT ) + c;
+	private static int evalTable(int[] table, int x ) {
+        int tableIdx = x >> INTERP_SHIFT;
+        int c = table[ tableIdx ];
+        int m = table[ tableIdx + 1 ] - c;
+        int y = ( m * (x & INTERP_MASK) >> INTERP_SHIFT ) + c;
 		return y >> 15 - IBXM.FP_SHIFT;
 	}
 }
