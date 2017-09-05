@@ -60,7 +60,7 @@ public class FastTracker2 {
 	}
 
 	private static Pattern read_xm_pattern( DataInput data_input, int num_channels ) throws IOException {
-		int pattern_header_length, packing_type, num_rows, pattern_data_length;
+		int pattern_header_length, packing_type, pattern_data_length;
 		byte[] structure_header, pattern_header, pattern_data;
 		Pattern pattern;
 		structure_header = new byte[ 4 ];

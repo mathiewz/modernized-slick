@@ -31,7 +31,7 @@ public class ImmediateModeOGLRenderer implements SGL {
 		this.width = width;
 		this.height = height;
 		
-		String extensions = GL11.glGetString(GL11.GL_EXTENSIONS);
+		GL11.glGetString(GL11.GL_EXTENSIONS);
 		
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glShadeModel(GL11.GL_SMOOTH);        

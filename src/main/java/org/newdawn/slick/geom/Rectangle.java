@@ -184,7 +184,7 @@ public class Rectangle extends Shape {
 	protected void createPoints() {
         float useWidth = width ;
         float useHeight = height;
-        points = new float[8];
+        points = new Float[8];
         
         points[0] = x;
         points[1] = y;
@@ -258,7 +258,7 @@ public class Rectangle extends Shape {
         
         Polygon resultPolygon = new Polygon();
         
-        float result[] = new float[points.length];
+        Float result[] = new Float[points.length];
         transform.transform(points, 0, result, 0, points.length / 2);
         resultPolygon.points = result;
         resultPolygon.findCenter();

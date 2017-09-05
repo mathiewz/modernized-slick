@@ -13,7 +13,7 @@ import java.util.ArrayList;
  */
 public class NavMesh {
 	/** The list of spaces that build up this navigation mesh */
-	private ArrayList spaces = new ArrayList();
+	private ArrayList<Space> spaces = new ArrayList<>();
 	
 	/**
 	 * Create a new empty mesh
@@ -27,7 +27,7 @@ public class NavMesh {
 	 * 
 	 * @param spaces The spaces included in the mesh
 	 */
-	public NavMesh(ArrayList spaces) {
+	public NavMesh(ArrayList<Space> spaces) {
 		this.spaces.addAll(spaces);
 	}
 	

@@ -13,7 +13,7 @@ import org.newdawn.slick.util.Log;
  */
 public class Animation implements Renderable {
 	/** The list of frames to render in this animation */
-	private ArrayList frames = new ArrayList();
+	private ArrayList<Frame> frames = new ArrayList<>();
 	/** The frame currently being displayed */
 	private int currentFrame = -1;
 	/** The time the next frame change should take place */

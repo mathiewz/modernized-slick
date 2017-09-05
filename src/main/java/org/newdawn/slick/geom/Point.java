@@ -28,7 +28,7 @@ public class Point extends Shape
      */
     public Shape transform(Transform transform) 
     { 
-        float result[] = new float[points.length]; 
+        Float result[] = new Float[points.length]; 
         transform.transform(points, 0, result, 0, points.length / 2); 
         
         return new Point(points[0], points[1]); 
@@ -39,7 +39,7 @@ public class Point extends Shape
      */
     protected void createPoints() 
     { 
-        points = new float[2]; 
+        points = new Float[2]; 
         points[0] = getX(); 
         points[1] = getY(); 
         

@@ -10,7 +10,6 @@ import org.newdawn.slick.opengl.ImageDataFactory;
 import org.newdawn.slick.opengl.LoadableImageData;
 import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.opengl.renderer.SGL;
-import org.newdawn.slick.opengl.renderer.Renderer;
 import org.newdawn.slick.util.OperationNotSupportedException;
 import org.newdawn.slick.util.ResourceLoader;
 
@@ -30,8 +29,6 @@ import org.newdawn.slick.util.ResourceLoader;
  * @author kevin
  */
 public class BigImage extends Image {
-	/** The renderer to use for all GL operations */
-	protected static SGL GL = Renderer.get();
 	
 	/**
 	 * Get the maximum size of an image supported by the underlying
@@ -211,8 +208,6 @@ public class BigImage extends Image {
 		
 		for (int x=0;x<xcount;x++) {
 			for (int y=0;y<ycount;y++) {
-				int finalX = ((x+1) * tileSize);
-				int finalY = ((y+1) * tileSize);
 				final int imageWidth = Math.min((realWidth - (x*tileSize)), tileSize); 
 				final int imageHeight = Math.min((realHeight - (y*tileSize)), tileSize);
 				
@@ -385,9 +380,6 @@ public class BigImage extends Image {
 	 * @see org.newdawn.slick.Image#drawEmbedded(float, float, float, float)
 	 */
 	public void drawEmbedded(float x, float y, float width, float height) {
-		float sx = width / realWidth;
-		float sy = height / realHeight;
-
 		float xp = 0;
 		float yp = 0;
 		

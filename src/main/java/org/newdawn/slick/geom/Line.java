@@ -14,28 +14,10 @@ public class Line extends Shape {
 	private Vector2f end;
 	/** The vector between the two points */
 	private Vector2f vec;
-	/** The length of the line squared */
-	private float lenSquared;
-
 	/** Temporary storage - declared globally to reduce GC */
 	private Vector2f loc = new Vector2f(0, 0);
 	/** Temporary storage - declared globally to reduce GC */
-	private Vector2f v = new Vector2f(0, 0);
-	/** Temporary storage - declared globally to reduce GC */
-	private Vector2f v2 = new Vector2f(0, 0);
-	/** Temporary storage - declared globally to reduce GC */
-	private Vector2f proj = new Vector2f(0, 0);
-
-	/** Temporary storage - declared globally to reduce GC */
 	private Vector2f closest = new Vector2f(0, 0);
-	/** Temporary storage - declared globally to reduce GC */
-	private Vector2f other = new Vector2f(0, 0);
-
-	/** True if this line blocks on the outer edge */
-	private boolean outerEdge = true;
-	/** True if this line blocks on the inner edge */
-	private boolean innerEdge = true;
-
 	/**
 	 * Create a new line based on the origin and a single point
 	 * 
@@ -197,7 +179,7 @@ public class Line extends Shape {
 		vec = new Vector2f(end);
 		vec.sub(start);
 
-		lenSquared = vec.lengthSquared();
+		vec.lengthSquared();
 	}
 
 	/**
@@ -219,8 +201,6 @@ public class Line extends Shape {
 		float dx = (ex - sx);
 		float dy = (ey - sy);
 		vec.set(dx,dy);
-		
-		lenSquared = (dx * dx) + (dy * dy);
 	}
 
 	/**
@@ -443,7 +423,7 @@ public class Line extends Shape {
 	 * @see org.newdawn.slick.geom.Shape#createPoints()
 	 */
 	protected void createPoints() {
-		points = new float[4];
+		points = new Float[4];
 		points[0] = getX1();
 		points[1] = getY1();
 		points[2] = getX2();
@@ -454,7 +434,7 @@ public class Line extends Shape {
 	 * @see org.newdawn.slick.geom.Shape#transform(org.newdawn.slick.geom.Transform)
 	 */
 	public Shape transform(Transform transform) {
-		float[] temp = new float[4];
+		Float[] temp = new Float[4];
 		createPoints();
 		transform.transform(points, 0, temp, 0, 2);
 

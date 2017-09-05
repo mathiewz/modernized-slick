@@ -29,7 +29,7 @@ public final class ShapeRenderer {
         Texture t = TextureImpl.getLastBind();
         TextureImpl.bindNone();
         
-        float points[] = shape.getPoints();
+        Float points[] = shape.getPoints();
         
         LSR.start();
         for(int i=0;i<points.length;i+=2) {
@@ -57,12 +57,11 @@ public final class ShapeRenderer {
      * @param fill The fill to apply
      */
     public static final void draw(Shape shape, ShapeFill fill) {
-        float points[] = shape.getPoints();
+        Float points[] = shape.getPoints();
         
         Texture t = TextureImpl.getLastBind();
         TextureImpl.bindNone();
 
-        float center[] = shape.getCenter();
         GL.glBegin(SGL.GL_LINE_STRIP);
         for(int i=0;i<points.length;i+=2) {
             fill.colorAt(shape, points[i], points[i + 1]).bind();
@@ -204,7 +203,7 @@ public final class ShapeRenderer {
 			}
     	});
     	
-        float points[] = shape.getPoints();
+        shape.getPoints();
         
         if (t == null) {
         	TextureImpl.bindNone();
@@ -228,15 +227,15 @@ public final class ShapeRenderer {
     		return;
     	}
     	
-        float points[] = shape.getPoints();
+        shape.getPoints();
         
         Texture t = TextureImpl.getLastBind();
         image.getTexture().bind();
         
-        final float minX = shape.getX();
-        final float minY = shape.getY();
-        final float maxX = shape.getMaxX() - minX;
-        final float maxY = shape.getMaxY() - minY;
+        shape.getX();
+        shape.getY();
+        shape.getMaxX();
+        shape.getMaxY();
 
         fill(shape, new PointCallback() {
 			public float[] preRenderPoint(Shape shape, float x, float y) {
@@ -279,7 +278,6 @@ public final class ShapeRenderer {
         Texture t = TextureImpl.getLastBind();
         TextureImpl.bindNone();
 
-        final float center[] = shape.getCenter();
         fill(shape, new PointCallback() {
 			public float[] preRenderPoint(Shape shape, float x, float y) {
 	            fill.colorAt(shape, x, y).bind();
@@ -355,7 +353,6 @@ public final class ShapeRenderer {
 
         image.getTexture().bind();
 
-        final float center[] = shape.getCenter();
         fill(shape, new PointCallback() {
 			public float[] preRenderPoint(Shape shape, float x, float y) {
 				Vector2f tex = gen.getCoordFor(x, y);

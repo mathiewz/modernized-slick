@@ -150,15 +150,6 @@ public class AppletGameContainer extends Applet {
    }
 
    /**
-    * Get the GameContainer providing this applet
-    *
-    * @return The game container providing this applet
-    */
-   public GameContainer getContainer() {
-      return container;
-   }
-
-   /**
     * Create a new panel to display the GL context
     *
     * @author kevin

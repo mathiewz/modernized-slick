@@ -114,7 +114,7 @@ public class Graphics {
 	private float lineWidth = 1;
 
 	/** The matrix stack */
-	private ArrayList stack = new ArrayList();
+	private ArrayList<FloatBuffer> stack = new ArrayList<>();
 	/** The index into the stack we're using */
 	private int stackIndex;
 
@@ -135,8 +135,8 @@ public class Graphics {
 	 */
 	public Graphics(int width, int height) {
 		if (DEFAULT_FONT == null) {
-			AccessController.doPrivileged(new PrivilegedAction() {
-				public Object run() {
+			AccessController.doPrivileged(new PrivilegedAction<Void>() {
+				public Void run() {
 					try {
 						DEFAULT_FONT = new AngelCodeFont(
 								"org/newdawn/slick/data/defaultfont.fnt",
@@ -683,8 +683,6 @@ public class Graphics {
 	 *            The height of the rectangle to draw
 	 */
 	public void drawRect(float x1, float y1, float width, float height) {
-		float lineWidth = getLineWidth();
-		
 		drawLine(x1,y1,x1+width,y1);
 		drawLine(x1+width,y1,x1+width,y1+height);
 		drawLine(x1+width,y1+height,x1,y1+height);

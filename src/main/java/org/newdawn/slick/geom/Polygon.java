@@ -1,7 +1,6 @@
 package org.newdawn.slick.geom;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  * A polygon implementation meeting the <code>Shape</code> contract. 
@@ -21,10 +20,10 @@ public class Polygon extends Shape {
      * 
      * @param points An array of points in x, y order.
      */
-    public Polygon(float points[]) {
+    public Polygon(Float points[]) {
         int length = points.length;
         
-        this.points = new float[length];
+        this.points = new Float[length];
         maxX = -Float.MIN_VALUE;
         maxY = -Float.MIN_VALUE;
         minX = Float.MAX_VALUE;
@@ -67,7 +66,7 @@ public class Polygon extends Shape {
      *
      */
     public Polygon(){
-        points = new float[0];
+        points = new Float[0];
         maxX = -Float.MIN_VALUE;
         maxY = -Float.MIN_VALUE;
         minX = Float.MAX_VALUE;
@@ -94,14 +93,14 @@ public class Polygon extends Shape {
     		return;
     	}
     	
-        ArrayList tempPoints = new ArrayList();
+        ArrayList<Float> tempPoints = new ArrayList<>();
         for(int i=0;i<points.length;i++) {
             tempPoints.add(new Float(points[i]));
         }
         tempPoints.add(new Float(x));
         tempPoints.add(new Float(y));
         int length = tempPoints.size();
-        points = new float[length];
+        points = new Float[length];
         for(int i=0;i<length;i++) {
             points[i] = ((Float)tempPoints.get(i)).floatValue();
         }
@@ -136,7 +135,7 @@ public class Polygon extends Shape {
         
         Polygon resultPolygon = new Polygon();
         
-        float result[] = new float[points.length];
+        Float result[] = new Float[points.length];
         transform.transform(points, 0, result, 0, points.length / 2);
         resultPolygon.points = result;
         resultPolygon.findCenter();
@@ -192,7 +191,7 @@ public class Polygon extends Shape {
 	 * @return A copy of this polygon
 	 */
 	public Polygon copy() {
-		float[] copyPoints = new float[points.length];
+		Float[] copyPoints = new Float[points.length];
 		System.arraycopy(points, 0, copyPoints, 0, copyPoints.length);
 		
 		return new Polygon(copyPoints);

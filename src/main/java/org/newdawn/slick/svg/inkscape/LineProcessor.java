@@ -94,8 +94,8 @@ public class LineProcessor implements ElementProcessor {
 			}
 		}
 		
-		float[] in = new float[] {x1,y1,x2,y2};
-		float[] out = new float[4];
+		Float[] in = new Float[] {x1,y1,x2,y2};
+		Float[] out = new Float[4];
 		
 		transform.transform(in,0,out,0,2);
 		Line line = new Line(out[0],out[1],out[2],out[3]);

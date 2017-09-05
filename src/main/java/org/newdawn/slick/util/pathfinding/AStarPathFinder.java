@@ -358,7 +358,7 @@ public class AStarPathFinder implements PathFinder, PathFindingContext {
 	 */
 	private class PriorityList {
 		/** The list of elements */
-		private List<Comparable> list = new LinkedList<>();
+		private List<Comparable<Node>> list = new LinkedList<>();
 		
 		/**
 		 * Retrieve the first element from the list
@@ -381,7 +381,7 @@ public class AStarPathFinder implements PathFinder, PathFindingContext {
 		 * 
 		 * @param o The element to add
 		 */
-		public void add(Comparable o) {
+		public void add(Node o) {
 			// float the new entry 
 			for (int i=0;i<list.size();i++) {
 				if (list.get(i).compareTo(o) > 0) {
@@ -412,16 +412,6 @@ public class AStarPathFinder implements PathFinder, PathFindingContext {
 			return list.size();
 		}
 		
-		/**
-		 * Check if an element is in the list
-		 * 
-		 * @param o The element to search for
-		 * @return True if the element is in the list
-		 */
-		public boolean contains(Object o) {
-			return list.contains(o);
-		}
-		
 		public String toString() {
 			return "{" + list.stream().map(Object::toString).collect(Collectors.joining(",")) + "}";
 		}
@@ -430,7 +420,7 @@ public class AStarPathFinder implements PathFinder, PathFindingContext {
 	/**
 	 * A single node in the search graph
 	 */
-	private class Node implements Comparable {
+	private class Node implements Comparable<Node> {
 		/** The x coordinate of the node */
 		private int x;
 		/** The y coordinate of the node */
@@ -475,8 +465,7 @@ public class AStarPathFinder implements PathFinder, PathFindingContext {
 		/**
 		 * @see Comparable#compareTo(Object)
 		 */
-		public int compareTo(Object obj) {
-            Node o = (Node) obj;
+		public int compareTo(Node o) {
 
 			float f = heuristic + cost;
 			float of = o.heuristic + o.cost;

@@ -76,13 +76,8 @@ public class Image implements Renderable {
     protected Color[] corners;
     /** The OpenGL max filter */
     private int filter = SGL.GL_LINEAR;
-    
-    /** True if the image should be flipped vertically */
-    private boolean flipped;
-    /** The transparent colour set if any */
-    private Color transparent;
-    
-	/**
+
+    /**
 	 * Create a texture as a copy of another
 	 * 
 	 * @param other The other texture to copy
@@ -177,8 +172,6 @@ public class Image implements Renderable {
 	 */
 	public Image(String ref, boolean flipped, int f, Color transparent) throws SlickException {
 		this.filter = f == FILTER_LINEAR ? SGL.GL_LINEAR : SGL.GL_NEAREST;
-		this.transparent = transparent;
-		this.flipped = flipped;
 		
 		try {
 			this.ref = ref;

@@ -26,7 +26,8 @@ import org.newdawn.slick.util.Log;
  */
 public class TransitionTest extends StateBasedGame {
 	/** The transitions under test */
-	private Class[][] transitions = new Class[][] {
+	@SuppressWarnings("unchecked")
+	private Class<? extends Transition>[][] transitions = new Class[][] {
 			{null, VerticalSplitTransition.class},
 			{FadeOutTransition.class, FadeInTransition.class},
 			{null, RotateTransition.class},

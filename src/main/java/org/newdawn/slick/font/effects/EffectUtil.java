@@ -154,16 +154,18 @@ public class EffectUtil {
 	 * @param description The description of the value
 	 * @return The value selected by the user
 	 */
-	static public Value optionValue (String name, final String currentValue, final String[][] options, final String description) {
-		return new DefaultValue(name, currentValue.toString()) {
+	public static Value optionValue (String name, final String currentValue, final String[][] options, final String description) {
+		return new DefaultValue(name, currentValue) {
 			public void showDialog () {
 				int selectedIndex = -1;
-				DefaultComboBoxModel model = new DefaultComboBoxModel();
+				DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>();
 				for (int i = 0; i < options.length; i++) {
 					model.addElement(options[i][0]);
-					if (getValue(i).equals(currentValue)) selectedIndex = i;
+					if (getValue(i).equals(currentValue)) {
+						selectedIndex = i;
+					}
 				}
-				JComboBox comboBox = new JComboBox(model);
+				JComboBox<String> comboBox = new JComboBox<>(model);
 				comboBox.setSelectedIndex(selectedIndex);
 				if (showValueDialog(comboBox, description)) value = getValue(comboBox.getSelectedIndex());
 			}

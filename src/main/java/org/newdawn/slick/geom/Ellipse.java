@@ -117,7 +117,7 @@ public class Ellipse extends Shape {
      *
      */
     protected void createPoints() {
-        ArrayList tempPoints = new ArrayList();
+        ArrayList<Float> tempPoints = new ArrayList<>();
 
         maxX = -Float.MIN_VALUE;
         maxY = -Float.MIN_VALUE;
@@ -156,7 +156,7 @@ public class Ellipse extends Shape {
             tempPoints.add(new Float(newX));
             tempPoints.add(new Float(newY));
         }
-        points = new float[tempPoints.size()];
+        points = new Float[tempPoints.size()];
         for(int i=0;i<points.length;i++) {
             points[i] = ((Float)tempPoints.get(i)).floatValue();
         }
@@ -170,7 +170,7 @@ public class Ellipse extends Shape {
         
         Polygon resultPolygon = new Polygon();
         
-        float result[] = new float[points.length];
+        Float result[] = new Float[points.length];
         transform.transform(points, 0, result, 0, points.length / 2);
         resultPolygon.points = result;
         resultPolygon.checkPoints();

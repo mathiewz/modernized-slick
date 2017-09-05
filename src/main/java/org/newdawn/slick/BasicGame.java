@@ -54,11 +54,6 @@ public abstract class BasicGame implements Game, InputListener {
 	}
 
 	/**
-	 * @see org.newdawn.slick.Game#init(org.newdawn.slick.GameContainer)
-	 */
-	public abstract void init(GameContainer container) throws SlickException;
-
-	/**
 	 * @see org.newdawn.slick.InputListener#keyPressed(int, char)
 	 */
 	public void keyPressed(int key, char c) {
@@ -170,11 +165,6 @@ public abstract class BasicGame implements Game, InputListener {
 	 */
 	public void mouseReleased(int button, int x, int y) {
 	}
-
-	/**
-	 * @see org.newdawn.slick.Game#update(org.newdawn.slick.GameContainer, int)
-	 */
-	public abstract void update(GameContainer container, int delta) throws SlickException;
 
 	/**
 	 * @see org.newdawn.slick.InputListener#mouseWheelMoved(int)

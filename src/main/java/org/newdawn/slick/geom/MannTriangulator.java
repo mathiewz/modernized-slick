@@ -49,7 +49,7 @@ public class MannTriangulator implements Triangulator {
 	/** The next available point */
 	private Point nextFreePoint;
 	/** The list of triangles created (or rather points in triangles, 3xn) */
-	private List triangles = new ArrayList();
+	private List<Vector2f> triangles = new ArrayList<>();
 	
 	/** Creates a new instance of Triangulator0 */
 	public MannTriangulator() {
@@ -307,8 +307,6 @@ public class MannTriangulator implements Triangulator {
 		protected double ny;
 		/** The angle at this point in the path */
 		protected double angle;
-		/** The distance of this point from */
-		protected double dist;
 
 		/**
 		 * Create a new point
@@ -403,29 +401,6 @@ public class MannTriangulator implements Triangulator {
 			} else {
 				angle = nx * dx2 + ny * dy2;
 			}
-		}
-
-		/**
-		 * Get the angle of this point to another
-		 * 
-		 * @param p The other point
-		 * @return The angle between this point and another
-		 */
-		public double getAngle(Point p) {
-			double dx = p.pt.x - pt.x;
-			double dy = p.pt.y - pt.y;
-			double dlen = hypot(dx, dy);
-
-			return (nx * dx + ny * dy) / dlen;
-		}
-
-		/**
-		 * Check if this point is convave
-		 * 
-		 * @return True if this point remains concave
-		 */
-		public boolean isConcave() {
-			return angle < 0;
 		}
 
 		/**

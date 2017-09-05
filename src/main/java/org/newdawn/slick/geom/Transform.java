@@ -89,9 +89,9 @@ public class Transform {
      * @param numberOfPoints Number of points to be transformed   
      * @throws ArrayIndexOutOfBoundsException if sourceOffset + numberOfPoints * 2 > source.length or the same operation on the destination array   
      */   
-    public void transform(float source[], int sourceOffset, float destination[], int destOffset, int numberOfPoints) {   
+    public void transform(Float source[], int sourceOffset, Float destination[], int destOffset, int numberOfPoints) {   
         //TODO performance can be improved by removing the safety to the destination array   
-        float result[] = source == destination ? new float[numberOfPoints * 2] : destination;
+        Float result[] = source == destination ? new Float[numberOfPoints * 2] : destination;
            
         for(int i=0;i<numberOfPoints * 2;i+=2) {   
             for(int j=0;j<6;j+=3) {   
@@ -147,11 +147,9 @@ public class Transform {
      * @return This Transform in human readable format.   
      */   
     public String toString() {   
-        String result = "Transform[[" + matrixPosition[0] + "," + matrixPosition[1] + "," + matrixPosition[2] +    
+        return "Transform[[" + matrixPosition[0] + "," + matrixPosition[1] + "," + matrixPosition[2] +    
         "][" + matrixPosition[3] + "," + matrixPosition[4] + "," + matrixPosition[5] + 
         "][" + matrixPosition[6] + "," + matrixPosition[7] + "," + matrixPosition[8] + "]]";   
-           
-        return result.toString();   
     }   
    
     /**   
@@ -220,8 +218,8 @@ public class Transform {
      * @return The resulting point transformed by this matrix
      */
     public Vector2f transform(Vector2f pt) {
-    	float[] in = new float[] {pt.x, pt.y};
-    	float[] out = new float[2];
+    	Float[] in = new Float[] {pt.x, pt.y};
+    	Float[] out = new Float[2];
     	
     	transform(in, 0, out, 0, 1);
     	

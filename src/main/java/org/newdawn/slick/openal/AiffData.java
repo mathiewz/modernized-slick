@@ -1,34 +1,3 @@
-/* 
- * Copyright (c) 2002-2004 LWJGL Project
- * All rights reserved.
- * 
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are 
- * met:
- * 
- * * Redistributions of source code must retain the above copyright 
- *   notice, this list of conditions and the following disclaimer.
- *
- * * Redistributions in binary form must reproduce the above copyright
- *   notice, this list of conditions and the following disclaimer in the
- *   documentation and/or other materials provided with the distribution.
- *
- * * Neither the name of 'LWJGL' nor the names of 
- *   its contributors may be used to endorse or promote products derived 
- *   from this software without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
- * TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
- * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR 
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
- * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
- * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING 
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
 package org.newdawn.slick.openal;
 
 import java.io.BufferedInputStream;
@@ -46,6 +15,7 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.AudioFormat.Encoding;
 
 import org.lwjgl.openal.AL10;
+import org.newdawn.slick.util.Log;
 
 /**
  *
@@ -141,7 +111,7 @@ public class AiffData {
 				AudioSystem.getAudioInputStream(
 					new BufferedInputStream(new ByteArrayInputStream(buffer))));
 		} catch (Exception e) {
-			e.printStackTrace();
+			Log.error(e);
 			return null;
 		}
 	}
@@ -209,7 +179,8 @@ public class AiffData {
 				* (int) ais.getFrameLength()
 				* audioformat.getSampleSizeInBits()
 				/ 8];
-		int read = 0, total = 0;
+		int read = 0;
+        int total = 0;
 		try {
 			while ((read = ais.read(buf, total, buf.length - total)) != -1
 				&& total < buf.length) {
@@ -223,7 +194,7 @@ public class AiffData {
 		ByteBuffer buffer = convertAudioBytes(audioformat, buf, audioformat.getSampleSizeInBits() == 16);
 
 		//create our result
-		AiffData Aiffdata =
+		AiffData aiffdata =
 			new AiffData(buffer, channels, (int) audioformat.getSampleRate());
 
 		//close stream
@@ -232,27 +203,27 @@ public class AiffData {
 		} catch (IOException ioe) {
 		}
 
-		return Aiffdata;
+		return aiffdata;
 	}
 
 	/**
 	 * Convert the audio bytes into the stream
 	 * 
 	 * @param format The audio format being decoded
-	 * @param audio_bytes The audio byts
-	 * @param two_bytes_data True if we using double byte data
+	 * @param audioBytes The audio byts
+	 * @param twoBytesData True if we using double byte data
 	 * @return The byte bufer of data
 	 */
-	private static ByteBuffer convertAudioBytes(AudioFormat format, byte[] audio_bytes, boolean two_bytes_data) {
-		ByteBuffer dest = ByteBuffer.allocateDirect(audio_bytes.length);
+	private static ByteBuffer convertAudioBytes(AudioFormat format, byte[] audioBytes, boolean twoBytesData) {
+		ByteBuffer dest = ByteBuffer.allocateDirect(audioBytes.length);
 		dest.order(ByteOrder.nativeOrder());
-		ByteBuffer src = ByteBuffer.wrap(audio_bytes);
+		ByteBuffer src = ByteBuffer.wrap(audioBytes);
 		src.order(ByteOrder.BIG_ENDIAN);
-		if (two_bytes_data) {
-			ShortBuffer dest_short = dest.asShortBuffer();
-			ShortBuffer src_short = src.asShortBuffer();
-			while (src_short.hasRemaining())
-				dest_short.put(src_short.get());
+		if (twoBytesData) {
+			ShortBuffer descShort = dest.asShortBuffer();
+			ShortBuffer srcShort = src.asShortBuffer();
+			while (srcShort.hasRemaining())
+				descShort.put(srcShort.get());
 		} else {
 			while (src.hasRemaining()) {
 				byte b = src.get();

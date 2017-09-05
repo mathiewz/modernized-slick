@@ -29,8 +29,8 @@ public class DefaultLogSystem implements LogSystem {
 	 * @param e The exception causing the error
 	 */
 	public void error(Throwable e) {
-		out.println(new Date()+" ERROR:" +e.getMessage());
-		e.printStackTrace(out);
+		System.err.println(new Date()+" ERROR:" +e.getMessage());
+		e.printStackTrace(System.err);
 	}
 
 	/**

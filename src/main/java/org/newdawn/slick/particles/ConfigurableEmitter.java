@@ -70,7 +70,7 @@ public class ConfigurableEmitter implements ParticleEmitter {
 	 * 
 	 * @see ColorRecord
 	 */
-	public ArrayList colors = new ArrayList();
+	public ArrayList<ColorRecord> colors = new ArrayList<>();
 	/** The starting alpha value */
 	public SimpleValue startAlpha = new SimpleValue(255);
 	/** The ending alpha value */
@@ -150,22 +150,22 @@ public class ConfigurableEmitter implements ParticleEmitter {
 		colors.add(new ColorRecord(0, Color.white));
 		colors.add(new ColorRecord(1, Color.red));
 
-		ArrayList curve = new ArrayList();
+		ArrayList<Vector2f> curve = new ArrayList<>();
 		curve.add(new Vector2f(0.0f, 0.0f));
 		curve.add(new Vector2f(1.0f, 255.0f));
 		alpha = new LinearInterpolator(curve, 0, 255);
 
-		curve = new ArrayList();
+		curve = new ArrayList<>();
 		curve.add(new Vector2f(0.0f, 0.0f));
 		curve.add(new Vector2f(1.0f, 255.0f));
 		size = new LinearInterpolator(curve, 0, 255);
 
-		curve = new ArrayList();
+		curve = new ArrayList<>();
 		curve.add(new Vector2f(0.0f, 0.0f));
 		curve.add(new Vector2f(1.0f, 1.0f));
 		velocity = new LinearInterpolator(curve, 0, 1);
 
-		curve = new ArrayList();
+		curve = new ArrayList<>();
 		curve.add(new Vector2f(0.0f, 0.0f));
 		curve.add(new Vector2f(1.0f, 1.0f));
 		scaleY = new LinearInterpolator(curve, 0, 1);
@@ -541,8 +541,6 @@ public class ConfigurableEmitter implements ParticleEmitter {
 	public class SimpleValue implements Value {
 		/** The value configured */
 		private float value;
-		/** The next value */
-		private float next;
 
 		/**
 		 * Create a new configurable new value
@@ -629,7 +627,7 @@ public class ConfigurableEmitter implements ParticleEmitter {
 	 */
 	public class LinearInterpolator implements Value {
 		/** The list of points to interpolate between */
-		private ArrayList curve;
+		private ArrayList<Vector2f> curve;
 		/** True if this interpolation value is active */
 		private boolean active;
 		/** The minimum value in the data set */
@@ -644,7 +642,7 @@ public class ConfigurableEmitter implements ParticleEmitter {
 		 * @param min The minimum value in the dataset
 		 * @param max The maximum value possible in the dataset
 		 */
-		public LinearInterpolator(ArrayList curve, int min, int max) {
+		public LinearInterpolator(ArrayList<Vector2f> curve, int min, int max) {
 			this.curve = curve;
 			this.min = min;
 			this.max = max;
@@ -656,7 +654,7 @@ public class ConfigurableEmitter implements ParticleEmitter {
 		 * 
 		 * @param curve The list of data points to interpolate between
 		 */
-		public void setCurve(ArrayList curve) {
+		public void setCurve(ArrayList<Vector2f> curve) {
 			this.curve = curve;
 		}
 
@@ -665,7 +663,7 @@ public class ConfigurableEmitter implements ParticleEmitter {
 		 * 
 		 * @return A list of Vector2f of the data points to interpolate between
 		 */
-		public ArrayList getCurve() {
+		public ArrayList<Vector2f> getCurve() {
 			return curve;
 		}
 

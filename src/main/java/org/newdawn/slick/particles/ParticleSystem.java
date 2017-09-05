@@ -37,7 +37,7 @@ public class ParticleSystem {
 	private static final int DEFAULT_PARTICLES = 100;
 
 	/** List of emitters to be removed */
-	private ArrayList removeMe = new ArrayList();
+	private ArrayList<ParticleEmitter> removeMe = new ArrayList<>();
 	
 	/**
 	 * Set the path from which images should be loaded
@@ -59,7 +59,7 @@ public class ParticleSystem {
 		/** The particles being rendered and maintained */
 		public Particle[] particles;
 		/** The list of particles left to be used, if this size() == 0 then the particle engine was too small for the effect */
-		public ArrayList available;
+		public ArrayList<Particle> available;
 		
 		/**
 		 * Create a new particle pool contiaining a set of particles
@@ -70,7 +70,7 @@ public class ParticleSystem {
 		public ParticlePool( ParticleSystem system, int maxParticles )
 		{
 			particles = new Particle[ maxParticles ];
-			available = new ArrayList();
+			available = new ArrayList<>();
 			
 			for( int i=0; i<particles.length; i++ )
 			{
@@ -101,12 +101,12 @@ public class ParticleSystem {
 	 * each emitter. actually this is used to allow setting an individual blend mode for
 	 * each emitter
 	 */
-	protected HashMap particlesByEmitter = new HashMap();
+	protected HashMap<ParticleEmitter, ParticlePool> particlesByEmitter = new HashMap<>();
 	/** The maximum number of particles allows per emitter */
 	protected int maxParticlesPerEmitter;
 	
 	/** The list of emittered producing and controlling particles */
-	protected ArrayList emitters = new ArrayList();
+	protected ArrayList<ParticleEmitter> emitters = new ArrayList<>();
 	
 	/** The dummy particle to return should no more particles be available */
 	protected Particle dummy;
@@ -154,7 +154,7 @@ public class ParticleSystem {
 	 * Reset the state of the system
 	 */
 	public void reset() {
-		Iterator pools = particlesByEmitter.values().iterator();
+		Iterator<ParticlePool> pools = particlesByEmitter.values().iterator();
 		while (pools.hasNext()) {
 			ParticlePool pool = (ParticlePool) pools.next();
 			pool.reset(this);
@@ -462,8 +462,8 @@ public class ParticleSystem {
 	 * Load the system particle image as the extension permissions
 	 */
 	private void loadSystemParticleImage() {
-		AccessController.doPrivileged(new PrivilegedAction() {
-            public Object run() {
+		AccessController.doPrivileged(new PrivilegedAction<Void>() {
+            public Void run() {
         		try {
         			if (mask != null) {
         				sprite = new Image(defaultImageName, mask);
@@ -490,7 +490,7 @@ public class ParticleSystem {
 		}
 		
 		removeMe.clear();
-		ArrayList emitters = new ArrayList(this.emitters);
+		ArrayList<ParticleEmitter> emitters = new ArrayList<>(this.emitters);
 		for (int i=0;i<emitters.size();i++) {
 			ParticleEmitter emitter = (ParticleEmitter) emitters.get(i);
 			if (emitter.isEnabled()) {
@@ -509,7 +509,7 @@ public class ParticleSystem {
 		
 		if (!particlesByEmitter.isEmpty())
 		{
-			Iterator it= particlesByEmitter.keySet().iterator();
+			Iterator<ParticleEmitter> it= particlesByEmitter.keySet().iterator();
 			while (it.hasNext())
 			{
 				ParticleEmitter emitter = (ParticleEmitter) it.next();
@@ -546,7 +546,7 @@ public class ParticleSystem {
 	public Particle getNewParticle(ParticleEmitter emitter, float life)
 	{
 		ParticlePool pool = (ParticlePool) particlesByEmitter.get(emitter);
-		ArrayList available = pool.available;
+		ArrayList<Particle> available = pool.available;
 		if (available.size() > 0)
 		{
 			Particle p = (Particle) available.remove(available.size()-1);
@@ -581,7 +581,7 @@ public class ParticleSystem {
 	public void releaseAll(ParticleEmitter emitter) {
 		if( !particlesByEmitter.isEmpty() )
 		{
-			Iterator it= particlesByEmitter.values().iterator();
+			Iterator<ParticlePool> it= particlesByEmitter.values().iterator();
 			while( it.hasNext())
 			{
 				ParticlePool pool= (ParticlePool)it.next();

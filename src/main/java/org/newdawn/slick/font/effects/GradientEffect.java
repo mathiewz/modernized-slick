@@ -161,8 +161,8 @@ public class GradientEffect implements ConfigurableEffect {
 	/**
 	 * @see org.newdawn.slick.font.effects.ConfigurableEffect#getValues()
 	 */
-	public List getValues() {
-		List values = new ArrayList();
+	public List<Value> getValues() {
+		List<Value> values = new ArrayList<>();
 		values.add(EffectUtil.colorValue("Top color", topColor));
 		values.add(EffectUtil.colorValue("Bottom color", bottomColor));
 		values.add(EffectUtil.intValue("Offset", offset,
@@ -176,8 +176,8 @@ public class GradientEffect implements ConfigurableEffect {
 	/**
 	 * @see org.newdawn.slick.font.effects.ConfigurableEffect#setValues(java.util.List)
 	 */
-	public void setValues(List values) {
-		for (Iterator iter = values.iterator(); iter.hasNext();) {
+	public void setValues(List<Value> values) {
+		for (Iterator<Value> iter = values.iterator(); iter.hasNext();) {
 			Value value = (Value)iter.next();
 			if (value.getName().equals("Top color")) {
 				topColor = (Color)value.getObject();

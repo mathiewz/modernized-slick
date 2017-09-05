@@ -9,7 +9,7 @@ import java.util.ArrayList;
  */
 public class MorphShape extends Shape {
 	/** The shapes to morph between */
-	private ArrayList shapes = new ArrayList();
+	private ArrayList<Shape> shapes = new ArrayList<>();
 	/** The offset between the shapes */
 	private float offset;
 	
@@ -25,8 +25,8 @@ public class MorphShape extends Shape {
 	 */
 	public MorphShape(Shape base) {
 		shapes.add(base);
-		float[] copy = base.points;
-		this.points = new float[copy.length];
+		Float[] copy = base.points;
+		this.points = new Float[copy.length];
 		
 		current = base;
 		next = base;
@@ -172,8 +172,8 @@ public class MorphShape extends Shape {
 			return;
 		}
 		
-		float[] apoints = current.points;
-		float[] bpoints = next.points;
+		Float[] apoints = current.points;
+		Float[] bpoints = next.points;
 		
 		for (int i=0;i<points.length;i++) {
 			points[i] = apoints[i] * (1 - offset);

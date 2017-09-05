@@ -650,7 +650,7 @@ public class ParticleIO {
 						emitter.scaleY));
 
 		Element color = document.createElement("color");
-		ArrayList list = emitter.colors;
+		ArrayList<ColorRecord> list = emitter.colors;
 		for (int i = 0; i < list.size(); i++) {
 			ColorRecord record = (ColorRecord) list.get(i);
 			Element step = document.createElement("step");
@@ -721,7 +721,7 @@ public class ParticleIO {
 			element.setAttribute("active", ""
 					+ ((LinearInterpolator) value).isActive());
 
-			ArrayList curve = ((LinearInterpolator) value).getCurve();
+			ArrayList<Vector2f> curve = ((LinearInterpolator) value).getCurve();
 			for (int i = 0; i < curve.size(); i++) {
 				Vector2f point = (Vector2f) curve.get(i);
 
@@ -795,7 +795,7 @@ public class ParticleIO {
 
 				NodeList points = element.getElementsByTagName("point");
 
-				ArrayList curve = new ArrayList();
+				ArrayList<Vector2f> curve = new ArrayList<>();
 				for (int i = 0; i < points.getLength(); i++) {
 					Element point = (Element) points.item(i);
 

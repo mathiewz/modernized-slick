@@ -160,7 +160,7 @@ public class RoundedRectangle extends Rectangle {
         float useWidth = width - 1;
         float useHeight = height - 1;
         if(cornerRadius == 0) {
-            points = new float[8];
+            points = new Float[8];
             
             points[0] = x;
             points[1] = y;
@@ -185,7 +185,7 @@ public class RoundedRectangle extends Rectangle {
                 cornerRadius = doubleRadius / 2;
             }
             
-            ArrayList tempPoints = new ArrayList();
+            ArrayList<Float> tempPoints = new ArrayList<>();
             //the outer most set of points for each arc will also ac as the points that start the
             //straight sides, so the straight sides do not have to be added.
             
@@ -221,7 +221,7 @@ public class RoundedRectangle extends Rectangle {
 	        	tempPoints.add(new Float(y+useHeight));
 	        }
             
-            points = new float[tempPoints.size()];
+            points = new Float[tempPoints.size()];
             for(int i=0;i<tempPoints.size();i++) {
                 points[i] = ((Float)tempPoints.get(i)).floatValue();
             }
@@ -242,8 +242,8 @@ public class RoundedRectangle extends Rectangle {
      * @param end The end angle of the arc.
      * @return The points created.
      */
-    private List createPoints(int numberOfSegments, float radius, float cx, float cy, float start, float end) {
-        ArrayList tempPoints = new ArrayList();
+    private List<Float> createPoints(int numberOfSegments, float radius, float cx, float cy, float start, float end) {
+        ArrayList<Float> tempPoints = new ArrayList<>();
 
         int step = 360 / numberOfSegments;
         
@@ -273,7 +273,7 @@ public class RoundedRectangle extends Rectangle {
         
         Polygon resultPolygon = new Polygon();
         
-        float result[] = new float[points.length];
+        Float result[] = new Float[points.length];
         transform.transform(points, 0, result, 0, points.length / 2);
         resultPolygon.points = result;
         resultPolygon.findCenter();

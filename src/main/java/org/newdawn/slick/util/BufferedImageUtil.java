@@ -1,6 +1,5 @@
 package org.newdawn.slick.util;
 
-import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -119,32 +118,15 @@ public class BufferedImageUtil {
 		}
 
 		Renderer.get().glTexImage2D(target, 
-                      0, 
-                      dstPixelFormat, 
-                      texture.getTextureWidth(), 
-                      texture.getTextureHeight(), 
-                      0, 
-                      srcPixelFormat, 
-                      SGL.GL_UNSIGNED_BYTE, 
-                      textureBuffer); 
+				0, 
+				dstPixelFormat, 
+				texture.getTextureWidth(), 
+				texture.getTextureHeight(), 
+				0, 
+				srcPixelFormat, 
+				SGL.GL_UNSIGNED_BYTE, 
+				textureBuffer); 
 
 		return texture;
-	}
-	
-	/**
-	 * Implement of transform copy area for 1.4
-	 * 
-	 * @param image The image to copy
- 	 * @param x The x position to copy to
-	 * @param y The y position to copy to
-	 * @param width The width of the image
-	 * @param height The height of the image
-	 * @param dx The transform on the x axis
-	 * @param dy The transform on the y axis
-	 */
-	private static void copyArea(BufferedImage image, int x, int y, int width, int height, int dx, int dy) {
-		Graphics2D g = (Graphics2D) image.getGraphics();
-		
-		g.drawImage(image.getSubimage(x, y, width, height),x+dx,y+dy,null);
 	}
 }

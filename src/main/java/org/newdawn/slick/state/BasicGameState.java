@@ -38,11 +38,6 @@ public abstract class BasicGameState implements GameState {
 	}
 	
 	/**
-	 * @see org.newdawn.slick.state.GameState#getID()
-	 */
-	public abstract int getID();
-
-	/**
 	 * @see org.newdawn.slick.InputListener#controllerButtonPressed(int, int)
 	 */
 	public void controllerButtonPressed(int controller, int button) {

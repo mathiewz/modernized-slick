@@ -96,20 +96,6 @@ public class CanvasGameContainer extends Canvas {
 			}
 		});
 	}
-	/**
-	 * Dispose the container and any resources it holds
-	 */
-	public void dispose() {
-	}
-
-	/**
-	 * Get the GameContainer providing this canvas
-	 * 
-	 * @return The game container providing this canvas
-	 */
-	public GameContainer getContainer() {
-		return container;
-	}
 
 	/**
 	 * A game container to provide the canvas context

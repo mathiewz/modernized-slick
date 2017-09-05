@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.ref.SoftReference;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.IntBuffer;
@@ -31,9 +30,9 @@ public class InternalTextureLoader {
 	/** The standard texture loaded used everywhere */
 	private static final InternalTextureLoader loader = new InternalTextureLoader();
     /** The table of textures that have been loaded in this loader */
-    private final HashMap texturesLinear = new HashMap();
+    private final HashMap<String, TextureImpl> texturesLinear = new HashMap<>();
     /** The table of textures that have been loaded in this loader */
-    private final HashMap texturesNearest = new HashMap();
+    private final HashMap<String, TextureImpl> texturesNearest = new HashMap<>();
     /** The destination pixel format */
     private int dstPixelFormat = SGL.GL_RGBA8;
     /** True if we're using deferred loading */
@@ -203,7 +202,7 @@ public class InternalTextureLoader {
 	    	return new DeferredTexture(in, resourceName, flipped, filter, transparent);
 	    }
     	
-    	HashMap<String, SoftReference<TextureImpl>> hash = filter == SGL.GL_NEAREST ? texturesNearest : texturesLinear;
+    	HashMap<String, TextureImpl> hash = filter == SGL.GL_NEAREST ? texturesNearest : texturesLinear;
         
         String resName = resourceName;
         if (transparent != null) {
@@ -211,15 +210,12 @@ public class InternalTextureLoader {
         }
         resName += ":"+flipped;
 
-    	SoftReference<TextureImpl> ref = hash.get(resName);
-    	if (ref != null) {
-	    	TextureImpl tex = ref.get();
-	        if (tex != null) {
-	        	return tex;
-	        } else {
-	        	hash.remove(resName);
-	        }
-    	}
+    	TextureImpl tex = hash.get(resName);
+        if (tex != null) {
+        	return tex;
+        } else {
+        	hash.remove(resName);
+        }
         
         // horrible test until I can find something more suitable
         try {
@@ -228,12 +224,12 @@ public class InternalTextureLoader {
         	throw new RuntimeException("Image based resources must be loaded as part of init() or the game loop. They cannot be loaded before initialisation.", e);
         }
         
-        TextureImpl tex = getTexture(in, resourceName, SGL.GL_TEXTURE_2D, filter, filter, flipped, transparent);
+        TextureImpl texture = getTexture(in, resourceName, SGL.GL_TEXTURE_2D, filter, filter, flipped, transparent);
         
-        tex.setCacheName(resName);
-    	hash.put(resName, new SoftReference(tex));
+        texture.setCacheName(resName);
+    	hash.put(resName, texture);
         
-        return tex;
+        return texture;
     }
 
     /**
@@ -446,7 +442,7 @@ public class InternalTextureLoader {
      * Reload all the textures loaded in this loader
      */
     public void reload() {
-    	Iterator texs = texturesLinear.values().iterator();
+    	Iterator<TextureImpl> texs = texturesLinear.values().iterator();
     	while (texs.hasNext()) {
     		((TextureImpl) texs.next()).reload();
     	}

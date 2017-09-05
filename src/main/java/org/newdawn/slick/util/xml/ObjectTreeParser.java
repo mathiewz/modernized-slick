@@ -47,11 +47,11 @@ import org.newdawn.slick.util.ResourceLoader;
  */
 public class ObjectTreeParser {
 	/** The mapping of XML element names to class names */
-	private HashMap nameToClass = new HashMap();
+	private HashMap<String, Class<? extends Object>> nameToClass = new HashMap<>();
 	/** The default package where classes will be searched for */
 	private String defaultPackage;
 	/** The list of elements to ignore */
-	private ArrayList ignored = new ArrayList();
+	private ArrayList<String> ignored = new ArrayList<>();
 	/** The name of the method to add an child object to it's parent */
 	private String addMethod = "add";
 	
@@ -77,7 +77,7 @@ public class ObjectTreeParser {
 	 * @param elementName The name of the XML element
 	 * @param elementClass The class to be created for the given element
 	 */
-	public void addElementMapping(String elementName, Class elementClass) {
+	public void addElementMapping(String elementName, Class<? extends Object> elementClass) {
 		nameToClass.put(elementName, elementClass);
 	}
 	
@@ -178,8 +178,8 @@ public class ObjectTreeParser {
 	 * @param name The name of the XML element
 	 * @return The class to be used or null if none can be found
 	 */
-	private Class getClassForElementName(String name) {
-		Class clazz = (Class) nameToClass.get(name);
+	private Class<? extends Object> getClassForElementName(String name) {
+		Class<? extends Object> clazz = nameToClass.get(name);
 		if (clazz != null) {
 			return clazz;
 		}
@@ -222,7 +222,7 @@ public class ObjectTreeParser {
 			return null;
 		}
 		
-		Class clazz;
+		Class<? extends Object> clazz;
 		
 		if (instance == null) {
 			clazz = getClassForElementName(name);
@@ -238,10 +238,12 @@ public class ObjectTreeParser {
 			if (instance == null) {
 				instance = clazz.newInstance();
 				
+				@SuppressWarnings("unchecked")
 				Method elementNameMethod = getMethod(clazz, "setXMLElementName", new Class[] {String.class});
 				if (elementNameMethod != null) {
 					invoke(elementNameMethod, instance, new Object[] {name});
 				}
+				@SuppressWarnings("unchecked")
 				Method contentMethod = getMethod(clazz, "setXMLElementContent", new Class[] {String.class});
 				if (contentMethod != null) {
 					invoke(contentMethod, instance, new Object[] {current.getContent()});
@@ -303,7 +305,7 @@ public class ObjectTreeParser {
 	 * @return The value as the given type
 	 * @throws SlickXMLException Indicates there is no automatic way of converting the value to the type
 	 */
-	private Object typeValue(String value, Class clazz) throws SlickXMLException {
+	private Object typeValue(String value, Class<? extends Object> clazz) throws SlickXMLException {
 		if (clazz == String.class) {
 			return value;
 		}
@@ -322,7 +324,7 @@ public class ObjectTreeParser {
 	 * @param clazz The primitive type class
 	 * @return The object wrapper class
 	 */
-	private Class mapPrimitive(Class clazz) {
+	private Class<? extends Object> mapPrimitive(Class<? extends Object> clazz) {
 		if (clazz == Integer.TYPE) {
 			return Integer.class;
 		}
@@ -351,7 +353,7 @@ public class ObjectTreeParser {
 	 * @param name The name of the field to search for
 	 * @return The field or null if none could be located
 	 */
-	private Field findField(Class clazz, String name) {
+	private Field findField(Class<? extends Object> clazz, String name) {
 		Field[] fields = clazz.getDeclaredFields();
 		for (int i=0;i<fields.length;i++) {
 			if (fields[i].getName().equalsIgnoreCase(name)) {
@@ -376,12 +378,12 @@ public class ObjectTreeParser {
 	 * @param name The name of the method to search for
 	 * @return The method or null if none could be located
 	 */
-	private Method findMethod(Class clazz, String name) {
+	private Method findMethod(Class<? extends Object> clazz, String name) {
 		Method[] methods = clazz.getDeclaredMethods();
 		for (int i=0;i<methods.length;i++) {
 			if (methods[i].getName().equalsIgnoreCase(name)) {
 				Method method = methods[i];
-				Class[] params = method.getParameterTypes();
+				Class<? extends Object>[] params = method.getParameterTypes();
 				
 				if (params.length == 1) {
 					return method;
@@ -400,12 +402,12 @@ public class ObjectTreeParser {
 	 * @param parameter The type the single parameter must have
 	 * @return The method or null if none could be located
 	 */
-	private Method findMethod(Class clazz, String name, Class parameter) {
+	private Method findMethod(Class<? extends Object> clazz, String name, Class<? extends Object> parameter) {
 		Method[] methods = clazz.getDeclaredMethods();
 		for (int i=0;i<methods.length;i++) {
 			if (methods[i].getName().equalsIgnoreCase(name)) {
 				Method method = methods[i];
-				Class[] params = method.getParameterTypes();
+				Class<? extends Object>[] params = method.getParameterTypes();
 				
 				if (params.length == 1) {
 					if (method.getParameterTypes()[0].isAssignableFrom(parameter)) {
@@ -471,7 +473,7 @@ public class ObjectTreeParser {
 	 * @param params The parameters for the method
 	 * @return The method or null if none can be found
 	 */
-	private Method getMethod(Class clazz, String name, Class[] params) {
+	private Method getMethod(Class<? extends Object> clazz, String name, Class<? extends Object>[] params) {
 		try {
 			return clazz.getMethod(name, params);
 		} catch (SecurityException e) {

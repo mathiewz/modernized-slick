@@ -76,7 +76,7 @@ public class Curve extends Shape {
 	 */
 	protected void createPoints() {
 		float step = 1.0f / segments;
-		points = new float[(segments+1) * 2];
+		points = new Float[(segments+1) * 2];
 		for (int i=0;i<segments+1;i++) {
 			float t = i * step;
 		
@@ -90,8 +90,8 @@ public class Curve extends Shape {
 	 * @see org.newdawn.slick.geom.Shape#transform(org.newdawn.slick.geom.Transform)
 	 */
 	public Shape transform(Transform transform) {
-		float[] pts = new float[8];
-		float[] dest = new float[8];
+		Float[] pts = new Float[8];
+		Float[] dest = new Float[8];
 		pts[0] = p1.x; pts[1] = p1.y;
 		pts[2] = c1.x; pts[3] = c1.y;
 		pts[4] = c2.x; pts[5] = c2.y;

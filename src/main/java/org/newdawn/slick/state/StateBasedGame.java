@@ -20,7 +20,7 @@ import org.newdawn.slick.state.transition.Transition;
  */
 public abstract class StateBasedGame implements Game, InputListener {
 	/** The list of states making up this game */
-	private HashMap states = new HashMap();
+	private HashMap<Integer, GameState> states = new HashMap<>();
 	/** The current state */
 	private GameState currentState;
 	/** The next state we're moving into */
@@ -48,8 +48,6 @@ public abstract class StateBasedGame implements Game, InputListener {
 				return -1;
 			}
 			public void init(GameContainer container, StateBasedGame game) throws SlickException {
-			}
-			public void render(StateBasedGame game, Graphics g) throws SlickException {
 			}
 			public void update(GameContainer container, StateBasedGame game, int delta) throws SlickException {
 			}
@@ -163,7 +161,7 @@ public abstract class StateBasedGame implements Game, InputListener {
 		this.container = container;
 		initStatesList(container);
 		
-		Iterator gameStates = states.values().iterator();
+		Iterator<GameState> gameStates = states.values().iterator();
 		
 		while (gameStates.hasNext()) {
 			GameState state = (GameState) gameStates.next();

@@ -38,11 +38,6 @@ public abstract class CrossStateTransition implements Transition {
 	public CrossStateTransition(GameState secondState) {
 		this.secondState = secondState;
 	}
-	
-	/**
-	 * @see org.newdawn.slick.state.transition.Transition#isComplete()
-	 */
-	public abstract boolean isComplete();
 
 	/**
 	 * @see org.newdawn.slick.state.transition.Transition#postRender(org.newdawn.slick.state.StateBasedGame, org.newdawn.slick.GameContainer, org.newdawn.slick.Graphics)

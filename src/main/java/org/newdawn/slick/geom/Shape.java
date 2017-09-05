@@ -10,7 +10,7 @@ import java.io.Serializable;
  */
 public abstract class Shape implements Serializable {
     /** The points representing this polygon. */
-    protected float points[];
+    protected Float points[];
     /** Center point of the polygon. */
     protected float center[];
     /** The left most point of this shape. */
@@ -271,7 +271,7 @@ public abstract class Shape implements Serializable {
      * 
      * @return an array of x,y points
      */
-    public float[] getPoints() {
+    public Float[] getPoints() {
         checkPoints();
         return points;
     }
@@ -491,8 +491,8 @@ public abstract class Shape implements Serializable {
         checkPoints();
 
         boolean result = false;
-        float points[] = getPoints();           // (x3, y3)  and (x4, y4)
-        float thatPoints[] = shape.getPoints(); // (x1, y1)  and (x2, y2)
+        Float points[] = getPoints();           // (x3, y3)  and (x4, y4)
+        Float thatPoints[] = shape.getPoints(); // (x1, y1)  and (x2, y2)
         int length = points.length;
         int thatLength = thatPoints.length;
         double unknownA;
@@ -608,20 +608,7 @@ public abstract class Shape implements Serializable {
     		return;
     	}
     	if (points.length >= 6) {
-    		boolean clockwise = true;
-    		float area = 0;
-    		for (int i=0;i<(points.length/2)-1;i++) {
-    			float x1 = points[(i*2)];
-    			float y1 = points[(i*2)+1];
-    			float x2 = points[(i*2)+2];
-    			float y2 = points[(i*2)+3];
-    			
-    			area += (x1 * y2) - (y1 * x2);
-    		}
-    		area /= 2;
-    		clockwise = area > 0;
-
-        	tris = new NeatTriangulator();
+    		tris = new NeatTriangulator();
     		for (int i=0;i<points.length;i+=2) {
 	    		tris.addPolyPoint(points[i], points[i+1]);
 	    	}

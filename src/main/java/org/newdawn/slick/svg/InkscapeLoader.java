@@ -40,7 +40,7 @@ public class InkscapeLoader implements Loader {
 	public static int RADIAL_TRIANGULATION_LEVEL = 1;
 
 	/** The list of XML element processors */
-	private static ArrayList processors = new ArrayList();
+	private static ArrayList<ElementProcessor> processors = new ArrayList<>();
 
 	/** The diagram loaded */
 	private Diagram diagram;
@@ -115,19 +115,6 @@ public class InkscapeLoader implements Loader {
 	 * Private, you should be using the static method
 	 */
 	private InkscapeLoader() {
-	}
-
-	/**
-	 * Load a SVG document into a diagram
-	 * 
-	 * @param in
-	 *            The input stream from which to read the SVG
-	 * @return The diagram loaded
-	 * @throws SlickException
-	 *             Indicates a failure to process the document
-	 */
-	private Diagram loadDiagram(InputStream in) throws SlickException {
-		return loadDiagram(in, false);
 	}
 
 	/**

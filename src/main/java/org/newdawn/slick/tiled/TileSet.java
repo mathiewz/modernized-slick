@@ -46,7 +46,7 @@ public class TileSet {
 	public int tilesDown;
 
 	/** The properties for each tile */
-	private HashMap props = new HashMap();
+	private HashMap<Integer, Properties> props = new HashMap<>();
 	/** The padding of the tiles */
 	protected int tileSpacing = 0;
 	/** The margin of the tileset */

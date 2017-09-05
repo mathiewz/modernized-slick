@@ -13,7 +13,6 @@ import org.lwjgl.opengl.PixelFormat;
 import org.newdawn.slick.gui.GUIContext;
 import org.newdawn.slick.openal.SoundStore;
 import org.newdawn.slick.opengl.CursorLoader;
-import org.newdawn.slick.opengl.ImageData;
 import org.newdawn.slick.opengl.renderer.Renderer;
 import org.newdawn.slick.opengl.renderer.SGL;
 import org.newdawn.slick.util.Log;
@@ -392,20 +391,6 @@ public abstract class GameContainer implements GUIContext {
 	}
 	
 	/**
-	 * Get the width of the standard screen resolution
-	 * 
-	 * @return The screen width
-	 */
-	public abstract int getScreenWidth();
-	
-	/**
-	 * Get the height of the standard screen resolution
-	 * 
-	 * @return The screen height
-	 */
-	public abstract int getScreenHeight();
-	
-	/**
 	 * Get the width of the game canvas
 	 * 
 	 * @return The width of the game canvas
@@ -464,28 +449,6 @@ public abstract class GameContainer implements GUIContext {
 			try { Thread.sleep(1); } catch (Exception e) {}
 		}
 	}
-	
-	/**
-	 * Set the mouse cursor to be displayed - this is a hardware cursor and hence
-	 * shouldn't have any impact on FPS.
-	 * 
-	 * @param ref The location of the image to be loaded for the cursor
-	 * @param hotSpotX The x coordinate of the hotspot within the cursor image
-	 * @param hotSpotY The y coordinate of the hotspot within the cursor image
-	 * @throws SlickException Indicates a failure to load the cursor image or create the hardware cursor
-	 */
-	public abstract void setMouseCursor(String ref, int hotSpotX, int hotSpotY) throws SlickException;
-
-	/**
-	 * Set the mouse cursor to be displayed - this is a hardware cursor and hence
-	 * shouldn't have any impact on FPS.
-	 * 
-	 * @param data The image data from which the cursor can be construted
-	 * @param hotSpotX The x coordinate of the hotspot within the cursor image
-	 * @param hotSpotY The y coordinate of the hotspot within the cursor image
-	 * @throws SlickException Indicates a failure to load the cursor image or create the hardware cursor
-	 */
-	public abstract void setMouseCursor(ImageData data, int hotSpotX, int hotSpotY) throws SlickException;
 
 	/**
 	 * Set the mouse cursor based on the contents of the image. Note that this will not take
@@ -500,17 +463,6 @@ public abstract class GameContainer implements GUIContext {
 	 * @throws SlickException Indicates a failure to load the cursor image or create the hardware cursor
 	 */
 	public abstract void setMouseCursor(Image image, int hotSpotX, int hotSpotY) throws SlickException;
-	
-	/**
-	 * Set the mouse cursor to be displayed - this is a hardware cursor and hence
-	 * shouldn't have any impact on FPS.
-	 * 
-	 * @param cursor The cursor to use
-	 * @param hotSpotX The x coordinate of the hotspot within the cursor image
-	 * @param hotSpotY The y coordinate of the hotspot within the cursor image
-	 * @throws SlickException Indicates a failure to load the cursor image or create the hardware cursor
-	 */
-	public abstract void setMouseCursor(Cursor cursor, int hotSpotX, int hotSpotY) throws SlickException;
 	
 	/**
 	 * Get a cursor based on a image reference on the classpath. The image 
@@ -538,12 +490,6 @@ public abstract class GameContainer implements GUIContext {
 			throw new SlickException("Failed to set mouse cursor", e);
 		}
 	}
-	
-	/**
-	 * Set the default mouse cursor - i.e. the original cursor before any native 
-	 * cursor was set
-	 */
-	public abstract void setDefaultMouseCursor();
 	
 	/**
 	 * Get the input system

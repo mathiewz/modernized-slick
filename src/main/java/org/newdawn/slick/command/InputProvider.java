@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
+import java.util.Map.Entry;
 
 import org.newdawn.slick.Input;
 import org.newdawn.slick.util.InputAdapter;
@@ -19,16 +19,13 @@ import org.newdawn.slick.util.InputAdapter;
  */
 public class InputProvider {
 	/** The commands that have been defined */
-	private HashMap commands;
+	private HashMap<Control, Command> commands;
 
 	/** The list of listeners that may be listening */
-	private ArrayList listeners = new ArrayList();
-
-	/** The input context we're responding to */
-	private Input input;
+	private ArrayList<InputProviderListener> listeners = new ArrayList<>();
 
 	/** The command input states */
-	private HashMap commandState = new HashMap();
+	private HashMap<Command, CommandState> commandState = new HashMap<>();
 
 	/** True if this provider is actively sending events */
 	private boolean active = true;
@@ -41,10 +38,8 @@ public class InputProvider {
 	 *            The input from which this provider will receive events
 	 */
 	public InputProvider(Input input) {
-		this.input = input;
-
 		input.addListener(new InputListenerImpl());
-		commands = new HashMap();
+		commands = new HashMap<>();
 	}
 
 	/**
@@ -54,10 +49,10 @@ public class InputProvider {
 	 * @return The list of commands (@see Command) that can be issued from this
 	 *         provider
 	 */
-	public List getUniqueCommands() {
-		List uniqueCommands = new ArrayList();
+	public List<Command> getUniqueCommands() {
+		List<Command> uniqueCommands = new ArrayList<>();
 
-		for (Iterator it = commands.values().iterator(); it.hasNext();) {
+		for (Iterator<Command> it = commands.values().iterator(); it.hasNext();) {
 			Command command = (Command) it.next();
 
 			if (!uniqueCommands.contains(command)) {
@@ -76,13 +71,13 @@ public class InputProvider {
 	 *            The command to be invoked
 	 * @return The list of controls that can cause the command (@see Control)
 	 */
-	public List getControlsFor(Command command) {
-		List controlsForCommand = new ArrayList();
+	public List<Control> getControlsFor(Command command) {
+		List<Control> controlsForCommand = new ArrayList<>();
 
-		for (Iterator it = commands.entrySet().iterator(); it.hasNext();) {
-			Map.Entry entry = (Map.Entry) it.next();
-			Control key = (Control) entry.getKey();
-			Command value = (Command) entry.getValue();
+		for (Iterator<Entry<Control, Command>> it = commands.entrySet().iterator(); it.hasNext();) {
+			Entry<Control, Command> entry = it.next();
+			Control key = entry.getKey();
+			Command value = entry.getValue();
 
 			if (value == command) {
 				controlsForCommand.add(key);
@@ -154,10 +149,10 @@ public class InputProvider {
 	 * @param command The command whose controls should be unbound
 	 */
 	public void clearCommand(Command command) {
-		List controls = getControlsFor(command);
+		List<Control> controls = getControlsFor(command);
 		
 		for (int i=0;i<controls.size();i++) {
-	    	unbindCommand((Control) controls.get(i));
+	    	unbindCommand(controls.get(i));
 	    }
 	}
 	
@@ -168,9 +163,9 @@ public class InputProvider {
 	 *            The control to remove
 	 */
 	public void unbindCommand(Control control) {
-		Command command = (Command) commands.remove(control);
+		Command command = commands.remove(control);
 		if (command != null) {
-			if (!commands.keySet().contains(command)) {
+			if (!commands.values().contains(command)) {
 				commandState.remove(command);
 			}
 		}

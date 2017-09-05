@@ -28,7 +28,7 @@ public class ImageDataFactory {
 	private static void checkProperty() {
 		if (!pngLoaderPropertyChecked) {
 			pngLoaderPropertyChecked = true;
-			PrivilegedAction action = () -> {
+			PrivilegedAction<Void> action = () -> {
 				String val = System.getProperty(PNG_LOADER);
 				if ("false".equalsIgnoreCase(val)) {
 					usePngLoader = false;

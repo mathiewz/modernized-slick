@@ -20,9 +20,7 @@ public class LineRenderTest extends BasicGame {
 	/** The polygon to be rendered */
 	private Polygon polygon = new Polygon();
 	/** The path to be rendered */
-	private Path path = new Path(100,100);
-	/** The line width to render to */
-	private float width = 10;
+	private Path path = new Path(100f,100f);
 	/** True if antialiasing */
 	private boolean antialias = true;
 	
@@ -43,9 +41,9 @@ public class LineRenderTest extends BasicGame {
 		polygon.addPoint(230,210);
 		polygon.addPoint(170,260);
 		
-		path.curveTo(200,200,200,100,100,200);
-		path.curveTo(400,100,400,200,200,100);
-		path.curveTo(500,500,400,200,200,100);
+		path.curveTo(200f,200f,200f,100f,100f,200f);
+		path.curveTo(400f,100f,400f,200f,200f,100f);
+		path.curveTo(500f,500f,400f,200f,200f,100f);
 	}
 
 	/**

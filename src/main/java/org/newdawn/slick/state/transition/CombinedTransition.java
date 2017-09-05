@@ -16,7 +16,7 @@ import org.newdawn.slick.state.StateBasedGame;
  */
 public class CombinedTransition implements Transition {
 	/** The list of transitions to be combined */
-    private ArrayList transitions = new ArrayList();
+    private ArrayList<Transition> transitions = new ArrayList<>();
 
     /**
      * Create an empty transition

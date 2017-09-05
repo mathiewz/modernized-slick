@@ -1,7 +1,5 @@
 package org.newdawn.slick;
 
-import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
@@ -33,8 +31,8 @@ import org.newdawn.slick.util.ResourceLoader;
  */
 public class AppGameContainer extends GameContainer {
 	static {
-		AccessController.doPrivileged(new PrivilegedAction() {
-            public Object run() {
+		AccessController.doPrivileged(new PrivilegedAction<Void>() {
+            public Void run() {
         		try {
         			Display.getDisplayMode();
         		} catch (Exception e) {
@@ -345,8 +343,8 @@ public class AppGameContainer extends GameContainer {
 		Log.info("OriginalDisplayMode: "+originalDisplayMode);
 		Log.info("TargetDisplayMode: "+targetDisplayMode);
 		
-		AccessController.doPrivileged(new PrivilegedAction() {
-            public Object run() {
+		AccessController.doPrivileged(new PrivilegedAction<Void>() {
+            public Void run() {
         		try {
         			PixelFormat format = new PixelFormat(8,8,stencil ? 8 : 0,samples);
         			
@@ -490,21 +488,6 @@ public class AppGameContainer extends GameContainer {
 	public void destroy() {
 		Display.destroy();
 		AL.destroy();
-	}
-	
-	/**
-	 * A null stream to clear out those horrid errors
-	 *
-	 * @author kevin
-	 */
-	private class NullOutputStream extends OutputStream {
-		/**
-		 * @see java.io.OutputStream#write(int)
-		 */
-		public void write(int b) throws IOException {
-			// null implemetnation
-		}
-		
 	}
 
 	/**

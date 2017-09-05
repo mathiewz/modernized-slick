@@ -10,13 +10,13 @@ import java.util.HashMap;
  */
 public class Diagram {
 	/** The figures in the diagram */
-	private ArrayList figures = new ArrayList();
+	private ArrayList<Figure> figures = new ArrayList<>();
 	/** The pattern definitions */
-	private HashMap patterns = new HashMap();
+	private HashMap<String, String> patterns = new HashMap<>();
 	/** The linear gradients defined within the diagram */
-	private HashMap gradients = new HashMap();
+	private HashMap<String, Gradient> gradients = new HashMap<>();
 	/** The figures mapping */
-	private HashMap figureMap = new HashMap();
+	private HashMap<String, Figure> figureMap = new HashMap<>();
 	
 	/** The width of the diagram */
 	private float width;

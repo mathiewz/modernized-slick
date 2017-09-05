@@ -11,7 +11,6 @@ public class Envelope {
 	}
 
 	public void set_num_points( int num_points ) {
-		int point;
 		if( num_points <= 0 ) {
 			num_points = 1;
 		}

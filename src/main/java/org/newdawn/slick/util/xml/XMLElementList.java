@@ -10,7 +10,7 @@ import java.util.Collection;
  */
 public class XMLElementList  {
 	/** The list of elements */
-	private ArrayList list = new ArrayList();
+	private ArrayList<XMLElement> list = new ArrayList<>();
 	
 	/**
 	 * Create a new list
@@ -62,7 +62,7 @@ public class XMLElementList  {
 	 * 
 	 * @param collection The collection the elements should be added to
 	 */
-	public void addAllTo(Collection collection) {
+	public void addAllTo(Collection<XMLElement> collection) {
 		collection.addAll(list);
 	}
 }

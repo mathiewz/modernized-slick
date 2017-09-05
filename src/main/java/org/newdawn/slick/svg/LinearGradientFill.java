@@ -16,13 +16,8 @@ public class LinearGradientFill implements TexCoordGenerator {
 	private Vector2f start;
 	/** The ends position of the gradient line */
 	private Vector2f end;
-	/** The gradient being applied */
-	private Gradient gradient;
 	/** The line of the gradient */
 	private Line line;
-	/** The shape being filled with gradient */
-	private Shape shape;
-	
 	/**
 	 * Create a new fill for gradients
 	 * 
@@ -31,20 +26,18 @@ public class LinearGradientFill implements TexCoordGenerator {
 	 * @param gradient The gradient to apply
 	 */
 	public LinearGradientFill(Shape shape, Transform trans, Gradient gradient) {
-		this.gradient = gradient;
-		
-		float x = gradient.getX1();
-		float y = gradient.getY1();
-		float mx = gradient.getX2();
-		float my = gradient.getY2();
+		Float x = gradient.getX1();
+		Float y = gradient.getY1();
+		Float mx = gradient.getX2();
+		Float my = gradient.getY2();
 	
-		float h = my - y;
-		float w = mx - x;
+		Float h = my - y;
+		Float w = mx - x;
 		
-		float[] s = new float[] {x,y+(h/2)};
+		Float[] s = new Float[] {x,y+(h/2)};
 		gradient.getTransform().transform(s, 0, s, 0, 1);
 		trans.transform(s, 0, s, 0, 1);
-		float[] e = new float[] {x+w,y+(h/2)};
+		Float[] e = new Float[] {x+w,y+(h/2)};
 		gradient.getTransform().transform(e, 0, e, 0, 1);
 		trans.transform(e, 0, e, 0, 1);
 		

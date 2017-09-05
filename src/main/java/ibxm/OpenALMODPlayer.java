@@ -177,9 +177,7 @@ public class OpenALMODPlayer {
 	public static Module loadModule(InputStream in) throws IOException {
 		Module module;
 		DataInputStream din;
-		byte[] xm_header, s3m_header, mod_header, output_buffer;
-		int frames;
-		
+		byte[] xm_header, s3m_header, mod_header;
 		din = new DataInputStream(in);
 		module = null;
 		xm_header = new byte[ 60 ];

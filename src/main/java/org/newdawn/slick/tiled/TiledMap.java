@@ -34,17 +34,6 @@ public class TiledMap {
 	/** Indicates if we're running on a headless system */
 	private static boolean headless;
 
-	/**
-	 * Indicate if we're running on a headless system where we'd just like to
-	 * load the data model.
-	 * 
-	 * @param h
-	 *            True if we're running on a headless system
-	 */
-	private static void setHeadless(boolean h) {
-		headless = h;
-	}
-
 	/** The width of the map */
 	protected int width;
 	/** The height of the map */
@@ -61,11 +50,11 @@ public class TiledMap {
 	protected Properties props;
 
 	/** The list of tilesets defined in the map */
-	protected ArrayList tileSets = new ArrayList();
+	protected ArrayList<TileSet> tileSets = new ArrayList<>();
 	/** The list of layers defined in the map */
-	protected ArrayList layers = new ArrayList();
+	protected ArrayList<Layer> layers = new ArrayList<>();
 	/** The list of object-groups defined in the map */
-	protected ArrayList objectGroups = new ArrayList();
+	protected ArrayList<ObjectGroup> objectGroups = new ArrayList<>();
 
 	/** Indicates a orthogonal map */
 	protected static final int ORTHOGONAL = 1;
@@ -167,8 +156,6 @@ public class TiledMap {
 	 * @return The index of the layer or -1 if there is no layer with given name
 	 */
 	public int getLayerIndex(String name) {
-		int idx = 0;
-
 		for (int i = 0; i < layers.size(); i++) {
 			Layer layer = (Layer) layers.get(i);
 
@@ -501,9 +488,9 @@ public class TiledMap {
 	 */
 	protected void renderIsometricMap(int x, int y, int sx, int sy, int width,
 			int height, Layer layer, boolean lineByLine) {
-		ArrayList drawLayers = layers;
+		ArrayList<Layer> drawLayers = layers;
 		if (layer != null) {
-			drawLayers = new ArrayList();
+			drawLayers = new ArrayList<>();
 			drawLayers.add(layer);
 		}
 
@@ -986,7 +973,7 @@ public class TiledMap {
 		/** The name of this group - read from the XML */
 		public String name;
 		/** The Objects of this group */
-		public ArrayList objects;
+		public ArrayList<GroupObject> objects;
 		/** The width of this layer */
 		public int width;
 		/** The height of this layer */
@@ -1007,7 +994,7 @@ public class TiledMap {
 			name = element.getAttribute("name");
 			width = Integer.parseInt(element.getAttribute("width"));
 			height = Integer.parseInt(element.getAttribute("height"));
-			objects = new ArrayList();
+			objects = new ArrayList<>();
 
 			// now read the layer properties
 			Element propsElement = (Element) element.getElementsByTagName(

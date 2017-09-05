@@ -10,8 +10,8 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.StringTokenizer;
 import java.util.Map.Entry;
+import java.util.StringTokenizer;
 
 import org.newdawn.slick.opengl.renderer.Renderer;
 import org.newdawn.slick.opengl.renderer.SGL;
@@ -62,7 +62,8 @@ public class AngelCodeFont implements Font {
 	private DisplayList eldestDisplayList;
 	
 	/** The display list cache for rendered lines */
-	private final LinkedHashMap displayLists = new LinkedHashMap(DISPLAY_LIST_CACHE_SIZE, 1, true) {
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private final LinkedHashMap<String, DisplayList> displayLists = new LinkedHashMap(DISPLAY_LIST_CACHE_SIZE, 1, true) {
 		protected boolean removeEldestEntry(Entry eldest) {
 			eldestDisplayList = (DisplayList)eldest.getValue();
 			eldestDisplayListID = eldestDisplayList.id;
@@ -236,7 +237,7 @@ public class AngelCodeFont implements Font {
 						int offset = Integer.parseInt(tokens.nextToken()); // offset value
 						List<Short> values = kerning.get(new Short(first));
 						if (values == null) {
-							values = new ArrayList();
+							values = new ArrayList<>();
 							kerning.put(new Short(first), values);
 						}
 						// Pack the character and kerning offset into a short.
@@ -246,19 +247,19 @@ public class AngelCodeFont implements Font {
 			}
 
 			chars = new CharDef[maxChar + 1];
-			for (Iterator iter = charDefs.iterator(); iter.hasNext();) {
+			for (Iterator<CharDef> iter = charDefs.iterator(); iter.hasNext();) {
 				CharDef def = (CharDef)iter.next();
 				chars[def.id] = def;
 			}
 
 			// Turn each list of kerning values into a short[] and set on the chardef. 
-			for (Iterator iter = kerning.entrySet().iterator(); iter.hasNext(); ) {
-				Entry entry = (Entry)iter.next();
+			for (Iterator<Entry<Short, List<Short>>> iter = kerning.entrySet().iterator(); iter.hasNext(); ) {
+				Entry<Short, List<Short>> entry = iter.next();
 				short first = ((Short)entry.getKey()).shortValue();
-				List valueList = (List)entry.getValue();
+				List<Short> valueList = entry.getValue();
 				short[] valueArray = new short[valueList.size()];
 				int i = 0;
-				for (Iterator valueIter = valueList.iterator(); valueIter.hasNext(); i++)
+				for (Iterator<Short> valueIter = valueList.iterator(); valueIter.hasNext(); i++)
 					valueArray[i] = ((Short)valueIter.next()).shortValue();
 				chars[first].kerning = valueArray;
 			}

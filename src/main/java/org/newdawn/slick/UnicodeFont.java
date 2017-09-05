@@ -21,6 +21,7 @@ import java.util.Map.Entry;
 import org.newdawn.slick.font.Glyph;
 import org.newdawn.slick.font.GlyphPage;
 import org.newdawn.slick.font.HieroSettings;
+import org.newdawn.slick.font.effects.Effect;
 import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.opengl.TextureImpl;
 import org.newdawn.slick.opengl.renderer.Renderer;
@@ -69,9 +70,9 @@ public class UnicodeFont implements org.newdawn.slick.Font {
 	/**
 	 * Sorts glyphs by height, tallest first.
 	 */
-	private static final Comparator heightComparator = new Comparator() {
-		public int compare (Object o1, Object o2) {
-			return ((Glyph)o1).getHeight() - ((Glyph)o2).getHeight();
+	private static final Comparator<Glyph> heightComparator = new Comparator<Glyph>() {
+		public int compare (Glyph o1, Glyph o2) {
+			return o1.getHeight() - o2.getHeight();
 		}
 	};
 	
@@ -90,11 +91,11 @@ public class UnicodeFont implements org.newdawn.slick.Font {
 	/** The glyphs that are available in this font */
 	private final Glyph[][] glyphs = new Glyph[PAGES][];
 	/** The pages that have been loaded for this font */
-	private final List glyphPages = new ArrayList();
+	private final List<GlyphPage> glyphPages = new ArrayList<>();
 	/** The glyphs queued up to be rendered */
-	private final List queuedGlyphs = new ArrayList(256);
+	private final List<Glyph> queuedGlyphs = new ArrayList<>(256);
 	/** The effects that need to be applied to the font */
-	private final List effects = new ArrayList();
+	private final List<Effect> effects = new ArrayList<>();
 	
 	/** The padding applied in pixels to the top of the glyph rendered area */
 	private int paddingTop;
@@ -122,12 +123,10 @@ public class UnicodeFont implements org.newdawn.slick.Font {
 	private int baseDisplayListID = -1;
 	/** The ID of the display list that has been around the longest time */
 	private int eldestDisplayListID;
-	/** The eldest display list  */
-	private DisplayList eldestDisplayList;
 	
 	/** The map fo the display list generated and cached - modified to allow removal of the oldest entry */
-	private final LinkedHashMap displayLists = new LinkedHashMap(DISPLAY_LIST_CACHE_SIZE, 1, true) {
-		protected boolean removeEldestEntry (Entry eldest) {
+	private final LinkedHashMap<String, DisplayList> displayLists = new LinkedHashMap<String, DisplayList>(DISPLAY_LIST_CACHE_SIZE, 1, true) {
+		protected boolean removeEldestEntry (Entry<String, DisplayList> eldest) {
 			DisplayList displayList = (DisplayList)eldest.getValue();
 			if (displayList != null) eldestDisplayListID = displayList.id;
 			return size() > DISPLAY_LIST_CACHE_SIZE;
@@ -224,14 +223,15 @@ public class UnicodeFont implements org.newdawn.slick.Font {
 	 * @param bold True if the font should be rendered in bold typeface
 	 * @param italic True if the font should be rendered in bold typeface
 	 */
+	@SuppressWarnings("unchecked")
 	private void initializeFont(Font baseFont, int size, boolean bold, boolean italic) {
+		@SuppressWarnings("rawtypes")
 		Map attributes = baseFont.getAttributes();
 		attributes.put(TextAttribute.SIZE, new Float(size));
 		attributes.put(TextAttribute.WEIGHT, bold ? TextAttribute.WEIGHT_BOLD : TextAttribute.WEIGHT_REGULAR);
 		attributes.put(TextAttribute.POSTURE, italic ? TextAttribute.POSTURE_OBLIQUE : TextAttribute.POSTURE_REGULAR);
 		try {
-			attributes.put(TextAttribute.class.getDeclaredField("KERNING").get(null), TextAttribute.class.getDeclaredField(
-				"KERNING_ON").get(null));
+			attributes.put(TextAttribute.KERNING, TextAttribute.KERNING_ON);
 		} catch (Exception ignored) {
 		}
 		font = baseFont.deriveFont(attributes);
@@ -339,7 +339,7 @@ public class UnicodeFont implements org.newdawn.slick.Font {
 		if (effects.isEmpty())
 			throw new IllegalStateException("The UnicodeFont must have at least one effect before any glyphs can be loaded.");
 
-		for (Iterator iter = queuedGlyphs.iterator(); iter.hasNext();) {
+		for (Iterator<Glyph> iter = queuedGlyphs.iterator(); iter.hasNext();) {
 			Glyph glyph = (Glyph)iter.next();
 			int codePoint = glyph.getCodePoint();
 
@@ -362,7 +362,7 @@ public class UnicodeFont implements org.newdawn.slick.Font {
 		Collections.sort(queuedGlyphs, heightComparator);
 
 		// Add to existing pages.
-		for (Iterator iter = glyphPages.iterator(); iter.hasNext();) {
+		for (Iterator<GlyphPage> iter = glyphPages.iterator(); iter.hasNext();) {
 			GlyphPage glyphPage = (GlyphPage)iter.next();
 			maxGlyphsToLoad -= glyphPage.loadGlyphs(queuedGlyphs, maxGlyphsToLoad);
 			if (maxGlyphsToLoad == 0 || queuedGlyphs.isEmpty())
@@ -387,7 +387,7 @@ public class UnicodeFont implements org.newdawn.slick.Font {
 		for (int i = 0; i < PAGES; i++)
 			glyphs[i] = null;
 
-		for (Iterator iter = glyphPages.iterator(); iter.hasNext();) {
+		for (Iterator<GlyphPage> iter = glyphPages.iterator(); iter.hasNext();) {
 			GlyphPage page = (GlyphPage)iter.next();
 			try {
 				page.getImage().destroy();
@@ -482,7 +482,6 @@ public class UnicodeFont implements org.newdawn.slick.Font {
 
 		int maxWidth = 0, maxLogicWidth = 0, totalHeight = 0, lines = 0;
 		int extraX = 0, extraY = ascent;
-        int extraXLogic = 0;
 		boolean startNewLine = false;
 		Texture lastBind = null;
 		for (int glyphIndex = 0, n = vector.getNumGlyphs(); glyphIndex < n; glyphIndex++) {
@@ -498,7 +497,6 @@ public class UnicodeFont implements org.newdawn.slick.Font {
 
 			if (startNewLine && codePoint != '\n') {
 				extraX = -bounds.x;
-                extraXLogic = -boundsLogic.x;
 				startNewLine = false;
 			}
 
@@ -935,7 +933,7 @@ public class UnicodeFont implements org.newdawn.slick.Font {
 	 * 
 	 * @return The glyph pages that have been loaded into this font
 	 */
-	public List getGlyphPages () {
+	public List<GlyphPage> getGlyphPages () {
 		return glyphPages;
 	}
 
@@ -945,7 +943,7 @@ public class UnicodeFont implements org.newdawn.slick.Font {
 	 * 
 	 * @return The list of effects to be applied to the font
 	 */
-	public List getEffects () {
+	public List<Effect> getEffects () {
 		return effects;
 	}
 

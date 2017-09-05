@@ -1,7 +1,5 @@
 package org.newdawn.slick;
 
-import java.io.IOException;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -291,24 +289,6 @@ public class Input {
 	private static final int DOWN = 3;
 	/** Control index */
 	private static final int BUTTON1 = 4;
-	/** Control index */
-	private static final int BUTTON2 = 5;
-	/** Control index */
-	private static final int BUTTON3 = 6;
-	/** Control index */
-	private static final int BUTTON4 = 7;
-	/** Control index */
-	private static final int BUTTON5 = 8;
-	/** Control index */
-	private static final int BUTTON6 = 9;
-	/** Control index */
-	private static final int BUTTON7 = 10;
-	/** Control index */
-	private static final int BUTTON8 = 11;
-	/** Control index */
-	private static final int BUTTON9 = 12;
-	/** Control index */
-	private static final int BUTTON10 = 13;
 	
 	/** The left mouse button indicator */
 	public static final int MOUSE_LEFT_BUTTON = 0;
@@ -320,7 +300,7 @@ public class Input {
 	/** True if the controllers system has been initialised */
 	private static boolean controllersInited = false;
 	/** The list of controllers */
-	private static ArrayList controllers = new ArrayList();
+	private static ArrayList<Controller> controllers = new ArrayList<>();
 
 	/** The last recorded mouse x position */
 	private int lastMouseX;
@@ -343,19 +323,17 @@ public class Input {
 	/** True if the event has been consumed */
 	protected boolean consumed = false;
 	/** A list of listeners to be notified of input events */
-	protected HashSet allListeners = new HashSet();
+	protected HashSet<ControlledInputReciever> allListeners = new HashSet<>();
 	/** The listeners to notify of key events */
-	protected ArrayList keyListeners = new ArrayList();
+	protected ArrayList<KeyListener> keyListeners = new ArrayList<>();
 	/** The listener to add */
-	protected ArrayList keyListenersToAdd = new ArrayList();
+	protected ArrayList<KeyListener> keyListenersToAdd = new ArrayList<>();
 	/** The listeners to notify of mouse events */
-	protected ArrayList mouseListeners = new ArrayList();
+	protected ArrayList<MouseListener> mouseListeners = new ArrayList<>();
 	/** The listener to add */
-	protected ArrayList mouseListenersToAdd = new ArrayList();
-	/** The listener to nofiy of controller events */
-	protected ArrayList controllerListeners = new ArrayList();
-	/** The current value of the wheel */
-	private int wheel;
+	protected ArrayList<MouseListener> mouseListenersToAdd = new ArrayList<>();
+	/** The listener to notify of controller events */
+	protected ArrayList<ControllerListener> controllerListeners = new ArrayList<>();
 	/** The height of the display */
 	private int height;
 	
@@ -384,11 +362,7 @@ public class Input {
 	private int doubleClickDelay = 250;
 	/** The timer running out for a single click */
 	private long doubleClickTimeout = 0;
-	
-	/** The clicked x position */
-	private int clickX;
-	/** The clicked y position */
-	private int clickY;
+
 	/** The clicked button */
 	private int clickButton;
 
@@ -604,10 +578,6 @@ public class Input {
 	 */
 	public void removeKeyListener(KeyListener listener) {
 		keyListeners.remove(listener);
-		
-		if (!mouseListeners.contains(listener) && !controllerListeners.contains(listener)) {
-			allListeners.remove(listener);
-		}
 	}
 
 	/**
@@ -617,10 +587,6 @@ public class Input {
 	 */
 	public void removeControllerListener(ControllerListener listener) {
 		controllerListeners.remove(listener);
-		
-		if (!mouseListeners.contains(listener) && !keyListeners.contains(listener)) {
-			allListeners.remove(listener);
-		}
 	}
 
 	/**
@@ -630,10 +596,6 @@ public class Input {
 	 */
 	public void removeMouseListener(MouseListener listener) {
 		mouseListeners.remove(listener);
-		
-		if (!controllerListeners.contains(listener) && !keyListeners.contains(listener)) {
-			allListeners.remove(listener);
-		}
 	}
 	
 	/**
@@ -1062,21 +1024,6 @@ public class Input {
 	}
 	
 	/**
-	 * A null stream to clear out those horrid errors
-	 *
-	 * @author kevin
-	 */
-	private class NullOutputStream extends OutputStream {
-		/**
-		 * @see java.io.OutputStream#write(int)
-		 */
-		public void write(int b) throws IOException {
-			// null implemetnation
-		}
-		
-	}
-	
-	/**
 	 * Hook to allow us to translate any key character into special key 
 	 * codes for easier use.
 	 * 
@@ -1104,8 +1051,6 @@ public class Input {
 	 */
 	public void considerDoubleClick(int button, int x, int y) {
 		if (doubleClickTimeout == 0) {
-			clickX = x;
-			clickY = y;
 			clickButton = button;
 			doubleClickTimeout = System.currentTimeMillis() + doubleClickDelay;
 			fireMouseClicked(button, x, y, 1);
@@ -1160,7 +1105,7 @@ public class Input {
 		
 		this.height = height;
 
-		Iterator allStarts = allListeners.iterator();
+		Iterator<ControlledInputReciever> allStarts = allListeners.iterator();
 		while (allStarts.hasNext()) {
 			ControlledInputReciever listener = (ControlledInputReciever) allStarts.next();
 			listener.inputStarted();
@@ -1266,7 +1211,6 @@ public class Input {
 				}
 				
 				int dwheel = Mouse.getEventDWheel();
-				wheel += dwheel;
 				if (dwheel != 0) {
 					consumed = false;
 					for (int i=0;i<mouseListeners.size();i++) {
@@ -1345,7 +1289,7 @@ public class Input {
 		}
 
 		
-		Iterator all = allListeners.iterator();
+		Iterator<ControlledInputReciever> all = allListeners.iterator();
 		while (all.hasNext()) {
 			ControlledInputReciever listener = (ControlledInputReciever) all.next();
 			listener.inputEnded();

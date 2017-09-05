@@ -27,7 +27,7 @@ public class WebstartMuffin implements Muffin {
 	/**
 	 * @see org.newdawn.slick.muffin.Muffin#saveFile(java.util.HashMap, java.lang.String)
 	 */
-	public void saveFile(HashMap scoreMap, String fileName) throws IOException {
+	public void saveFile(HashMap<String, ? extends Object> scoreMap, String fileName) throws IOException {
 
 		PersistenceService ps;
 		BasicService bs;
@@ -60,10 +60,10 @@ public class WebstartMuffin implements Muffin {
 					.getOutputStream(false));
 
 			// scroll through hashMap and write key and value to file
-			Set keys = scoreMap.keySet(); // get the keys
+			Set<String> keys = scoreMap.keySet(); // get the keys
 
 			// get values using keys
-			for (Iterator i = keys.iterator(); i.hasNext();) {
+			for (Iterator<String> i = keys.iterator(); i.hasNext();) {
 				String key = (String) i.next();
 
 				oos.writeUTF(key);
@@ -88,8 +88,8 @@ public class WebstartMuffin implements Muffin {
 	/**
 	 * @see org.newdawn.slick.muffin.Muffin#loadFile(java.lang.String)
 	 */
-	public HashMap loadFile(String fileName) throws IOException {
-		HashMap hashMap = new HashMap();
+	public HashMap<String, ? extends Object> loadFile(String fileName) throws IOException {
+		HashMap<String, Object> hashMap = new HashMap<>();
 
 		try {
 			PersistenceService ps = (PersistenceService) ServiceManager

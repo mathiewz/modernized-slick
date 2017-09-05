@@ -31,7 +31,7 @@ public class TrueTypeFont implements org.newdawn.slick.Font {
 	private IntObject[] charArray = new IntObject[256];
 	
 	/** Map of user defined font characters (Character <-> IntObject) */
-	private Map customChars = new HashMap();
+	private Map<Character, IntObject> customChars = new HashMap<>();
 
 	/** Boolean flag on whether AntiAliasing is enabled or not */
 	private boolean antiAlias;

@@ -38,13 +38,11 @@ public class SoundStore {
 	/** The number of sound sources enabled - default 8 */
 	private int sourceCount;
 	/** The map of references to IDs of previously loaded sounds */
-	private HashMap loaded = new HashMap();
+	private HashMap<String, Integer> loaded = new HashMap<>();
 	/** The ID of the buffer containing the music currently being played */
 	private int currentMusic = -1;
 	/** The OpenGL AL sound sources in use */
 	private IntBuffer sources;
-	/** The next source to be used for sound effects */
-	private int nextSource;
 	/** True if the sound system has been initialise */
 	private boolean inited = false;
 	/** The MODSound to be updated */
@@ -289,8 +287,8 @@ public class SoundStore {
 		Log.info("Initialising sounds..");
 		inited = true;
 		
-		AccessController.doPrivileged(new PrivilegedAction() {
-            public Object run() {
+		AccessController.doPrivileged(new PrivilegedAction<Void>() {
+            public Void run() {
 				try {
 					AL.create();
 					soundWorks = true;

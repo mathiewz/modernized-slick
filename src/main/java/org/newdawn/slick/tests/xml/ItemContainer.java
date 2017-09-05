@@ -9,13 +9,14 @@ import java.util.ArrayList;
  */
 public class ItemContainer extends Item {
 	/** The items held in this container */
-	private ArrayList items = new ArrayList();
+	private ArrayList<Item> items = new ArrayList<>();
 
 	/**
 	 * Called by XML parser to add a configured item to the entity 
 	 * 
 	 * @param item The item to be added 
 	 */
+	@SuppressWarnings("unused")
 	private void add(Item item) {
 		items.add(item);
 	}
@@ -27,6 +28,7 @@ public class ItemContainer extends Item {
 	 *  
 	 * @param name The value to set
 	 */
+	@SuppressWarnings("unused")
 	private void setName(String name) {
 		this.name = name;
 	}
@@ -38,6 +40,7 @@ public class ItemContainer extends Item {
 	 *  
 	 * @param condition The value to set
 	 */
+	@SuppressWarnings("unused")
 	private void setCondition(int condition) {
 		this.condition = condition;
 	}

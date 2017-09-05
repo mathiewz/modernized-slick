@@ -47,7 +47,7 @@ public class HieroSettings {
 	/** The height of the glyph page generated */
 	private int glyphPageHeight = 512;
 	/** The list of effects applied */
-	private final List effects = new ArrayList();
+	private final List<ConfigurableEffect> effects = new ArrayList<>();
 
 	/**
 	 * Default constructor for injection
@@ -106,7 +106,7 @@ public class HieroSettings {
 					glyphPageHeight = Integer.parseInt(value);
 				} else if (name.equals("effect.class")) {
 					try {
-						effects.add(Class.forName(value).newInstance());
+						effects.add((ConfigurableEffect) Class.forName(value).newInstance());
 					} catch (Exception ex) {
 						throw new SlickException("Unable to create effect instance: " + value, ex);
 					}
@@ -114,8 +114,8 @@ public class HieroSettings {
 					// Set an effect value on the last added effect.
 					name = name.substring(7);
 					ConfigurableEffect effect = (ConfigurableEffect)effects.get(effects.size() - 1);
-					List values = effect.getValues();
-					for (Iterator iter = values.iterator(); iter.hasNext();) {
+					List<Value> values = effect.getValues();
+					for (Iterator<Value> iter = values.iterator(); iter.hasNext();) {
 						Value effectValue = (Value)iter.next();
 						if (effectValue.getName().equals(name)) {
 							effectValue.setString(value);
@@ -340,7 +340,7 @@ public class HieroSettings {
 	 * 
 	 * @return The list of effects applied to the text
 	 */
-	public List getEffects() {
+	public List<ConfigurableEffect> getEffects() {
 		return effects;
 	}
 
@@ -366,10 +366,10 @@ public class HieroSettings {
 		out.println("glyph.page.width=" + glyphPageWidth);
 		out.println("glyph.page.height=" + glyphPageHeight);
 		out.println();
-		for (Iterator iter = effects.iterator(); iter.hasNext();) {
+		for (Iterator<ConfigurableEffect> iter = effects.iterator(); iter.hasNext();) {
 			ConfigurableEffect effect = (ConfigurableEffect)iter.next();
 			out.println("effect.class=" + effect.getClass().getName());
-			for (Iterator iter2 = effect.getValues().iterator(); iter2.hasNext();) {
+			for (Iterator<Value> iter2 = effect.getValues().iterator(); iter2.hasNext();) {
 				Value value = (Value)iter2.next();
 				out.println("effect." + value.getName() + "=" + value.getString());
 			}
