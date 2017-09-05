@@ -1,4 +1,4 @@
-# slick2D
+# Modernized Slick
 
 fork from [this repository](https://bitbucket.org/kevglass/slick)
 
