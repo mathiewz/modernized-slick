@@ -45,7 +45,7 @@ public class Path extends Shape {
      * @param sy
      *            The start point of the hole
      */
-    public void startHole(Float sx, Float sy) {
+    public void startHole() {
         hole = new ArrayList<>();
         holes.add(hole);
     }
@@ -128,12 +128,12 @@ public class Path extends Shape {
             Float t = i * step;
             Vector2f p = curve.pointAt(t);
             if (hole != null) {
-                hole.add(new Float[] { p.x, p.y });
+                hole.add(new Float[] { p.getX(), p.getY() });
             } else {
-                localPoints.add(new Float[] { p.x, p.y });
+                localPoints.add(new Float[] { p.getX(), p.getY() });
             }
-            cx = p.x;
-            cy = p.y;
+            cx = p.getX();
+            cy = p.getY();
         }
         pointsDirty = true;
     }

@@ -14,9 +14,9 @@ public strictfp class Vector2f implements Serializable {
     private static final long serialVersionUID = 1339934L;
 
     /** The x component of this vector */
-    public float x;
+    private float x;
     /** The y component of this vector */
-    public float y;
+    private float y;
 
     /**
      * Create an empty vector
@@ -62,22 +62,10 @@ public strictfp class Vector2f implements Serializable {
         if (theta < 0) {
             theta = 360 + theta;
         }
-        double oldTheta = getTheta();
-        if (theta < -360 || theta > 360) {
-            oldTheta = oldTheta % 360;
-        }
-        if (theta < 0) {
-            oldTheta = 360 + oldTheta;
-        }
-
         float len = length();
         x = len * (float) FastTrig.cos(StrictMath.toRadians(theta));
         y = len * (float) FastTrig.sin(StrictMath.toRadians(theta));
 
-// x = x / (float) FastTrig.cos(StrictMath.toRadians(oldTheta))
-// * (float) FastTrig.cos(StrictMath.toRadians(theta));
-// y = x / (float) FastTrig.sin(StrictMath.toRadians(oldTheta))
-// * (float) FastTrig.sin(StrictMath.toRadians(theta));
     }
 
     /**
@@ -410,5 +398,13 @@ public strictfp class Vector2f implements Serializable {
         }
 
         return false;
+    }
+    
+    public void setY(float y) {
+        this.y = y;
+    }
+    
+    public void setX(float x) {
+        this.x = x;
     }
 }

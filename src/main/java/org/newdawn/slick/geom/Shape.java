@@ -10,9 +10,9 @@ import java.io.Serializable;
  */
 public abstract class Shape implements Serializable {
     /** The points representing this polygon. */
-    protected Float points[];
+    protected Float[] points;
     /** Center point of the polygon. */
-    protected float center[];
+    protected float[] center;
     /** The left most point of this shape. */
     protected float x;
     /** The top most point of this shape. */
@@ -100,7 +100,6 @@ public abstract class Shape implements Serializable {
                 points[i * 2] += dx;
             }
             center[0] += dx;
-            x += dx;
             maxX += dx;
             minX += dx;
             trianglesDirty = true;
@@ -126,7 +125,6 @@ public abstract class Shape implements Serializable {
                 points[i * 2 + 1] += dy;
             }
             center[1] += dy;
-            y += dy;
             maxY += dy;
             minY += dy;
             trianglesDirty = true;
@@ -159,8 +157,8 @@ public abstract class Shape implements Serializable {
      *            The new coordinate of the top-left of this shape
      */
     public void setLocation(Vector2f loc) {
-        setX(loc.x);
-        setY(loc.y);
+        setX(loc.getX());
+        setY(loc.getY());
     }
 
     /**
@@ -305,7 +303,7 @@ public abstract class Shape implements Serializable {
     public float[] getPoint(int index) {
         checkPoints();
 
-        float result[] = new float[2];
+        float[] result = new float[2];
 
         result[0] = points[index * 2];
         result[1] = points[index * 2 + 1];
@@ -508,8 +506,8 @@ public abstract class Shape implements Serializable {
         checkPoints();
 
         boolean result = false;
-        Float points[] = getPoints();           // (x3, y3) and (x4, y4)
-        Float thatPoints[] = shape.getPoints(); // (x1, y1) and (x2, y2)
+        Float[] points = getPoints();           // (x3, y3) and (x4, y4)
+        Float[] thatPoints = shape.getPoints(); // (x1, y1) and (x2, y2)
         int length = points.length;
         int thatLength = thatPoints.length;
         double unknownA;
@@ -594,8 +592,8 @@ public abstract class Shape implements Serializable {
             center[0] += points[i];
             center[1] += points[i + 1];
         }
-        center[0] /= length / 2;
-        center[1] /= length / 2;
+        center[0] /= length / 2f;
+        center[1] /= length / 2f;
     }
 
     /**

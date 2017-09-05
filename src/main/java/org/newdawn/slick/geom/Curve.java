@@ -75,8 +75,8 @@ public class Curve extends Shape {
         float f3 = 3 * a * b * b;
         float f4 = b * b * b;
 
-        float nx = p1.x * f1 + c1.x * f2 + c2.x * f3 + p2.x * f4;
-        float ny = p1.y * f1 + c1.y * f2 + c2.y * f3 + p2.y * f4;
+        float nx = p1.getX() * f1 + c1.getX() * f2 + c2.getX() * f3 + p2.getX() * f4;
+        float ny = p1.getY() * f1 + c1.getY() * f2 + c2.getY() * f3 + p2.getY() * f4;
 
         return new Vector2f(nx, ny);
     }
@@ -92,8 +92,8 @@ public class Curve extends Shape {
             float t = i * step;
 
             Vector2f p = pointAt(t);
-            points[i * 2] = p.x;
-            points[i * 2 + 1] = p.y;
+            points[i * 2] = p.getX();
+            points[i * 2 + 1] = p.getY();
         }
     }
 
@@ -104,14 +104,14 @@ public class Curve extends Shape {
     public Shape transform(Transform transform) {
         Float[] pts = new Float[8];
         Float[] dest = new Float[8];
-        pts[0] = p1.x;
-        pts[1] = p1.y;
-        pts[2] = c1.x;
-        pts[3] = c1.y;
-        pts[4] = c2.x;
-        pts[5] = c2.y;
-        pts[6] = p2.x;
-        pts[7] = p2.y;
+        pts[0] = p1.getX();
+        pts[1] = p1.getY();
+        pts[2] = c1.getX();
+        pts[3] = c1.getY();
+        pts[4] = c2.getX();
+        pts[5] = c2.getY();
+        pts[6] = p2.getX();
+        pts[7] = p2.getY();
         transform.transform(pts, 0, dest, 0, 4);
 
         return new Curve(new Vector2f(dest[0], dest[1]), new Vector2f(dest[2], dest[3]), new Vector2f(dest[4], dest[5]), new Vector2f(dest[6], dest[7]));

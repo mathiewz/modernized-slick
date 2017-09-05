@@ -1,5 +1,6 @@
 package org.newdawn.slick.geom;
 
+import org.newdawn.slick.SlickException;
 import org.newdawn.slick.util.FastTrig;
 
 /**
@@ -15,7 +16,7 @@ public class Transform {
      * |3 4 5|
      * |6 7 8|
      */
-    private float matrixPosition[];
+    private float[] matrixPosition;
 
     /**
      * Create and identity transform
@@ -56,12 +57,10 @@ public class Transform {
      *
      * @param matrixPosition
      *            An array of float[6] to set up a transform
-     * @throws RuntimeException
-     *             if the array is not of length 6
      */
-    public Transform(float matrixPosition[]) {
+    public Transform(float[] matrixPosition) {
         if (matrixPosition.length != 6) {
-            throw new RuntimeException("The parameter must be a float array of length 6.");
+            throw new SlickException("The parameter must be a float array of length 6.");
         }
         this.matrixPosition = new float[] { matrixPosition[0], matrixPosition[1], matrixPosition[2], matrixPosition[3], matrixPosition[4], matrixPosition[5], 0, 0, 1 };
     }
@@ -104,9 +103,9 @@ public class Transform {
      * @throws ArrayIndexOutOfBoundsException
      *             if sourceOffset + numberOfPoints * 2 > source.length or the same operation on the destination array
      */
-    public void transform(Float source[], int sourceOffset, Float destination[], int destOffset, int numberOfPoints) {
+    public void transform(Float[] source, int sourceOffset, Float[] destination, int destOffset, int numberOfPoints) {
         // TODO performance can be improved by removing the safety to the destination array
-        Float result[] = source == destination ? new Float[numberOfPoints * 2] : destination;
+        Float[] result = source == destination ? new Float[numberOfPoints * 2] : destination;
 
         for (int i = 0; i < numberOfPoints * 2; i += 2) {
             for (int j = 0; j < 6; j += 3) {
@@ -144,14 +143,6 @@ public class Transform {
         mp[3] = n10;
         mp[4] = n11;
         mp[5] = n12;
-//
-// mp[0] = matrixPosition[0] * transform.matrixPosition[0] + matrixPosition[0] * transform.matrixPosition[3] + matrixPosition[0] * transform.matrixPosition[6];
-// mp[1] = matrixPosition[1] * transform.matrixPosition[1] + matrixPosition[1] * transform.matrixPosition[4] + matrixPosition[1] * transform.matrixPosition[7];
-// mp[2] = matrixPosition[2] * transform.matrixPosition[2] + matrixPosition[2] * transform.matrixPosition[5] + matrixPosition[2] * transform.matrixPosition[8];
-// mp[3] = matrixPosition[3] * transform.matrixPosition[0] + matrixPosition[3] * transform.matrixPosition[3] + matrixPosition[3] * transform.matrixPosition[6];
-// mp[4] = matrixPosition[4] * transform.matrixPosition[1] + matrixPosition[4] * transform.matrixPosition[4] + matrixPosition[4] * transform.matrixPosition[7];
-// mp[5] = matrixPosition[5] * transform.matrixPosition[2] + matrixPosition[5] * transform.matrixPosition[5] + matrixPosition[5] * transform.matrixPosition[8];
-//
         matrixPosition = mp;
         return this;
     }
@@ -241,7 +232,7 @@ public class Transform {
      * @return The resulting point transformed by this matrix
      */
     public Vector2f transform(Vector2f pt) {
-        Float[] in = new Float[] { pt.x, pt.y };
+        Float[] in = new Float[] { pt.getX(), pt.getY() };
         Float[] out = new Float[2];
 
         transform(in, 0, out, 0, 1);

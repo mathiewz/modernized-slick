@@ -109,65 +109,63 @@ public class MannTriangulator implements Triangulator {
         for (PointBag hole = holes; hole != null; hole = hole.next) {
             hole.computeAngles();
         }
-
+        
         // Step 2: Connect the holes with the contour (build bridges)
         while (holes != null) {
             Point pHole = holes.first;
             outer: do {
                 if (pHole.angle <= 0) {
                     Point pContour = contour.first;
-                    do {
-                        inner: if (pHole.isInfront(pContour) && pContour.isInfront(pHole)) {
-                            if (!contour.doesIntersectSegment(pHole.pt, pContour.pt)) {
-                                PointBag hole = holes;
-                                do {
-                                    if (hole.doesIntersectSegment(pHole.pt, pContour.pt)) {
-                                        break inner;
-                                    }
-                                } while ((hole = hole.next) != null);
-
-                                Point newPtContour = getPoint(pContour.pt);
-                                pContour.insertAfter(newPtContour);
-
-                                Point newPtHole = getPoint(pHole.pt);
-                                pHole.insertBefore(newPtHole);
-
-                                pContour.next = pHole;
-                                pHole.prev = pContour;
-
-                                newPtHole.next = newPtContour;
-                                newPtContour.prev = newPtHole;
-
-                                pContour.computeAngle();
-                                pHole.computeAngle();
-                                newPtContour.computeAngle();
-                                newPtHole.computeAngle();
-
-                                // detach the points from the hole
-                                holes.first = null;
-                                break outer;
-                            }
+                    inner: do {
+                        if (pHole.isInfront(pContour) && pContour.isInfront(pHole) && !contour.doesIntersectSegment(pHole.pt, pContour.pt)) {
+                            PointBag hole = holes;
+                            do {
+                                if (hole.doesIntersectSegment(pHole.pt, pContour.pt)) {
+                                    break inner;
+                                }
+                            } while ((hole = hole.next) != null);
+                            
+                            Point newPtContour = getPoint(pContour.pt);
+                            pContour.insertAfter(newPtContour);
+                            
+                            Point newPtHole = getPoint(pHole.pt);
+                            pHole.insertBefore(newPtHole);
+                            
+                            pContour.next = pHole;
+                            pHole.prev = pContour;
+                            
+                            newPtHole.next = newPtContour;
+                            newPtContour.prev = newPtHole;
+                            
+                            pContour.computeAngle();
+                            pHole.computeAngle();
+                            newPtContour.computeAngle();
+                            newPtHole.computeAngle();
+                            
+                            // detach the points from the hole
+                            holes.first = null;
+                            break outer;
                         }
                     } while ((pContour = pContour.next) != contour.first);
                 }
             } while ((pHole = pHole.next) != holes.first);
-
+            
             // free the hole
             holes = freePointBag(holes);
         }
-
+        
         // Step 3: Make sure we have enough space for the result
         int numTriangles = contour.countPoints() - 2;
         int neededSpace = numTriangles * 3 + 1; // for the null
         if (result.length < neededSpace) {
             result = (Vector2f[]) Array.newInstance(result.getClass().getComponentType(), neededSpace);
         }
-
+        
         // Step 4: Extract the triangles
         int idx = 0;
         for (;;) {
             Point pContour = contour.first;
-
+            
             if (pContour == null) {
                 break;
             }
@@ -175,43 +173,42 @@ public class MannTriangulator implements Triangulator {
             if (pContour.next == pContour.prev) {
                 break;
             }
-
-            outer: do {
+            
+            do {
                 if (pContour.angle > 0) {
                     Point prev = pContour.prev;
                     Point next = pContour.next;
-
-                    if (next.next == prev || prev.isInfront(next) && next.isInfront(prev)) {
-                        if (!contour.doesIntersectSegment(prev.pt, next.pt)) {
-                            result[idx++] = pContour.pt;
-                            result[idx++] = next.pt;
-                            result[idx++] = prev.pt;
-                            break outer;
-                        }
+                    
+                    if ((next.next == prev || prev.isInfront(next) && next.isInfront(prev)) && !contour.doesIntersectSegment(prev.pt, next.pt)) {
+                        result[idx++] = pContour.pt;
+                        result[idx++] = next.pt;
+                        result[idx++] = prev.pt;
+                        break;
                     }
                 }
             } while ((pContour = pContour.next) != contour.first);
-
+            
             // remove the point - we do it in every case to prevent endless loop
             Point prev = pContour.prev;
             Point next = pContour.next;
-
+            
             contour.first = prev;
             pContour.unlink();
             freePoint(pContour);
-
+            
             next.computeAngle();
             prev.computeAngle();
         }
-
+        
         // Step 5: Append a null (see Collection.toArray)
         result[idx] = null;
-
+        
         // Step 6: Free memory
         contour.clear();
-
+        
         // Finished !
         return result;
+        
     }
 
     /**
@@ -273,18 +270,6 @@ public class MannTriangulator implements Triangulator {
     private void freePoint(Point p) {
         p.next = nextFreePoint;
         nextFreePoint = p;
-    }
-
-    /**
-     * Release all points
-     *
-     * @param head
-     *            The head of the points bag
-     */
-    private void freePoints(Point head) {
-        head.prev.next = nextFreePoint;
-        head.prev = null;
-        nextFreePoint = head;
     }
 
     /**
@@ -370,19 +355,19 @@ public class MannTriangulator implements Triangulator {
          */
         public void computeAngle() {
             if (prev.pt.equals(pt)) {
-                pt.x += 0.01f;
+                pt.setX(pt.getX() + 0.01f);
             }
-            double dx1 = pt.x - prev.pt.x;
-            double dy1 = pt.y - prev.pt.y;
+            double dx1 = pt.getX() - prev.pt.getX();
+            double dy1 = pt.getY() - prev.pt.getY();
             double len1 = hypot(dx1, dy1);
             dx1 /= len1;
             dy1 /= len1;
 
             if (next.pt.equals(pt)) {
-                pt.y += 0.01f;
+                pt.setY(pt.getY() + 0.01f);
             }
-            double dx2 = next.pt.x - pt.x;
-            double dy2 = next.pt.y - pt.y;
+            double dx2 = next.pt.getX() - pt.getX();
+            double dy2 = next.pt.getY() - pt.getY();
             double len2 = hypot(dx2, dy2);
             dx2 /= len2;
             dy2 /= len2;
@@ -418,10 +403,10 @@ public class MannTriangulator implements Triangulator {
         public boolean isInfront(double dx, double dy) {
             // no nead to normalize, amplitude does not metter for side
             // detection
-            boolean sidePrev = (prev.pt.y - pt.y) * dx + (pt.x - prev.pt.x) * dy >= 0;
-            boolean sideNext = (pt.y - next.pt.y) * dx + (next.pt.x - pt.x) * dy >= 0;
+            boolean sidePrev = (prev.pt.getY() - pt.getY()) * dx + (pt.getX() - prev.pt.getX()) * dy >= 0;
+            boolean sideNext = (pt.getY() - next.pt.getY()) * dx + (next.pt.getX() - pt.getX()) * dy >= 0;
 
-            return angle < 0 ? sidePrev | sideNext : sidePrev & sideNext;
+            return angle < 0 ? sidePrev || sideNext : sidePrev && sideNext;
         }
 
         /**
@@ -432,7 +417,7 @@ public class MannTriangulator implements Triangulator {
          * @return True if this point is infront (in the contour)
          */
         public boolean isInfront(Point p) {
-            return isInfront(p.pt.x - pt.x, p.pt.y - pt.y);
+            return isInfront(p.pt.getX() - pt.getX(), p.pt.getY() - pt.getY());
         }
     }
 
@@ -455,6 +440,18 @@ public class MannTriangulator implements Triangulator {
                 freePoints(first);
                 first = null;
             }
+        }
+
+        /**
+         * Release all points
+         *
+         * @param head
+         *            The head of the points bag
+         */
+        private void freePoints(Point head) {
+            head.prev.next = nextFreePoint;
+            head.prev = null;
+            nextFreePoint = head;
         }
 
         /**
@@ -498,19 +495,19 @@ public class MannTriangulator implements Triangulator {
          * @return True if points in this contour intersect with the segment
          */
         public boolean doesIntersectSegment(Vector2f v1, Vector2f v2) {
-            double dxA = v2.x - v1.x;
-            double dyA = v2.y - v1.y;
+            double dxA = v2.getX() - v1.getX();
+            double dyA = v2.getY() - v1.getY();
 
             for (Point p = first;;) {
                 Point n = p.next;
                 if (p.pt != v1 && n.pt != v1 && p.pt != v2 && n.pt != v2) {
-                    double dxB = n.pt.x - p.pt.x;
-                    double dyB = n.pt.y - p.pt.y;
+                    double dxB = n.pt.getX() - p.pt.getX();
+                    double dyB = n.pt.getY() - p.pt.getY();
                     double d = dxA * dyB - dyA * dxB;
 
                     if (Math.abs(d) > EPSILON) {
-                        double tmp1 = p.pt.x - v1.x;
-                        double tmp2 = p.pt.y - v1.y;
+                        double tmp1 = p.pt.getX() - v1.getX();
+                        double tmp2 = p.pt.getY() - v1.getY();
                         double tA = (dyB * tmp1 - dxB * tmp2) / d;
                         double tB = (dyA * tmp1 - dxA * tmp2) / d;
 
@@ -553,17 +550,7 @@ public class MannTriangulator implements Triangulator {
          * @return True if it's in the bag
          */
         public boolean contains(Vector2f point) {
-            if (first == null) {
-                return false;
-            }
-
-            if (first.prev.pt.equals(point)) {
-                return true;
-            }
-            if (first.pt.equals(point)) {
-                return true;
-            }
-            return false;
+            return first != null && (first.prev.pt.equals(point) || first.pt.equals(point));
         }
     }
 
@@ -597,7 +584,7 @@ public class MannTriangulator implements Triangulator {
     public float[] getTrianglePoint(int tri, int i) {
         Vector2f pt = triangles.get(tri * 3 + i);
 
-        return new float[] { pt.x, pt.y };
+        return new float[] { pt.getX(), pt.getY() };
     }
 
 }

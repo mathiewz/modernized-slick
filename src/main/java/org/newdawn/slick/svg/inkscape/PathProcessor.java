@@ -56,9 +56,7 @@ public class PathProcessor implements ElementProcessor {
                     }
 
                     reasonToBePath = true;
-                    float x = Float.parseFloat(tokens.nextToken());
-                    float y = Float.parseFloat(tokens.nextToken());
-                    path.startHole(x, y);
+                    path.startHole();
 
                     continue;
                 }
