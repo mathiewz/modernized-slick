@@ -5,9 +5,9 @@ import java.util.ArrayList;
 import org.newdawn.slick.util.FastTrig;
 
 /**
- * An ellipse meeting the <code>Shape</code> contract. The ellipse is actually an approximation using 
+ * An ellipse meeting the <code>Shape</code> contract. The ellipse is actually an approximation using
  * a series of points generated around the contour of the ellipse.
- * 
+ *
  * @author Mark
  */
 public class Ellipse extends Shape {
@@ -15,11 +15,11 @@ public class Ellipse extends Shape {
      * Default number of segments to draw this ellipse with
      */
     protected static final int DEFAULT_SEGMENT_COUNT = 50;
-    
+
     /**
      * The number of segments for graphical representation.
      */
-    private int segmentCount;
+    private final int segmentCount;
     /**
      * horizontal radius
      */
@@ -32,10 +32,14 @@ public class Ellipse extends Shape {
     /**
      * Creates a new Ellipse object.
      *
-     * @param centerPointX x coordinate of the center of the ellipse
-     * @param centerPointY y coordinate of the center of the ellipse
-     * @param radius1 horizontal radius
-     * @param radius2 vertical radius
+     * @param centerPointX
+     *            x coordinate of the center of the ellipse
+     * @param centerPointY
+     *            y coordinate of the center of the ellipse
+     * @param radius1
+     *            horizontal radius
+     * @param radius2
+     *            vertical radius
      */
     public Ellipse(float centerPointX, float centerPointY, float radius1, float radius2) {
         this(centerPointX, centerPointY, radius1, radius2, DEFAULT_SEGMENT_COUNT);
@@ -44,15 +48,20 @@ public class Ellipse extends Shape {
     /**
      * Creates a new Ellipse object.
      *
-     * @param centerPointX x coordinate of the center of the ellipse
-     * @param centerPointY y coordinate of the center of the ellipse
-     * @param radius1 horizontal radius
-     * @param radius2 vertical radius
-     * @param segmentCount how fine to make the ellipse.
+     * @param centerPointX
+     *            x coordinate of the center of the ellipse
+     * @param centerPointY
+     *            y coordinate of the center of the ellipse
+     * @param radius1
+     *            horizontal radius
+     * @param radius2
+     *            vertical radius
+     * @param segmentCount
+     *            how fine to make the ellipse.
      */
     public Ellipse(float centerPointX, float centerPointY, float radius1, float radius2, int segmentCount) {
-        this.x = centerPointX - radius1;
-        this.y = centerPointY - radius2;
+        x = centerPointX - radius1;
+        y = centerPointY - radius2;
         this.radius1 = radius1;
         this.radius2 = radius2;
         this.segmentCount = segmentCount;
@@ -61,18 +70,20 @@ public class Ellipse extends Shape {
 
     /**
      * Change the shape of this Ellipse
-     * 
-     * @param radius1 horizontal radius
-     * @param radius2 vertical radius
+     *
+     * @param radius1
+     *            horizontal radius
+     * @param radius2
+     *            vertical radius
      */
     public void setRadii(float radius1, float radius2) {
-    	setRadius1(radius1);
-    	setRadius2(radius2);
+        setRadius1(radius1);
+        setRadius2(radius2);
     }
 
     /**
      * Get the horizontal radius of the ellipse
-     * 
+     *
      * @return The horizontal radius of the ellipse
      */
     public float getRadius1() {
@@ -81,19 +92,20 @@ public class Ellipse extends Shape {
 
     /**
      * Set the horizontal radius of the ellipse
-     * 
-     * @param radius1 The horizontal radius to set
+     *
+     * @param radius1
+     *            The horizontal radius to set
      */
     public void setRadius1(float radius1) {
-    	if (radius1 != this.radius1) {
-	        this.radius1 = radius1;
-	        pointsDirty = true;
-    	}
+        if (radius1 != this.radius1) {
+            this.radius1 = radius1;
+            pointsDirty = true;
+        }
     }
 
     /**
      * Get the vertical radius of the ellipse
-     * 
+     *
      * @return The vertical radius of the ellipse
      */
     public float getRadius2() {
@@ -102,20 +114,22 @@ public class Ellipse extends Shape {
 
     /**
      * Set the vertical radius of the ellipse
-     * 
-     * @param radius2 The vertical radius to set
+     *
+     * @param radius2
+     *            The vertical radius to set
      */
     public void setRadius2(float radius2) {
-    	if (radius2 != this.radius2) {
-	        this.radius2 = radius2;
-	        pointsDirty = true;
-    	}
+        if (radius2 != this.radius2) {
+            this.radius2 = radius2;
+            pointsDirty = true;
+        }
     }
 
     /**
      * Generate the points to outline this ellipse.
      *
      */
+    @Override
     protected void createPoints() {
         ArrayList<Float> tempPoints = new ArrayList<>();
 
@@ -126,50 +140,51 @@ public class Ellipse extends Shape {
 
         float start = 0;
         float end = 359;
-        
+
         float cx = x + radius1;
         float cy = y + radius2;
-        
+
         int step = 360 / segmentCount;
-        
-        for (float a=start;a<=end+step;a+=step) {
+
+        for (float a = start; a <= end + step; a += step) {
             float ang = a;
             if (ang > end) {
                 ang = end;
             }
-            float newX = (float) (cx + (FastTrig.cos(Math.toRadians(ang)) * radius1));
-            float newY = (float) (cy + (FastTrig.sin(Math.toRadians(ang)) * radius2));
+            float newX = (float) (cx + FastTrig.cos(Math.toRadians(ang)) * radius1);
+            float newY = (float) (cy + FastTrig.sin(Math.toRadians(ang)) * radius2);
 
-            if(newX > maxX) {
+            if (newX > maxX) {
                 maxX = newX;
             }
-            if(newY > maxY) {
+            if (newY > maxY) {
                 maxY = newY;
             }
-            if(newX < minX) {
-            	minX = newX;
+            if (newX < minX) {
+                minX = newX;
             }
-            if(newY < minY) {
-            	minY = newY;
+            if (newY < minY) {
+                minY = newY;
             }
-            
+
             tempPoints.add(new Float(newX));
             tempPoints.add(new Float(newY));
         }
         points = new Float[tempPoints.size()];
-        for(int i=0;i<points.length;i++) {
-            points[i] = ((Float)tempPoints.get(i)).floatValue();
+        for (int i = 0; i < points.length; i++) {
+            points[i] = tempPoints.get(i).floatValue();
         }
     }
 
     /**
      * @see org.newdawn.slick.geom.Shape#transform(org.newdawn.slick.geom.Transform)
      */
+    @Override
     public Shape transform(Transform transform) {
         checkPoints();
-        
+
         Polygon resultPolygon = new Polygon();
-        
+
         Float result[] = new Float[points.length];
         transform.transform(points, 0, result, 0, points.length / 2);
         resultPolygon.points = result;
@@ -181,6 +196,7 @@ public class Ellipse extends Shape {
     /**
      * @see org.newdawn.slick.geom.Shape#findCenter()
      */
+    @Override
     protected void findCenter() {
         center = new float[2];
         center[0] = x + radius1;
@@ -190,7 +206,8 @@ public class Ellipse extends Shape {
     /**
      * @see org.newdawn.slick.geom.Shape#calculateRadius()
      */
+    @Override
     protected void calculateRadius() {
-        boundingCircleRadius = (radius1 > radius2) ? radius1 : radius2;
+        boundingCircleRadius = radius1 > radius2 ? radius1 : radius2;
     }
 }

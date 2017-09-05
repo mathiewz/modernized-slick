@@ -7,11 +7,12 @@ package org.newdawn.slick.gui;
  */
 public interface ComponentListener {
 
-	/**
-	 * Notification that a component has been activated (button clicked,
-	 * text field entered, etc)
-	 * 
-	 * @param source The source of the event
-	 */
-	public void componentActivated(AbstractComponent source);
+    /**
+     * Notification that a component has been activated (button clicked,
+     * text field entered, etc)
+     *
+     * @param source
+     *            The source of the event
+     */
+    public void componentActivated(AbstractComponent source);
 }

@@ -14,62 +14,64 @@ import org.newdawn.slick.util.Log;
 /**
  * An implementation of the muffin load/save mechanism based around using the
  * local file system.
- * 
+ *
  * @author kappaOne
  */
 public class FileMuffin implements Muffin {
 
-	/**
-	 * @see org.newdawn.slick.muffin.Muffin#saveFile(java.util.HashMap,
-	 *      java.lang.String)
-	 */
-	public void saveFile(HashMap<String, ? extends Object> scoreMap, String fileName) throws IOException {
-		String userHome = System.getProperty("user.home");
-		File file = new File(userHome);
-		file = new File(file, ".java");
-		if (!file.exists()) {
-			file.mkdir();
-		}
+    /**
+     * @see org.newdawn.slick.muffin.Muffin#saveFile(java.util.HashMap,
+     *      java.lang.String)
+     */
+    @Override
+    public void saveFile(HashMap<String, ? extends Object> scoreMap, String fileName) throws IOException {
+        String userHome = System.getProperty("user.home");
+        File file = new File(userHome);
+        file = new File(file, ".java");
+        if (!file.exists()) {
+            file.mkdir();
+        }
 
-		file = new File(file, fileName);
-		FileOutputStream fos = new FileOutputStream(file);
-		ObjectOutputStream oos = new ObjectOutputStream(fos);
+        file = new File(file, fileName);
+        FileOutputStream fos = new FileOutputStream(file);
+        ObjectOutputStream oos = new ObjectOutputStream(fos);
 
-		// save hashMap
-		oos.writeObject(scoreMap);
+        // save hashMap
+        oos.writeObject(scoreMap);
 
-		oos.close();
-	}
+        oos.close();
+    }
 
-	/**
-	 * @see org.newdawn.slick.muffin.Muffin#loadFile(java.lang.String)
-	 */
-	@SuppressWarnings("unchecked")
-	public HashMap<String, ? extends Object> loadFile(String fileName) throws IOException {
-		HashMap<String, ? extends Object> hashMap = new HashMap<>();
-		String userHome = System.getProperty("user.home");
+    /**
+     * @see org.newdawn.slick.muffin.Muffin#loadFile(java.lang.String)
+     */
+    @Override
+    @SuppressWarnings("unchecked")
+    public HashMap<String, ? extends Object> loadFile(String fileName) throws IOException {
+        HashMap<String, ? extends Object> hashMap = new HashMap<>();
+        String userHome = System.getProperty("user.home");
 
-		File file = new File(userHome);
-		file = new File(file, ".java");
-		file = new File(file, fileName);
+        File file = new File(userHome);
+        file = new File(file, ".java");
+        file = new File(file, fileName);
 
-		if (file.exists()) {
-			try {
-				FileInputStream fis = new FileInputStream(file);
-				ObjectInputStream ois = new ObjectInputStream(fis);
+        if (file.exists()) {
+            try {
+                FileInputStream fis = new FileInputStream(file);
+                ObjectInputStream ois = new ObjectInputStream(fis);
 
-				hashMap = (HashMap<String, ? extends Object>) ois.readObject();
+                hashMap = (HashMap<String, ? extends Object>) ois.readObject();
 
-				ois.close();
+                ois.close();
 
-			} catch (EOFException e) {
-				// End of the file reached, do nothing
-			} catch (ClassNotFoundException e) {
-				Log.error(e);
-				throw new IOException("Failed to pull state from store - class not found");
-			}
-		}
+            } catch (EOFException e) {
+                // End of the file reached, do nothing
+            } catch (ClassNotFoundException e) {
+                Log.error(e);
+                throw new IOException("Failed to pull state from store - class not found");
+            }
+        }
 
-		return hashMap;
-	}
+        return hashMap;
+    }
 }
