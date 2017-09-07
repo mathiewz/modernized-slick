@@ -1,6 +1,7 @@
 package org.newdawn.slick.geom;
 
 import java.util.ArrayList;
+import java.util.stream.Stream;
 
 /**
  * A polygon implementation meeting the <code>Shape</code> contract.
@@ -12,7 +13,7 @@ public class Polygon extends Shape {
     private boolean allowDups = false;
     /** True if the polygon is closed */
     private boolean closed = true;
-
+    
     /**
      * Construct a new polygon with 3 or more points.
      * This constructor will take the first set of points and copy them after
@@ -21,9 +22,9 @@ public class Polygon extends Shape {
      * @param points
      *            An array of points in x, y order.
      */
-    public Polygon(Float points[]) {
+    public Polygon(Float[] points) {
         int length = points.length;
-
+        
         this.points = new Float[length];
         maxX = -Float.MIN_VALUE;
         maxY = -Float.MIN_VALUE;
@@ -31,7 +32,7 @@ public class Polygon extends Shape {
         minY = Float.MAX_VALUE;
         x = Float.MAX_VALUE;
         y = Float.MAX_VALUE;
-
+        
         for (int i = 0; i < length; i++) {
             this.points[i] = points[i];
             if (i % 2 == 0) {
@@ -56,12 +57,12 @@ public class Polygon extends Shape {
                 }
             }
         }
-
+        
         findCenter();
         calculateRadius();
         pointsDirty = true;
     }
-
+    
     /**
      * Create an empty polygon
      *
@@ -73,7 +74,7 @@ public class Polygon extends Shape {
         minX = Float.MAX_VALUE;
         minY = Float.MAX_VALUE;
     }
-
+    
     /**
      * Indicate if duplicate points are allow
      *
@@ -83,7 +84,7 @@ public class Polygon extends Shape {
     public void setAllowDuplicatePoints(boolean allowDups) {
         this.allowDups = allowDups;
     }
-
+    
     /**
      * Add a point to the polygon
      *
@@ -96,17 +97,15 @@ public class Polygon extends Shape {
         if (hasVertex(x, y) && !allowDups) {
             return;
         }
-
+        
         ArrayList<Float> tempPoints = new ArrayList<>();
-        for (Float point : points) {
-            tempPoints.add(new Float(point));
-        }
-        tempPoints.add(new Float(x));
-        tempPoints.add(new Float(y));
+        Stream.of(points).forEach(tempPoints::add);
+        tempPoints.add(x);
+        tempPoints.add(y);
         int length = tempPoints.size();
         points = new Float[length];
         for (int i = 0; i < length; i++) {
-            points[i] = tempPoints.get(i).floatValue();
+            points[i] = tempPoints.get(i);
         }
         if (x > maxX) {
             maxX = x;
@@ -122,10 +121,10 @@ public class Polygon extends Shape {
         }
         findCenter();
         calculateRadius();
-
+        
         pointsDirty = true;
     }
-
+    
     /**
      * Apply a transformation and return a new shape. This will not alter the current shape but will
      * return the transformed shape.
@@ -137,46 +136,44 @@ public class Polygon extends Shape {
     @Override
     public Shape transform(Transform transform) {
         checkPoints();
-
+        
         Polygon resultPolygon = new Polygon();
-
-        Float result[] = new Float[points.length];
+        
+        Float[] result = new Float[points.length];
         transform.transform(points, 0, result, 0, points.length / 2);
         resultPolygon.points = result;
         resultPolygon.findCenter();
         resultPolygon.closed = closed;
-
+        
         return resultPolygon;
     }
-
+    
     /**
      * @see org.newdawn.slick.geom.Shape#setX(float)
      */
     @Override
     public void setX(float x) {
         super.setX(x);
-
         pointsDirty = false;
     }
-
+    
     /**
      * @see org.newdawn.slick.geom.Shape#setY(float)
      */
     @Override
     public void setY(float y) {
         super.setY(y);
-
         pointsDirty = false;
     }
-
+    
     /**
      * @see org.newdawn.slick.geom.Shape#createPoints()
      */
     @Override
     protected void createPoints() {
-// This is empty since a polygon must have it's points all the time.
+        // This is empty since a polygon must have it's points all the time.
     }
-
+    
     /**
      * @see org.newdawn.slick.geom.Shape#closed()
      */
@@ -184,7 +181,7 @@ public class Polygon extends Shape {
     public boolean closed() {
         return closed;
     }
-
+    
     /**
      * Indicate if the polygon should be closed
      *
@@ -194,7 +191,7 @@ public class Polygon extends Shape {
     public void setClosed(boolean closed) {
         this.closed = closed;
     }
-
+    
     /**
      * Provide a copy of this polygon
      *
@@ -203,7 +200,7 @@ public class Polygon extends Shape {
     public Polygon copy() {
         Float[] copyPoints = new Float[points.length];
         System.arraycopy(points, 0, copyPoints, 0, copyPoints.length);
-
+        
         return new Polygon(copyPoints);
     }
 }

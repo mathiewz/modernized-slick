@@ -27,9 +27,9 @@ public class GeomUtil {
      *            The shape to subtract
      * @return The newly created shapes
      */
-    public Shape[] subtract(Shape target, Shape missing) {
-        target = target.transform(new Transform());
-        missing = missing.transform(new Transform());
+    public Shape[] subtract(Shape targetArg, Shape missingArg) {
+        Shape target = targetArg.transform(new Transform());
+        Shape missing = missingArg.transform(new Transform());
         
         int count = 0;
         for (int i = 0; i < target.getPointCount(); i++) {
@@ -112,9 +112,9 @@ public class GeomUtil {
      *            The additional shape to union
      * @return The newly created shapes
      */
-    public Shape[] union(Shape target, Shape other) {
-        target = target.transform(new Transform());
-        other = other.transform(new Transform());
+    public Shape[] union(Shape targetArg, Shape otherArg) {
+        Shape target = targetArg.transform(new Transform());
+        Shape other = otherArg.transform(new Transform());
         
         if (!target.intersects(other)) {
             return new Shape[] { target, other };
@@ -309,13 +309,8 @@ public class GeomUtil {
                             dir = 1;
                         }
                     } else {
-                        if (current == missing) {
-                            point = hit.p1;
-                            dir = 1;
-                        } else {
-                            point = hit.p1;
-                            dir = 1;
-                        }
+                        point = hit.p1;
+                        dir = 1;
                     }
                     
                     // swap the shapes over, we'll traverse the other one
@@ -347,7 +342,9 @@ public class GeomUtil {
         }
         
         poly.addPoint(px, py);
-        if (listener != null) {
+        if (listener != null)
+        
+        {
             listener.pointUsed(px, py);
         }
         

@@ -15,7 +15,7 @@ import org.w3c.dom.Element;
  * @author kevin
  */
 public class RectProcessor implements ElementProcessor {
-    
+
     /**
      * @see org.newdawn.slick.svg.inkscape.ElementProcessor#process(org.newdawn.slick.svg.Loader, org.w3c.dom.Element, org.newdawn.slick.svg.Diagram, org.newdawn.slick.geom.Transform)
      */
@@ -23,33 +23,29 @@ public class RectProcessor implements ElementProcessor {
     public void process(Loader loader, Element element, Diagram diagram, Transform t) {
         Transform transform = Util.getTransform(element);
         transform = new Transform(t, transform);
-        
+
         float width = Float.parseFloat(element.getAttribute("width"));
         float height = Float.parseFloat(element.getAttribute("height"));
         float x = Float.parseFloat(element.getAttribute("x"));
         float y = Float.parseFloat(element.getAttribute("y"));
-        
+
         Rectangle rect = new Rectangle(x, y, width + 1, height + 1);
         Shape shape = rect.transform(transform);
-        
+
         NonGeometricData data = Util.getNonGeometricData(element);
-        data.addAttribute("width", "" + width);
-        data.addAttribute("height", "" + height);
-        data.addAttribute("x", "" + x);
-        data.addAttribute("y", "" + y);
-        
+        data.addAttribute("width", String.valueOf(width));
+        data.addAttribute("height", String.valueOf(height));
+        data.addAttribute("x", String.valueOf(x));
+        data.addAttribute("y", String.valueOf(y));
+
         diagram.addFigure(new Figure(Figure.RECTANGLE, shape, data, transform));
     }
-    
+
     /**
      * @see org.newdawn.slick.svg.inkscape.ElementProcessor#handles(org.w3c.dom.Element)
      */
     @Override
     public boolean handles(Element element) {
-        if (element.getNodeName().equals("rect")) {
-            return true;
-        }
-        
-        return false;
+        return element.getNodeName().equals("rect");
     }
 }

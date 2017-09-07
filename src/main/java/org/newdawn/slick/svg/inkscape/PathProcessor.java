@@ -1,5 +1,6 @@
 package org.newdawn.slick.svg.inkscape;
 
+import java.util.Optional;
 import java.util.StringTokenizer;
 
 import org.newdawn.slick.geom.Path;
@@ -31,45 +32,45 @@ public class PathProcessor implements ElementProcessor {
     private static Path processPoly(Element element, StringTokenizer tokens) {
         boolean moved = false;
         boolean reasonToBePath = false;
-        Path path = null;
+        Optional<Path> optPath = Optional.empty();
 
         while (tokens.hasMoreTokens()) {
             try {
                 String nextToken = tokens.nextToken();
-                if (nextToken.equals("L")) {
-                    float x = Float.parseFloat(tokens.nextToken());
-                    float y = Float.parseFloat(tokens.nextToken());
-                    path.lineTo(x, y);
-                    continue;
-                }
-                if (nextToken.equals("z")) {
-                    path.close();
-                    continue;
-                }
-                if (nextToken.equals("M")) {
-                    if (!moved) {
-                        moved = true;
-                        float x = Float.parseFloat(tokens.nextToken());
-                        float y = Float.parseFloat(tokens.nextToken());
-                        path = new Path(x, y);
-                        continue;
-                    }
-
-                    reasonToBePath = true;
-                    path.startHole();
-
-                    continue;
-                }
-                if (nextToken.equals("C")) {
-                    reasonToBePath = true;
-                    float cx1 = Float.parseFloat(tokens.nextToken());
-                    float cy1 = Float.parseFloat(tokens.nextToken());
-                    float cx2 = Float.parseFloat(tokens.nextToken());
-                    float cy2 = Float.parseFloat(tokens.nextToken());
-                    float x = Float.parseFloat(tokens.nextToken());
-                    float y = Float.parseFloat(tokens.nextToken());
-                    path.curveTo(x, y, cx1, cy1, cx2, cy2);
-                    continue;
+                float x;
+                float y;
+                switch (nextToken) {
+                    case "L":
+                        x = Float.parseFloat(tokens.nextToken());
+                        y = Float.parseFloat(tokens.nextToken());
+                        optPath.ifPresent(path -> path.lineTo(x, y));
+                        break;
+                    case "z":
+                        optPath.ifPresent(Path::close);
+                        break;
+                    case "M":
+                        if (!moved) {
+                            moved = true;
+                            x = Float.parseFloat(tokens.nextToken());
+                            y = Float.parseFloat(tokens.nextToken());
+                            optPath = Optional.of(new Path(x, y));
+                            continue;
+                        }
+                        reasonToBePath = true;
+                        optPath.ifPresent(Path::startHole);
+                        break;
+                    case "C":
+                        reasonToBePath = true;
+                        float cx1 = Float.parseFloat(tokens.nextToken());
+                        float cy1 = Float.parseFloat(tokens.nextToken());
+                        float cx2 = Float.parseFloat(tokens.nextToken());
+                        float cy2 = Float.parseFloat(tokens.nextToken());
+                        x = Float.parseFloat(tokens.nextToken());
+                        y = Float.parseFloat(tokens.nextToken());
+                        optPath.ifPresent(path -> path.curveTo(x, y, cx1, cy1, cx2, cy2));
+                        break;
+                    default:
+                        break;
                 }
             } catch (NumberFormatException e) {
                 throw new ParsingException(element.getAttribute("id"), "Invalid token in points list", e);
@@ -80,7 +81,7 @@ public class PathProcessor implements ElementProcessor {
             return null;
         }
 
-        return path;
+        return optPath.orElse(null);
     }
 
     /**
@@ -111,13 +112,7 @@ public class PathProcessor implements ElementProcessor {
      */
     @Override
     public boolean handles(Element element) {
-        if (element.getNodeName().equals("path")) {
-            if (!"arc".equals(element.getAttributeNS(Util.SODIPODI, "type"))) {
-                return true;
-            }
-        }
-
-        return false;
+        return element.getNodeName().equals("path") && !"arc".equals(element.getAttributeNS(Util.SODIPODI, "type"));
     }
 
 }
