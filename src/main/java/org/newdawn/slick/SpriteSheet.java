@@ -232,10 +232,10 @@ public class SpriteSheet extends Image {
         init();
         
         if (x < 0 || x >= subImages.length) {
-            throw new RuntimeException("SubImage out of sheet bounds: " + x + "," + y);
+            throw new SlickException("SubImage out of sheet bounds: " + x + "," + y);
         }
         if (y < 0 || y >= subImages[0].length) {
-            throw new RuntimeException("SubImage out of sheet bounds: " + x + "," + y);
+            throw new SlickException("SubImage out of sheet bounds: " + x + "," + y);
         }
         
         return subImages[x][y];
@@ -254,11 +254,8 @@ public class SpriteSheet extends Image {
         target.init();
         initImpl();
         
-        if (x < 0 || x >= subImages.length) {
-            throw new RuntimeException("SubImage out of sheet bounds: " + x + "," + y);
-        }
-        if (y < 0 || y >= subImages[0].length) {
-            throw new RuntimeException("SubImage out of sheet bounds: " + x + "," + y);
+        if (x < 0 || x >= subImages.length || y < 0 || y >= subImages[0].length) {
+            throw new SlickException("SubImage out of sheet bounds: " + x + "," + y);
         }
         
         return target.getSubImage(x * (tw + spacing) + margin, y * (th + spacing) + margin, tw, th);

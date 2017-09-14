@@ -1,5 +1,6 @@
 package org.newdawn.slick.opengl;
 
+import org.newdawn.slick.SlickException;
 import org.newdawn.slick.opengl.renderer.Renderer;
 
 /**
@@ -8,7 +9,7 @@ import org.newdawn.slick.opengl.renderer.Renderer;
  * @author kevin
  */
 public final class GLUtils {
-
+    
     /**
      * Check that we're in the right place to be doing GL operations
      */
@@ -16,7 +17,7 @@ public final class GLUtils {
         try {
             Renderer.get().glGetError();
         } catch (NullPointerException e) {
-            throw new RuntimeException("OpenGL based resources (images, fonts, sprites etc) must be loaded as part of init() or the game loop. They cannot be loaded before initialisation.");
+            throw new SlickException("OpenGL based resources (images, fonts, sprites etc) must be loaded as part of init() or the game loop. They cannot be loaded before initialisation.");
         }
     }
 }

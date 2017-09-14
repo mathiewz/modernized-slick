@@ -8,6 +8,7 @@ import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.InputListener;
+import org.newdawn.slick.SlickException;
 import org.newdawn.slick.state.transition.EmptyTransition;
 import org.newdawn.slick.state.transition.Transition;
 
@@ -28,12 +29,12 @@ public abstract class StateBasedGame implements Game, InputListener {
     private GameContainer container;
     /** The title of the game */
     private String title;
-
+    
     /** The transition being used to enter the state */
     private Transition enterTransition;
     /** The transition being used to leave the state */
     private Transition leaveTransition;
-
+    
     /**
      * Create a new state based game
      *
@@ -42,35 +43,35 @@ public abstract class StateBasedGame implements Game, InputListener {
      */
     public StateBasedGame(String name) {
         title = name;
-
+        
         currentState = new BasicGameState() {
             @Override
             public int getID() {
                 return -1;
             }
-
+            
             @Override
             public void init(GameContainer container, StateBasedGame game) {
             }
-
+            
             @Override
             public void update(GameContainer container, StateBasedGame game, int delta) {
             }
-
+            
             @Override
             public void render(GameContainer container, StateBasedGame game, Graphics g) {
             }
         };
     }
-
+    
     /**
      * @see org.newdawn.slick.ControlledInputReciever#inputStarted()
      */
     @Override
     public void inputStarted() {
-
+        
     }
-
+    
     /**
      * Get the number of states that have been added to this game
      *
@@ -79,7 +80,7 @@ public abstract class StateBasedGame implements Game, InputListener {
     public int getStateCount() {
         return states.keySet().size();
     }
-
+    
     /**
      * Get the ID of the state the game is currently in
      *
@@ -88,7 +89,7 @@ public abstract class StateBasedGame implements Game, InputListener {
     public int getCurrentStateID() {
         return currentState.getID();
     }
-
+    
     /**
      * Get the state the game is currently in
      *
@@ -97,14 +98,14 @@ public abstract class StateBasedGame implements Game, InputListener {
     public GameState getCurrentState() {
         return currentState;
     }
-
+    
     /**
      * @see org.newdawn.slick.InputListener#setInput(org.newdawn.slick.Input)
      */
     @Override
     public void setInput(Input input) {
     }
-
+    
     /**
      * Add a state to the game. The state will be updated and maintained
      * by the game
@@ -114,12 +115,12 @@ public abstract class StateBasedGame implements Game, InputListener {
      */
     public void addState(GameState state) {
         states.put(new Integer(state.getID()), state);
-
+        
         if (currentState.getID() == -1) {
             currentState = state;
         }
     }
-
+    
     /**
      * Get a state based on it's identifier
      *
@@ -130,7 +131,7 @@ public abstract class StateBasedGame implements Game, InputListener {
     public GameState getState(int id) {
         return states.get(new Integer(id));
     }
-
+    
     /**
      * Enter a particular game state with no transition
      *
@@ -140,7 +141,7 @@ public abstract class StateBasedGame implements Game, InputListener {
     public void enterState(int id) {
         enterState(id, new EmptyTransition(), new EmptyTransition());
     }
-
+    
     /**
      * Enter a particular game state with the transitions provided
      *
@@ -160,15 +161,15 @@ public abstract class StateBasedGame implements Game, InputListener {
         }
         leaveTransition = leave;
         enterTransition = enter;
-
+        
         nextState = getState(id);
         if (nextState == null) {
-            throw new RuntimeException("No game state registered with the ID: " + id);
+            throw new SlickException("No game state registered with the ID: " + id);
         }
-
+        
         leaveTransition.init(currentState, nextState);
     }
-
+    
     /**
      * @see org.newdawn.slick.BasicGame#init(org.newdawn.slick.GameContainer)
      */
@@ -176,20 +177,20 @@ public abstract class StateBasedGame implements Game, InputListener {
     public final void init(GameContainer container) {
         this.container = container;
         initStatesList(container);
-
+        
         Iterator<GameState> gameStates = states.values().iterator();
-
+        
         while (gameStates.hasNext()) {
             GameState state = gameStates.next();
-
+            
             state.init(container, this);
         }
-
+        
         if (currentState != null) {
             currentState.enter(container, this);
         }
     }
-
+    
     /**
      * Initialise the list of states making up this game
      *
@@ -197,31 +198,31 @@ public abstract class StateBasedGame implements Game, InputListener {
      *            The container holding the game
      */
     public abstract void initStatesList(GameContainer container);
-
+    
     /**
      * @see org.newdawn.slick.Game#render(org.newdawn.slick.GameContainer, org.newdawn.slick.Graphics)
      */
     @Override
     public final void render(GameContainer container, Graphics g) {
         preRenderState(container, g);
-
+        
         if (leaveTransition != null) {
             leaveTransition.preRender(this, container, g);
         } else if (enterTransition != null) {
             enterTransition.preRender(this, container, g);
         }
-
+        
         currentState.render(container, this, g);
-
+        
         if (leaveTransition != null) {
             leaveTransition.postRender(this, container, g);
         } else if (enterTransition != null) {
             enterTransition.postRender(this, container, g);
         }
-
+        
         postRenderState(container, g);
     }
-
+    
     /**
      * User hook for rendering at the before the current state
      * and/or transition have been rendered
@@ -234,7 +235,7 @@ public abstract class StateBasedGame implements Game, InputListener {
     protected void preRenderState(GameContainer container, Graphics g) {
         // NO-OP
     }
-
+    
     /**
      * User hook for rendering at the game level after the current state
      * and/or transition have been rendered
@@ -247,14 +248,14 @@ public abstract class StateBasedGame implements Game, InputListener {
     protected void postRenderState(GameContainer container, Graphics g) {
         // NO-OP
     }
-
+    
     /**
      * @see org.newdawn.slick.BasicGame#update(org.newdawn.slick.GameContainer, int)
      */
     @Override
     public final void update(GameContainer container, int delta) {
         preUpdateState(container, delta);
-
+        
         if (leaveTransition != null) {
             leaveTransition.update(this, container, delta);
             if (leaveTransition.isComplete()) {
@@ -271,7 +272,7 @@ public abstract class StateBasedGame implements Game, InputListener {
                 return;
             }
         }
-
+        
         if (enterTransition != null) {
             enterTransition.update(this, container, delta);
             if (enterTransition.isComplete()) {
@@ -280,12 +281,12 @@ public abstract class StateBasedGame implements Game, InputListener {
                 return;
             }
         }
-
+        
         currentState.update(container, this, delta);
-
+        
         postUpdateState(container, delta);
     }
-
+    
     /**
      * User hook for updating at the game before the current state
      * and/or transition have been updated
@@ -298,7 +299,7 @@ public abstract class StateBasedGame implements Game, InputListener {
     protected void preUpdateState(GameContainer container, int delta) {
         // NO-OP
     }
-
+    
     /**
      * User hook for rendering at the game level after the current state
      * and/or transition have been updated
@@ -311,7 +312,7 @@ public abstract class StateBasedGame implements Game, InputListener {
     protected void postUpdateState(GameContainer container, int delta) {
         // NO-OP
     }
-
+    
     /**
      * Check if the game is transitioning between states
      *
@@ -320,7 +321,7 @@ public abstract class StateBasedGame implements Game, InputListener {
     private boolean transitioning() {
         return leaveTransition != null || enterTransition != null;
     }
-
+    
     /**
      * @see org.newdawn.slick.Game#closeRequested()
      */
@@ -328,7 +329,7 @@ public abstract class StateBasedGame implements Game, InputListener {
     public boolean closeRequested() {
         return true;
     }
-
+    
     /**
      * @see org.newdawn.slick.Game#getTitle()
      */
@@ -336,7 +337,7 @@ public abstract class StateBasedGame implements Game, InputListener {
     public String getTitle() {
         return title;
     }
-
+    
     /**
      * Get the container holding this game
      *
@@ -345,7 +346,7 @@ public abstract class StateBasedGame implements Game, InputListener {
     public GameContainer getContainer() {
         return container;
     }
-
+    
     /**
      * @see org.newdawn.slick.InputListener#controllerButtonPressed(int, int)
      */
@@ -354,10 +355,10 @@ public abstract class StateBasedGame implements Game, InputListener {
         if (transitioning()) {
             return;
         }
-
+        
         currentState.controllerButtonPressed(controller, button);
     }
-
+    
     /**
      * @see org.newdawn.slick.InputListener#controllerButtonReleased(int, int)
      */
@@ -366,10 +367,10 @@ public abstract class StateBasedGame implements Game, InputListener {
         if (transitioning()) {
             return;
         }
-
+        
         currentState.controllerButtonReleased(controller, button);
     }
-
+    
     /**
      * @see org.newdawn.slick.InputListener#controllerDownPressed(int)
      */
@@ -378,10 +379,10 @@ public abstract class StateBasedGame implements Game, InputListener {
         if (transitioning()) {
             return;
         }
-
+        
         currentState.controllerDownPressed(controller);
     }
-
+    
     /**
      * @see org.newdawn.slick.InputListener#controllerDownReleased(int)
      */
@@ -390,10 +391,10 @@ public abstract class StateBasedGame implements Game, InputListener {
         if (transitioning()) {
             return;
         }
-
+        
         currentState.controllerDownReleased(controller);
     }
-
+    
     /**
      * @see org.newdawn.slick.InputListener#controllerLeftPressed(int)
      */
@@ -402,10 +403,10 @@ public abstract class StateBasedGame implements Game, InputListener {
         if (transitioning()) {
             return;
         }
-
+        
         currentState.controllerLeftPressed(controller);
     }
-
+    
     /**
      * @see org.newdawn.slick.InputListener#controllerLeftReleased(int)
      */
@@ -414,10 +415,10 @@ public abstract class StateBasedGame implements Game, InputListener {
         if (transitioning()) {
             return;
         }
-
+        
         currentState.controllerLeftReleased(controller);
     }
-
+    
     /**
      * @see org.newdawn.slick.InputListener#controllerRightPressed(int)
      */
@@ -426,10 +427,10 @@ public abstract class StateBasedGame implements Game, InputListener {
         if (transitioning()) {
             return;
         }
-
+        
         currentState.controllerRightPressed(controller);
     }
-
+    
     /**
      * @see org.newdawn.slick.InputListener#controllerRightReleased(int)
      */
@@ -438,10 +439,10 @@ public abstract class StateBasedGame implements Game, InputListener {
         if (transitioning()) {
             return;
         }
-
+        
         currentState.controllerRightReleased(controller);
     }
-
+    
     /**
      * @see org.newdawn.slick.InputListener#controllerUpPressed(int)
      */
@@ -450,10 +451,10 @@ public abstract class StateBasedGame implements Game, InputListener {
         if (transitioning()) {
             return;
         }
-
+        
         currentState.controllerUpPressed(controller);
     }
-
+    
     /**
      * @see org.newdawn.slick.InputListener#controllerUpReleased(int)
      */
@@ -462,10 +463,10 @@ public abstract class StateBasedGame implements Game, InputListener {
         if (transitioning()) {
             return;
         }
-
+        
         currentState.controllerUpReleased(controller);
     }
-
+    
     /**
      * @see org.newdawn.slick.InputListener#keyPressed(int, char)
      */
@@ -474,10 +475,10 @@ public abstract class StateBasedGame implements Game, InputListener {
         if (transitioning()) {
             return;
         }
-
+        
         currentState.keyPressed(key, c);
     }
-
+    
     /**
      * @see org.newdawn.slick.InputListener#keyReleased(int, char)
      */
@@ -486,10 +487,10 @@ public abstract class StateBasedGame implements Game, InputListener {
         if (transitioning()) {
             return;
         }
-
+        
         currentState.keyReleased(key, c);
     }
-
+    
     /**
      * @see org.newdawn.slick.InputListener#mouseMoved(int, int, int, int)
      */
@@ -498,10 +499,10 @@ public abstract class StateBasedGame implements Game, InputListener {
         if (transitioning()) {
             return;
         }
-
+        
         currentState.mouseMoved(oldx, oldy, newx, newy);
     }
-
+    
     /**
      * @see org.newdawn.slick.InputListener#mouseDragged(int, int, int, int)
      */
@@ -510,10 +511,10 @@ public abstract class StateBasedGame implements Game, InputListener {
         if (transitioning()) {
             return;
         }
-
+        
         currentState.mouseDragged(oldx, oldy, newx, newy);
     }
-
+    
     /**
      * @see org.newdawn.slick.InputListener#mouseClicked(int, int, int, int)
      */
@@ -522,10 +523,10 @@ public abstract class StateBasedGame implements Game, InputListener {
         if (transitioning()) {
             return;
         }
-
+        
         currentState.mouseClicked(button, x, y, clickCount);
     }
-
+    
     /**
      * @see org.newdawn.slick.InputListener#mousePressed(int, int, int)
      */
@@ -534,10 +535,10 @@ public abstract class StateBasedGame implements Game, InputListener {
         if (transitioning()) {
             return;
         }
-
+        
         currentState.mousePressed(button, x, y);
     }
-
+    
     /**
      * @see org.newdawn.slick.InputListener#mouseReleased(int, int, int)
      */
@@ -546,10 +547,10 @@ public abstract class StateBasedGame implements Game, InputListener {
         if (transitioning()) {
             return;
         }
-
+        
         currentState.mouseReleased(button, x, y);
     }
-
+    
     /**
      * @see org.newdawn.slick.InputListener#isAcceptingInput()
      */
@@ -558,17 +559,17 @@ public abstract class StateBasedGame implements Game, InputListener {
         if (transitioning()) {
             return false;
         }
-
+        
         return currentState.isAcceptingInput();
     }
-
+    
     /**
      * @see org.newdawn.slick.InputListener#inputEnded()
      */
     @Override
     public void inputEnded() {
     }
-
+    
     /**
      * @see org.newdawn.slick.InputListener#mouseWheelMoved(int)
      */
@@ -577,8 +578,8 @@ public abstract class StateBasedGame implements Game, InputListener {
         if (transitioning()) {
             return;
         }
-
+        
         currentState.mouseWheelMoved(newValue);
     }
-
+    
 }

@@ -1,5 +1,7 @@
 package org.newdawn.slick.opengl.renderer;
 
+import org.newdawn.slick.SlickException;
+
 /**
  * The static holder for the current GL implementation. Note that this
  * renderer can only be set before the game has been started.
@@ -11,17 +13,17 @@ public class Renderer {
     public static final int IMMEDIATE_RENDERER = 1;
     /** The indicator for vertex array based rendering */
     public static final int VERTEX_ARRAY_RENDERER = 2;
-
+    
     /** The indicator for direct GL line renderer (the default) */
     public static final int DEFAULT_LINE_STRIP_RENDERER = 3;
     /** The indicator for consistant quad based lines */
     public static final int QUAD_BASED_LINE_STRIP_RENDERER = 4;
-
+    
     /** The renderer in use */
     private static SGL renderer = new ImmediateModeOGLRenderer();
     /** The line strip renderer to use */
     private static LineStripRenderer lineStripRenderer = new DefaultLineStripRenderer();
-
+    
     /**
      * Set the renderer to one of the known types
      *
@@ -37,10 +39,10 @@ public class Renderer {
                 setRenderer(new VAOGLRenderer());
                 return;
         }
-
-        throw new RuntimeException("Unknown renderer type: " + type);
+        
+        throw new SlickException("Unknown renderer type: " + type);
     }
-
+    
     /**
      * Set the line strip renderer to one of the known types
      *
@@ -55,11 +57,13 @@ public class Renderer {
             case QUAD_BASED_LINE_STRIP_RENDERER:
                 setLineStripRenderer(new QuadBasedLineStripRenderer());
                 return;
+            default:
+                throw new SlickException("Unknown line strip renderer type: " + type);
+                
         }
-
-        throw new RuntimeException("Unknown line strip renderer type: " + type);
+        
     }
-
+    
     /**
      * Set the line strip renderer to be used globally
      *
@@ -69,7 +73,7 @@ public class Renderer {
     public static void setLineStripRenderer(LineStripRenderer renderer) {
         lineStripRenderer = renderer;
     }
-
+    
     /**
      * Set the renderer to be used
      *
@@ -79,7 +83,7 @@ public class Renderer {
     public static void setRenderer(SGL r) {
         renderer = r;
     }
-
+    
     /**
      * Get the renderer to be used when accessing GL
      *
@@ -88,7 +92,7 @@ public class Renderer {
     public static SGL get() {
         return renderer;
     }
-
+    
     /**
      * Get the line strip renderer to use
      *
@@ -97,5 +101,5 @@ public class Renderer {
     public static LineStripRenderer getLineStripRenderer() {
         return lineStripRenderer;
     }
-
+    
 }

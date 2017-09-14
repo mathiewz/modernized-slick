@@ -6,6 +6,7 @@ import java.nio.IntBuffer;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.openal.AL10;
+import org.newdawn.slick.SlickException;
 
 import ibxm.Module;
 import ibxm.OpenALMODPlayer;
@@ -18,12 +19,12 @@ import ibxm.OpenALMODPlayer;
 public class MODSound extends AudioImpl {
     /** The MOD play back system */
     private static OpenALMODPlayer player = new OpenALMODPlayer();
-
+    
     /** The module to play back */
     private final Module module;
     /** The sound store this belongs to */
     private final SoundStore store;
-
+    
     /**
      * Create a mod sound to be played back
      *
@@ -38,23 +39,23 @@ public class MODSound extends AudioImpl {
         this.store = store;
         module = OpenALMODPlayer.loadModule(in);
     }
-
+    
     /**
      * @see org.newdawn.slick.openal.AudioImpl#playAsMusic(float, float, boolean)
      */
     @Override
     public int playAsMusic(float pitch, float gain, boolean loop) {
         cleanUpSource();
-
+        
         player.play(module, store.getSource(0), loop, SoundStore.get().isMusicOn());
         player.setup(pitch, 1.0f);
         store.setCurrentMusicVolume(gain);
-
+        
         store.setMOD(this);
-
+        
         return store.getSource(0);
     }
-
+    
     /**
      * Clean up the buffers applied to the sound source
      */
@@ -62,22 +63,22 @@ public class MODSound extends AudioImpl {
         AL10.alSourceStop(store.getSource(0));
         IntBuffer buffer = BufferUtils.createIntBuffer(1);
         int queued = AL10.alGetSourcei(store.getSource(0), AL10.AL_BUFFERS_QUEUED);
-
+        
         while (queued > 0) {
             AL10.alSourceUnqueueBuffers(store.getSource(0), buffer);
             queued--;
         }
-
+        
         AL10.alSourcei(store.getSource(0), AL10.AL_BUFFER, 0);
     }
-
+    
     /**
      * Poll the streaming on the MOD
      */
     public void poll() {
         player.update();
     }
-
+    
     /**
      * @see org.newdawn.slick.openal.AudioImpl#playAsSoundEffect(float, float, boolean)
      */
@@ -85,7 +86,7 @@ public class MODSound extends AudioImpl {
     public int playAsSoundEffect(float pitch, float gain, boolean loop) {
         return -1;
     }
-
+    
     /**
      * @see org.newdawn.slick.openal.AudioImpl#stop()
      */
@@ -93,20 +94,20 @@ public class MODSound extends AudioImpl {
     public void stop() {
         store.setMOD(null);
     }
-
+    
     /**
      * @see org.newdawn.slick.openal.AudioImpl#getPosition()
      */
     @Override
     public float getPosition() {
-        throw new RuntimeException("Positioning on modules is not currently supported");
+        throw new SlickException("Positioning on modules is not currently supported");
     }
-
+    
     /**
      * @see org.newdawn.slick.openal.AudioImpl#setPosition(float)
      */
     @Override
     public boolean setPosition(float position) {
-        throw new RuntimeException("Positioning on modules is not currently supported");
+        throw new SlickException("Positioning on modules is not currently supported");
     }
 }

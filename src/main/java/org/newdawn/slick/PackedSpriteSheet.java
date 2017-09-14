@@ -25,7 +25,7 @@ public class PackedSpriteSheet {
     private final HashMap<String, Section> sections = new HashMap<>();
     /** The filter used when loading the image */
     private int filter = Image.FILTER_NEAREST;
-    
+
     /**
      * Create a new packed sprite sheet based on a ImagePacker definition file
      *
@@ -35,7 +35,7 @@ public class PackedSpriteSheet {
     public PackedSpriteSheet(String def) {
         this(def, null);
     }
-    
+
     /**
      * Create a new packed sprite sheet based on a ImagePacker definition file
      *
@@ -47,10 +47,10 @@ public class PackedSpriteSheet {
     public PackedSpriteSheet(String def, Color trans) {
         def = def.replace('\\', '/');
         basePath = def.substring(0, def.lastIndexOf("/") + 1);
-        
+
         loadDefinition(def, trans);
     }
-    
+
     /**
      * Create a new packed sprite sheet based on a ImagePacker definition file
      *
@@ -62,7 +62,7 @@ public class PackedSpriteSheet {
     public PackedSpriteSheet(String def, int filter) {
         this(def, filter, null);
     }
-    
+
     /**
      * Create a new packed sprite sheet based on a ImagePacker definition file
      *
@@ -75,13 +75,13 @@ public class PackedSpriteSheet {
      */
     public PackedSpriteSheet(String def, int filter, Color trans) {
         this.filter = filter;
-        
+
         def = def.replace('\\', '/');
         basePath = def.substring(0, def.lastIndexOf("/") + 1);
-        
+
         loadDefinition(def, trans);
     }
-    
+
     /**
      * Get the full image contaning all the sprites/sections
      *
@@ -90,7 +90,7 @@ public class PackedSpriteSheet {
     public Image getFullImage() {
         return image;
     }
-    
+
     /**
      * Get a single named sprite from the sheet
      *
@@ -100,14 +100,14 @@ public class PackedSpriteSheet {
      */
     public Image getSprite(String name) {
         Section section = sections.get(name);
-        
+
         if (section == null) {
-            throw new RuntimeException("Unknown sprite from packed sheet: " + name);
+            throw new SlickException("Unknown sprite from packed sheet: " + name);
         }
-        
+
         return image.getSubImage(section.x, section.y, section.width, section.height);
     }
-    
+
     /**
      * Get a sprite sheet that has been packed into the greater image
      *
@@ -118,10 +118,10 @@ public class PackedSpriteSheet {
     public SpriteSheet getSpriteSheet(String name) {
         Image image = getSprite(name);
         Section section = sections.get(name);
-        
+
         return new SpriteSheet(image, section.width / section.tilesx, section.height / section.tilesy);
     }
-    
+
     /**
      * Load the definition file and parse each of the sections
      *
@@ -132,17 +132,17 @@ public class PackedSpriteSheet {
      */
     private void loadDefinition(String def, Color trans) {
         BufferedReader reader = new BufferedReader(new InputStreamReader(ResourceLoader.getResourceAsStream(def)));
-        
+
         try {
             image = new Image(basePath + reader.readLine(), false, filter, trans);
             while (reader.ready()) {
                 if (reader.readLine() == null) {
                     break;
                 }
-                
+
                 Section sect = new Section(reader);
                 sections.put(sect.name, sect);
-                
+
                 if (reader.readLine() == null) {
                     break;
                 }
@@ -152,7 +152,7 @@ public class PackedSpriteSheet {
             throw new SlickException("Failed to process definitions file - invalid format?", e);
         }
     }
-    
+
     /**
      * A single section defined within the packed sheet
      *
@@ -173,7 +173,7 @@ public class PackedSpriteSheet {
         public int tilesy;
         /** The name of this section */
         public String name;
-        
+
         /**
          * Create a new section by reading the stream provided
          *
@@ -184,7 +184,7 @@ public class PackedSpriteSheet {
          */
         public Section(BufferedReader reader) throws IOException {
             name = reader.readLine().trim();
-            
+
             x = Integer.parseInt(reader.readLine().trim());
             y = Integer.parseInt(reader.readLine().trim());
             width = Integer.parseInt(reader.readLine().trim());
@@ -193,7 +193,7 @@ public class PackedSpriteSheet {
             tilesy = Integer.parseInt(reader.readLine().trim());
             reader.readLine().trim();
             reader.readLine().trim();
-            
+
             tilesx = Math.max(1, tilesx);
             tilesy = Math.max(1, tilesy);
         }

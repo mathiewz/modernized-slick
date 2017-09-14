@@ -2,6 +2,7 @@ package org.newdawn.slick.svg;
 
 import java.util.ArrayList;
 
+import org.newdawn.slick.SlickException;
 import org.newdawn.slick.geom.MorphShape;
 
 /**
@@ -12,7 +13,7 @@ import org.newdawn.slick.geom.MorphShape;
 public class SVGMorph extends Diagram {
     /** The list of figures being morphed */
     private final ArrayList<Figure> figures = new ArrayList<>();
-
+    
     /**
      * Create a new morph with a first diagram base
      *
@@ -21,15 +22,15 @@ public class SVGMorph extends Diagram {
      */
     public SVGMorph(Diagram diagram) {
         super(diagram.getWidth(), diagram.getHeight());
-
+        
         for (int i = 0; i < diagram.getFigureCount(); i++) {
             Figure figure = diagram.getFigure(i);
             Figure copy = new Figure(figure.getType(), new MorphShape(figure.getShape()), figure.getData(), figure.getTransform());
-
+            
             figures.add(copy);
         }
     }
-
+    
     /**
      * Add a subsquent step to the morphing
      *
@@ -38,12 +39,12 @@ public class SVGMorph extends Diagram {
      */
     public void addStep(Diagram diagram) {
         if (diagram.getFigureCount() != figures.size()) {
-            throw new RuntimeException("Mismatched diagrams, missing ids");
+            throw new SlickException("Mismatched diagrams, missing ids");
         }
         for (int i = 0; i < diagram.getFigureCount(); i++) {
             Figure figure = diagram.getFigure(i);
             String id = figure.getData().getMetaData();
-
+            
             for (int j = 0; j < figures.size(); j++) {
                 Figure existing = figures.get(j);
                 if (existing.getData().getMetaData().equals(id)) {
@@ -54,7 +55,7 @@ public class SVGMorph extends Diagram {
             }
         }
     }
-
+    
     /**
      * Set the current diagram we should morph from. This only really works with
      * updateMorphTime() but can be used for smooth transitions between
@@ -66,7 +67,7 @@ public class SVGMorph extends Diagram {
     public void setExternalDiagram(Diagram diagram) {
         for (int i = 0; i < figures.size(); i++) {
             Figure figure = figures.get(i);
-
+            
             for (int j = 0; j < diagram.getFigureCount(); j++) {
                 Figure newBase = diagram.getFigure(j);
                 if (newBase.getData().getMetaData().equals(figure.getData().getMetaData())) {
@@ -77,7 +78,7 @@ public class SVGMorph extends Diagram {
             }
         }
     }
-
+    
     /**
      * Update the morph time index by the amount specified
      *
@@ -91,7 +92,7 @@ public class SVGMorph extends Diagram {
             shape.updateMorphTime(delta);
         }
     }
-
+    
     /**
      * Set the "time" index for this morph. This is given in terms of diagrams, so
      * 0.5f would give you the position half way between the first and second diagrams.
@@ -106,7 +107,7 @@ public class SVGMorph extends Diagram {
             shape.setMorphTime(time);
         }
     }
-
+    
     /**
      * @see Diagram#getFigureCount()
      */
@@ -114,7 +115,7 @@ public class SVGMorph extends Diagram {
     public int getFigureCount() {
         return figures.size();
     }
-
+    
     /**
      * @see Diagram#getFigure(int)
      */

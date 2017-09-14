@@ -2,6 +2,8 @@ package org.newdawn.slick.geom;
 
 import java.util.ArrayList;
 
+import org.newdawn.slick.SlickException;
+
 /**
  * A shape that morphs between a set of other shapes
  *
@@ -12,12 +14,12 @@ public class MorphShape extends Shape {
     private final ArrayList<Shape> shapes = new ArrayList<>();
     /** The offset between the shapes */
     private float offset;
-
+    
     /** The current shape */
     private Shape current;
     /** The next shape */
     private Shape next;
-
+    
     /**
      * Create a new mighty morphin shape
      *
@@ -28,11 +30,11 @@ public class MorphShape extends Shape {
         shapes.add(base);
         Float[] copy = base.points;
         points = new Float[copy.length];
-
+        
         current = base;
         next = base;
     }
-
+    
     /**
      * Add a subsequent shape that we should morph too in order
      *
@@ -41,21 +43,21 @@ public class MorphShape extends Shape {
      */
     public void addShape(Shape shape) {
         if (shape.points.length != points.length) {
-            throw new RuntimeException("Attempt to morph between two shapes with different vertex counts");
+            throw new SlickException("Attempt to morph between two shapes with different vertex counts");
         }
-
+        
         Shape prev = shapes.get(shapes.size() - 1);
         if (equalShapes(prev, shape)) {
             shapes.add(prev);
         } else {
             shapes.add(shape);
         }
-
+        
         if (shapes.size() == 2) {
             next = shapes.get(1);
         }
     }
-
+    
     /**
      * Check if the shape's points are all equal
      *
@@ -68,16 +70,16 @@ public class MorphShape extends Shape {
     private boolean equalShapes(Shape a, Shape b) {
         a.checkPoints();
         b.checkPoints();
-
+        
         for (int i = 0; i < a.points.length; i++) {
             if (a.points[i] != b.points[i]) {
                 return false;
             }
         }
-
+        
         return true;
     }
-
+    
     /**
      * Set the "time" index for this morph. This is given in terms of shapes, so
      * 0.5f would give you the position half way between the first and second shapes.
@@ -89,13 +91,13 @@ public class MorphShape extends Shape {
         int p = (int) time;
         int n = p + 1;
         float offset = time - p;
-
+        
         p = rational(p);
         n = rational(n);
-
+        
         setFrame(p, n, offset);
     }
-
+    
     /**
      * Update the morph time and hence the curent frame
      *
@@ -109,7 +111,7 @@ public class MorphShape extends Shape {
             if (index < 0) {
                 index = shapes.size() - 1;
             }
-
+            
             int nframe = rational(index + 1);
             setFrame(index, nframe, offset);
             offset += 1;
@@ -118,7 +120,7 @@ public class MorphShape extends Shape {
             if (index < 1) {
                 index = 0;
             }
-
+            
             int nframe = rational(index + 1);
             setFrame(index, nframe, offset);
             offset -= 1;
@@ -126,7 +128,7 @@ public class MorphShape extends Shape {
             pointsDirty = true;
         }
     }
-
+    
     /**
      * Set the current frame
      *
@@ -138,7 +140,7 @@ public class MorphShape extends Shape {
         next = shapes.get(0);
         offset = 0;
     }
-
+    
     /**
      * Get an index that is rational, i.e. fits inside this set of shapes
      *
@@ -153,10 +155,10 @@ public class MorphShape extends Shape {
         while (n < 0) {
             n += shapes.size();
         }
-
+        
         return n;
     }
-
+    
     /**
      * Set the frame to be represented
      *
@@ -173,7 +175,7 @@ public class MorphShape extends Shape {
         this.offset = offset;
         pointsDirty = true;
     }
-
+    
     /**
      * @see MorphShape#createPoints()
      */
@@ -183,16 +185,16 @@ public class MorphShape extends Shape {
             System.arraycopy(current.points, 0, points, 0, points.length);
             return;
         }
-
+        
         Float[] apoints = current.points;
         Float[] bpoints = next.points;
-
+        
         for (int i = 0; i < points.length; i++) {
             points[i] = apoints[i] * (1 - offset);
             points[i] += bpoints[i] * offset;
         }
     }
-
+    
     /**
      * @see MorphShape#transform(Transform)
      */
@@ -200,7 +202,7 @@ public class MorphShape extends Shape {
     public Shape transform(Transform transform) {
         createPoints();
         Polygon poly = new Polygon(points);
-
+        
         return poly;
     }
 }

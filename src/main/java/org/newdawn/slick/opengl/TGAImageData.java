@@ -8,6 +8,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 import org.lwjgl.BufferUtils;
+import org.newdawn.slick.SlickException;
 
 /**
  * A utility to load TGAs. Note: NOT THREAD SAFE
@@ -155,7 +156,7 @@ public class TGAImageData implements LoadableImageData {
         } else if (pixelDepth == 24) {
             rawData = new byte[texWidth * texHeight * 3];
         } else {
-            throw new RuntimeException("Only 24 and 32 bit TGAs are supported");
+            throw new SlickException("Only 24 and 32 bit TGAs are supported");
         }
 
         if (pixelDepth == 24) {
@@ -312,7 +313,7 @@ public class TGAImageData implements LoadableImageData {
      */
     @Override
     public ByteBuffer getImageBufferData() {
-        throw new RuntimeException("TGAImageData doesn't store it's image.");
+        throw new SlickException("TGAImageData doesn't store it's image.");
     }
 
     /**

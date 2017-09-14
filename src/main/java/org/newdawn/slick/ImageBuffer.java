@@ -30,7 +30,7 @@ public class ImageBuffer implements ImageData {
     private final int texHeight;
     /** The raw data generated for the image */
     private final byte[] rawData;
-
+    
     /**
      *
      * @param width
@@ -39,13 +39,13 @@ public class ImageBuffer implements ImageData {
     public ImageBuffer(int width, int height) {
         this.width = width;
         this.height = height;
-
+        
         texWidth = get2Fold(width);
         texHeight = get2Fold(height);
-
+        
         rawData = new byte[texWidth * texHeight * 4];
     }
-
+    
     /**
      * Retrieve the raw data stored within the image buffer
      *
@@ -54,7 +54,7 @@ public class ImageBuffer implements ImageData {
     public byte[] getRGBA() {
         return rawData;
     }
-
+    
     /**
      * @see org.newdawn.slick.opengl.ImageData#getDepth()
      */
@@ -62,7 +62,7 @@ public class ImageBuffer implements ImageData {
     public int getDepth() {
         return 32;
     }
-
+    
     /**
      * @see org.newdawn.slick.opengl.ImageData#getHeight()
      */
@@ -70,7 +70,7 @@ public class ImageBuffer implements ImageData {
     public int getHeight() {
         return height;
     }
-
+    
     /**
      * @see org.newdawn.slick.opengl.ImageData#getTexHeight()
      */
@@ -78,7 +78,7 @@ public class ImageBuffer implements ImageData {
     public int getTexHeight() {
         return texHeight;
     }
-
+    
     /**
      * @see org.newdawn.slick.opengl.ImageData#getTexWidth()
      */
@@ -86,7 +86,7 @@ public class ImageBuffer implements ImageData {
     public int getTexWidth() {
         return texWidth;
     }
-
+    
     /**
      * @see org.newdawn.slick.opengl.ImageData#getWidth()
      */
@@ -94,7 +94,7 @@ public class ImageBuffer implements ImageData {
     public int getWidth() {
         return width;
     }
-
+    
     /**
      * @see org.newdawn.slick.opengl.ImageData#getImageBufferData()
      */
@@ -103,10 +103,10 @@ public class ImageBuffer implements ImageData {
         ByteBuffer scratch = BufferUtils.createByteBuffer(rawData.length);
         scratch.put(rawData);
         scratch.flip();
-
+        
         return scratch;
     }
-
+    
     /**
      * Set a pixel in the image buffer
      *
@@ -125,11 +125,11 @@ public class ImageBuffer implements ImageData {
      */
     public void setRGBA(int x, int y, int r, int g, int b, int a) {
         if (x < 0 || x >= width || y < 0 || y >= height) {
-            throw new RuntimeException("Specified location: " + x + "," + y + " outside of image");
+            throw new SlickException("Specified location: " + x + "," + y + " outside of image");
         }
-
+        
         int ofs = (x + y * texWidth) * 4;
-
+        
         if (ByteOrder.nativeOrder() == ByteOrder.BIG_ENDIAN) {
             rawData[ofs] = (byte) b;
             rawData[ofs + 1] = (byte) g;
@@ -142,7 +142,7 @@ public class ImageBuffer implements ImageData {
             rawData[ofs + 3] = (byte) a;
         }
     }
-
+    
     /**
      * Get an image generated based on this buffer
      *
@@ -151,7 +151,7 @@ public class ImageBuffer implements ImageData {
     public Image getImage() {
         return new Image(this);
     }
-
+    
     /**
      * Get an image generated based on this buffer
      *
@@ -162,7 +162,7 @@ public class ImageBuffer implements ImageData {
     public Image getImage(int filter) {
         return new Image(this, filter);
     }
-
+    
     /**
      * Get the closest greater power of 2 to the fold number
      *
@@ -177,5 +177,5 @@ public class ImageBuffer implements ImageData {
         }
         return ret;
     }
-
+    
 }

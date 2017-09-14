@@ -2,6 +2,8 @@ package org.newdawn.slick.geom;
 
 import java.util.ArrayList;
 
+import org.newdawn.slick.SlickException;
+
 /**
  * Triangulates a polygon into triangles - duh. Doesn't handle
  * holes in polys
@@ -17,13 +19,13 @@ public class BasicTriangulator implements Triangulator {
     private final PointList tris = new PointList();
     /** True if we've tried to triangulate */
     private boolean tried;
-
+    
     /**
      * Create a new triangulator
      */
     public BasicTriangulator() {
     }
-
+    
     /**
      * Add a point describing the polygon to be triangulated
      *
@@ -39,7 +41,7 @@ public class BasicTriangulator implements Triangulator {
             poly.add(p);
         }
     }
-
+    
     /**
      * Get the number of points in the polygon
      *
@@ -48,7 +50,7 @@ public class BasicTriangulator implements Triangulator {
     public int getPolyPointCount() {
         return poly.size();
     }
-
+    
     /**
      * Get the coordinates of the point at the specified index
      *
@@ -59,7 +61,7 @@ public class BasicTriangulator implements Triangulator {
     public float[] getPolyPoint(int index) {
         return new float[] { poly.get(index).x, poly.get(index).y };
     }
-
+    
     /**
      * Cause the triangulator to split the polygon
      *
@@ -68,11 +70,11 @@ public class BasicTriangulator implements Triangulator {
     @Override
     public boolean triangulate() {
         tried = true;
-
+        
         boolean worked = process(poly, tris);
         return worked;
     }
-
+    
     /**
      * Get a count of the number of triangles produced
      *
@@ -81,11 +83,11 @@ public class BasicTriangulator implements Triangulator {
     @Override
     public int getTriangleCount() {
         if (!tried) {
-            throw new RuntimeException("Call triangulate() before accessing triangles");
+            throw new SlickException("Call triangulate() before accessing triangles");
         }
         return tris.size() / 3;
     }
-
+    
     /**
      * Get a point on a specified generated triangle
      *
@@ -99,12 +101,12 @@ public class BasicTriangulator implements Triangulator {
     @Override
     public float[] getTrianglePoint(int tri, int i) {
         if (!tried) {
-            throw new RuntimeException("Call triangulate() before accessing triangles");
+            throw new SlickException("Call triangulate() before accessing triangles");
         }
-
+        
         return tris.get(tri * 3 + i).toArray();
     }
-
+    
     /**
      * Find the area of a polygon defined by the series of points
      * in the list
@@ -116,18 +118,18 @@ public class BasicTriangulator implements Triangulator {
      */
     private float area(PointList contour) {
         int n = contour.size();
-
+        
         float A = 0.0f;
-
+        
         for (int p = n - 1, q = 0; q < n; p = q++) {
             Point contourP = contour.get(p);
             Point contourQ = contour.get(q);
-
+            
             A += contourP.getX() * contourQ.getY() - contourQ.getX() * contourP.getY();
         }
         return A * 0.5f;
     }
-
+    
     /**
      * Check if the point P is inside the triangle defined by
      * the points A,B,C
@@ -153,7 +155,7 @@ public class BasicTriangulator implements Triangulator {
     private boolean insideTriangle(float Ax, float Ay, float Bx, float By, float Cx, float Cy, float Px, float Py) {
         float ax, ay, bx, by, cx, cy, apx, apy, bpx, bpy, cpx, cpy;
         float cCROSSap, bCROSScp, aCROSSbp;
-
+        
         ax = Cx - Bx;
         ay = Cy - By;
         bx = Ax - Cx;
@@ -166,14 +168,14 @@ public class BasicTriangulator implements Triangulator {
         bpy = Py - By;
         cpx = Px - Cx;
         cpy = Py - Cy;
-
+        
         aCROSSbp = ax * bpy - ay * bpx;
         cCROSSap = cx * apy - cy * apx;
         bCROSScp = bx * cpy - by * cpx;
-
+        
         return aCROSSbp >= 0.0f && bCROSScp >= 0.0f && cCROSSap >= 0.0f;
     }
-
+    
     /**
      * Cut a the contour and add a triangle into V to describe the
      * location of the cut
@@ -195,36 +197,36 @@ public class BasicTriangulator implements Triangulator {
     private boolean snip(PointList contour, int u, int v, int w, int n, int[] V) {
         int p;
         float Ax, Ay, Bx, By, Cx, Cy, Px, Py;
-
+        
         Ax = contour.get(V[u]).getX();
         Ay = contour.get(V[u]).getY();
-
+        
         Bx = contour.get(V[v]).getX();
         By = contour.get(V[v]).getY();
-
+        
         Cx = contour.get(V[w]).getX();
         Cy = contour.get(V[w]).getY();
-
+        
         if (EPSILON > (Bx - Ax) * (Cy - Ay) - (By - Ay) * (Cx - Ax)) {
             return false;
         }
-
+        
         for (p = 0; p < n; p++) {
             if (p == u || p == v || p == w) {
                 continue;
             }
-
+            
             Px = contour.get(V[p]).getX();
             Py = contour.get(V[p]).getY();
-
+            
             if (insideTriangle(Ax, Ay, Bx, By, Cx, Cy, Px, Py)) {
                 return false;
             }
         }
-
+        
         return true;
     }
-
+    
     /**
      * Process a list of points defining a polygon
      *
@@ -238,18 +240,18 @@ public class BasicTriangulator implements Triangulator {
      */
     private boolean process(PointList contour, PointList result) {
         result.clear();
-
+        
         /* allocate and initialize list of Vertices in polygon */
-
+        
         int n = contour.size();
         if (n < 3) {
             return false;
         }
-
+        
         int[] V = new int[n];
-
+        
         /* we want a counter-clockwise polygon in V */
-
+        
         if (0.0f < area(contour)) {
             for (int v = 0; v < n; v++) {
                 V[v] = v;
@@ -259,19 +261,19 @@ public class BasicTriangulator implements Triangulator {
                 V[v] = n - 1 - v;
             }
         }
-
+        
         int nv = n;
-
+        
         /* remove nv-2 Vertices, creating 1 triangle every time */
         int count = 2 * nv; /* error detection */
-
+        
         for (int v = nv - 1; nv > 2;) {
             /* if we loop, it is probably a non-simple polygon */
             if (0 >= count--) {
                 // ** Triangulator4: ERROR - probable bad polygon!
                 return false;
             }
-
+            
             /* three consecutive vertices in current polygon, <u,v,w> */
             int u = v;
             if (nv <= u) {
@@ -285,34 +287,34 @@ public class BasicTriangulator implements Triangulator {
             if (nv <= w) {
                 w = 0; /* next */
             }
-            
+
             if (snip(contour, u, v, w, nv, V)) {
                 int a, b, c, s, t;
-
+                
                 /* true names of the vertices */
                 a = V[u];
                 b = V[v];
                 c = V[w];
-
+                
                 /* output Triangle */
                 result.add(contour.get(a));
                 result.add(contour.get(b));
                 result.add(contour.get(c));
-
+                
                 /* remove v from remaining polygon */
                 for (s = v, t = v + 1; t < nv; s++, t++) {
                     V[s] = V[t];
                 }
                 nv--;
-
+                
                 /* resest error detection counter */
                 count = 2 * nv;
             }
         }
-
+        
         return true;
     }
-
+    
     /**
      * A single point handled by the triangulator
      *
@@ -325,7 +327,7 @@ public class BasicTriangulator implements Triangulator {
         private final float y;
         /** The points in an array */
         private final float[] array;
-
+        
         /**
          * Create a new point
          *
@@ -339,7 +341,7 @@ public class BasicTriangulator implements Triangulator {
             this.y = y;
             array = new float[] { x, y };
         }
-
+        
         /**
          * Get the x coordinate of the point
          *
@@ -348,7 +350,7 @@ public class BasicTriangulator implements Triangulator {
         public float getX() {
             return x;
         }
-
+        
         /**
          * Get the y coordinate of the point
          *
@@ -357,7 +359,7 @@ public class BasicTriangulator implements Triangulator {
         public float getY() {
             return y;
         }
-
+        
         /**
          * Convert this point into a float array
          *
@@ -366,7 +368,7 @@ public class BasicTriangulator implements Triangulator {
         public float[] toArray() {
             return array;
         }
-
+        
         /**
          * @see java.lang.Object#hashCode()
          */
@@ -374,7 +376,7 @@ public class BasicTriangulator implements Triangulator {
         public int hashCode() {
             return (int) (x * y * 31);
         }
-
+        
         /**
          * @see java.lang.Object#equals(java.lang.Object)
          */
@@ -384,11 +386,11 @@ public class BasicTriangulator implements Triangulator {
                 Point p = (Point) other;
                 return p.x == x && p.y == y;
             }
-
+            
             return false;
         }
     }
-
+    
     /**
      * A list of type <code>Point</code>
      *
@@ -397,7 +399,7 @@ public class BasicTriangulator implements Triangulator {
     private class PointList {
         /** The list of points */
         private final ArrayList<Point> points = new ArrayList<>();
-
+        
         /**
          * Check if the list contains a point
          *
@@ -408,7 +410,7 @@ public class BasicTriangulator implements Triangulator {
         public boolean contains(Point p) {
             return points.contains(p);
         }
-
+        
         /**
          * Add a point to the list
          *
@@ -418,7 +420,7 @@ public class BasicTriangulator implements Triangulator {
         public void add(Point point) {
             points.add(point);
         }
-
+        
         /**
          * Get the size of the list
          *
@@ -427,7 +429,7 @@ public class BasicTriangulator implements Triangulator {
         public int size() {
             return points.size();
         }
-
+        
         /**
          * Get a point a specific index in the list
          *
@@ -438,7 +440,7 @@ public class BasicTriangulator implements Triangulator {
         public Point get(int i) {
             return points.get(i);
         }
-
+        
         /**
          * Clear the list
          */
@@ -446,7 +448,7 @@ public class BasicTriangulator implements Triangulator {
             points.clear();
         }
     }
-
+    
     /**
      * @see org.newdawn.slick.geom.Triangulator#startHole()
      */

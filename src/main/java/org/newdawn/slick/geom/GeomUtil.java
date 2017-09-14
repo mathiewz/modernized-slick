@@ -16,7 +16,7 @@ public class GeomUtil {
     public static final int MAX_POINTS = 10000;
     /** The listener to notify of operations */
     private GeomUtilListener listener;
-    
+
     /**
      * Subtract one shape from another - note this is experimental and doesn't
      * currently handle islands
@@ -30,22 +30,22 @@ public class GeomUtil {
     public Shape[] subtract(Shape targetArg, Shape missingArg) {
         Shape target = targetArg.transform(new Transform());
         Shape missing = missingArg.transform(new Transform());
-        
+
         int count = 0;
         for (int i = 0; i < target.getPointCount(); i++) {
             if (missing.contains(target.getPoint(i)[0], target.getPoint(i)[1])) {
                 count++;
             }
         }
-        
+
         if (count == target.getPointCount()) {
             return new Shape[0];
         }
-        
+
         if (!target.intersects(missing)) {
             return new Shape[] { target };
         }
-        
+
         int found = 0;
         for (int i = 0; i < missing.getPointCount(); i++) {
             if (target.contains(missing.getPoint(i)[0], missing.getPoint(i)[1])) {
@@ -61,14 +61,14 @@ public class GeomUtil {
                 }
             }
         }
-        
+
         if (found < 1) {
             return new Shape[] { target };
         }
-        
+
         return combine(target, missing, true);
     }
-    
+
     /**
      * Check if the given point is on the path
      *
@@ -88,10 +88,10 @@ public class GeomUtil {
                 return true;
             }
         }
-        
+
         return false;
     }
-    
+
     /**
      * Set the listener to be notified of geometry based operations
      *
@@ -101,7 +101,7 @@ public class GeomUtil {
     public void setListener(GeomUtilListener listener) {
         this.listener = listener;
     }
-    
+
     /**
      * Join to shapes together. Note that the shapes must be touching
      * for this method to work.
@@ -115,11 +115,11 @@ public class GeomUtil {
     public Shape[] union(Shape targetArg, Shape otherArg) {
         Shape target = targetArg.transform(new Transform());
         Shape other = otherArg.transform(new Transform());
-        
+
         if (!target.intersects(other)) {
             return new Shape[] { target, other };
         }
-        
+
         // handle the case where intersects is true but really we're talking
         // about edge points
         boolean touches = false;
@@ -143,15 +143,15 @@ public class GeomUtil {
                 }
             }
         }
-        
+
         if (!touches && buttCount < 2) {
             return new Shape[] { target, other };
         }
-        
+
         // so they are definitely touching, consider the union
         return combine(target, other, false);
     }
-    
+
     /**
      * Perform the combination
      *
@@ -167,7 +167,7 @@ public class GeomUtil {
         if (subtract) {
             ArrayList<Shape> shapes = new ArrayList<>();
             ArrayList<Vector2f> used = new ArrayList<>();
-            
+
             // remove any points that are contianed in the shape we're removing, these
             // are implicitly used
             for (int i = 0; i < target.getPointCount(); i++) {
@@ -179,11 +179,11 @@ public class GeomUtil {
                     }
                 }
             }
-            
+
             for (int i = 0; i < target.getPointCount(); i++) {
                 float[] point = target.getPoint(i);
                 Vector2f pt = new Vector2f(point[0], point[1]);
-                
+
                 if (!used.contains(pt)) {
                     Shape result = combineSingle(target, other, true, i);
                     shapes.add(result);
@@ -194,7 +194,7 @@ public class GeomUtil {
                     }
                 }
             }
-            
+
             return shapes.toArray(new Shape[0]);
         } else {
             for (int i = 0; i < target.getPointCount(); i++) {
@@ -205,11 +205,11 @@ public class GeomUtil {
                     }
                 }
             }
-            
+
             return new Shape[] { other };
         }
     }
-    
+
     /**
      * Combine two shapes
      *
@@ -228,62 +228,62 @@ public class GeomUtil {
         Shape other = missing;
         int point = start;
         int dir = 1;
-        
+
         Polygon poly = new Polygon();
         boolean first = true;
-        
+
         int loop = 0;
-        
+
         // while we've not reached the same point
         float px = current.getPoint(point)[0];
         float py = current.getPoint(point)[1];
-        
+
         while (!poly.hasVertex(px, py) || first || current != target) {
             first = false;
             loop++;
             if (loop > MAX_POINTS) {
                 break;
             }
-            
+
             // add the current point to the result shape
             poly.addPoint(px, py);
             if (listener != null) {
                 listener.pointUsed(px, py);
             }
-            
+
             // if the line between the current point and the next one intersect the
             // other shape work out where on the other shape and start traversing it's
             // path instead
             Line line = getLine(current, px, py, rationalPoint(current, point + dir));
             HitResult hit = intersect(other, line);
-            
+
             if (hit != null) {
                 Line hitLine = hit.line;
                 Vector2f pt = hit.pt;
                 px = pt.getX();
                 py = pt.getY();
-                
+
                 if (listener != null) {
                     listener.pointIntersected(px, py);
                 }
-                
+
                 if (other.hasVertex(px, py)) {
                     point = other.indexOf(pt.getX(), pt.getY());
                     dir = 1;
                     px = pt.getX();
                     py = pt.getY();
-                    
+
                     Shape temp = current;
                     current = other;
                     other = temp;
                     continue;
                 }
-                
+
                 float dx = hitLine.getDX() / hitLine.length();
                 float dy = hitLine.getDY() / hitLine.length();
                 dx *= EDGE_SCALE;
                 dy *= EDGE_SCALE;
-                
+
                 if (current.contains(pt.getX() + dx, pt.getY() + dy)) {
                     // the point is the next one, we need to take the first and traverse
                     // the path backwards
@@ -294,7 +294,7 @@ public class GeomUtil {
                         point = hit.p1;
                         dir = 1;
                     }
-                    
+
                     // swap the shapes over, we'll traverse the other one
                     Shape temp = current;
                     current = other;
@@ -312,7 +312,7 @@ public class GeomUtil {
                         point = hit.p1;
                         dir = 1;
                     }
-                    
+
                     // swap the shapes over, we'll traverse the other one
                     Shape temp = current;
                     current = other;
@@ -327,7 +327,7 @@ public class GeomUtil {
                         Shape temp = current;
                         current = other;
                         other = temp;
-                        
+
                         point = rationalPoint(current, point + dir);
                         px = current.getPoint(point)[0];
                         py = current.getPoint(point)[1];
@@ -340,17 +340,17 @@ public class GeomUtil {
                 py = current.getPoint(point)[1];
             }
         }
-        
+
         poly.addPoint(px, py);
         if (listener != null)
-        
+
         {
             listener.pointUsed(px, py);
         }
-        
+
         return poly;
     }
-    
+
     /**
      * Intersect a line with a shape
      *
@@ -363,11 +363,11 @@ public class GeomUtil {
     public HitResult intersect(Shape shape, Line line) {
         float distance = Float.MAX_VALUE;
         HitResult hit = null;
-        
+
         for (int i = 0; i < shape.getPointCount(); i++) {
             int next = rationalPoint(shape, i + 1);
             Line local = getLine(shape, i, next);
-            
+
             Vector2f pt = line.intersect(local, true);
             if (pt != null) {
                 float newDis = pt.distance(line.getStart());
@@ -381,10 +381,10 @@ public class GeomUtil {
                 }
             }
         }
-        
+
         return hit;
     }
-    
+
     /**
      * Rationalise a point in terms of a given shape
      *
@@ -395,16 +395,17 @@ public class GeomUtil {
      * @return The index that is rational for the shape
      */
     public static int rationalPoint(Shape shape, int p) {
-        while (p < 0) {
-            p += shape.getPointCount();
+        int r = p;
+        while (r < 0) {
+            r += shape.getPointCount();
         }
-        while (p >= shape.getPointCount()) {
-            p -= shape.getPointCount();
+        while (r >= shape.getPointCount()) {
+            r -= shape.getPointCount();
         }
-        
-        return p;
+
+        return r;
     }
-    
+
     /**
      * Get a line between two points in a shape
      *
@@ -419,10 +420,10 @@ public class GeomUtil {
     public Line getLine(Shape shape, int s, int e) {
         float[] start = shape.getPoint(s);
         float[] end = shape.getPoint(e);
-        
+
         return new Line(start[0], start[1], end[0], end[1]);
     }
-    
+
     /**
      * Get a line between two points in a shape
      *
@@ -440,7 +441,7 @@ public class GeomUtil {
         float[] end = shape.getPoint(e);
         return new Line(sx, sy, end[0], end[1]);
     }
-    
+
     /**
      * A lightweigtht description of a intersection between a shape and
      * line.

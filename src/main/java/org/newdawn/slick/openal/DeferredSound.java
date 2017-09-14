@@ -3,6 +3,7 @@ package org.newdawn.slick.openal;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.newdawn.slick.SlickException;
 import org.newdawn.slick.loading.DeferredResource;
 import org.newdawn.slick.loading.LoadingList;
 import org.newdawn.slick.util.Log;
@@ -22,7 +23,7 @@ public class DeferredSound extends AudioImpl implements DeferredResource {
     public static final int MOD = 3;
     /** Indicate a AIF to be loaded */
     public static final int AIF = 4;
-
+    
     /** The type of sound to be loader */
     private final int type;
     /** The location of the sound this proxy wraps */
@@ -31,7 +32,7 @@ public class DeferredSound extends AudioImpl implements DeferredResource {
     private Audio target;
     /** The input stream to load the sound this proxy wraps from (can be null) */
     private InputStream in;
-
+    
     /**
      * Create a new sound on request to load
      *
@@ -45,24 +46,24 @@ public class DeferredSound extends AudioImpl implements DeferredResource {
     public DeferredSound(String ref, InputStream in, int type) {
         this.ref = ref;
         this.type = type;
-
+        
         // nasty hack to detect when we're loading from a stream
         if (ref.equals(in.toString())) {
             this.in = in;
         }
-
+        
         LoadingList.get().add(this);
     }
-
+    
     /**
      * Check if the target has already been loaded
      */
     private void checkTarget() {
         if (target == null) {
-            throw new RuntimeException("Attempt to use deferred sound before loading");
+            throw new SlickException("Attempt to use deferred sound before loading");
         }
     }
-
+    
     /**
      * @see org.newdawn.slick.loading.DeferredResource#load()
      */
@@ -109,17 +110,17 @@ public class DeferredSound extends AudioImpl implements DeferredResource {
         }
         SoundStore.get().setDeferredLoading(before);
     }
-
+    
     /**
      * @see org.newdawn.slick.openal.AudioImpl#isPlaying()
      */
     @Override
     public boolean isPlaying() {
         checkTarget();
-
+        
         return target.isPlaying();
     }
-
+    
     /**
      * @see org.newdawn.slick.openal.AudioImpl#playAsMusic(float, float, boolean)
      */
@@ -128,7 +129,7 @@ public class DeferredSound extends AudioImpl implements DeferredResource {
         checkTarget();
         return target.playAsMusic(pitch, gain, loop);
     }
-
+    
     /**
      * @see org.newdawn.slick.openal.AudioImpl#playAsSoundEffect(float, float, boolean)
      */
@@ -137,7 +138,7 @@ public class DeferredSound extends AudioImpl implements DeferredResource {
         checkTarget();
         return target.playAsSoundEffect(pitch, gain, loop);
     }
-
+    
     /**
      * Play this sound as a sound effect
      *
@@ -159,7 +160,7 @@ public class DeferredSound extends AudioImpl implements DeferredResource {
         checkTarget();
         return target.playAsSoundEffect(pitch, gain, loop, x, y, z);
     }
-
+    
     /**
      * @see org.newdawn.slick.openal.AudioImpl#stop()
      */
@@ -168,7 +169,7 @@ public class DeferredSound extends AudioImpl implements DeferredResource {
         checkTarget();
         target.stop();
     }
-
+    
     /**
      * @see org.newdawn.slick.loading.DeferredResource#getDescription()
      */
@@ -176,5 +177,5 @@ public class DeferredSound extends AudioImpl implements DeferredResource {
     public String getDescription() {
         return ref;
     }
-
+    
 }

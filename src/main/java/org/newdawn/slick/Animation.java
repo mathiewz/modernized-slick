@@ -40,14 +40,14 @@ public class Animation implements Renderable {
     private boolean loop = true;
     /** The spriteSheet backing this animation */
     private SpriteSheet spriteSheet = null;
-
+    
     /**
      * Create an empty animation
      */
     public Animation() {
         this(true);
     }
-
+    
     /**
      * Create a new animation from a set of images
      *
@@ -59,7 +59,7 @@ public class Animation implements Renderable {
     public Animation(Image[] frames, int duration) {
         this(frames, duration, true);
     }
-
+    
     /**
      * Create a new animation from a set of images
      *
@@ -71,7 +71,7 @@ public class Animation implements Renderable {
     public Animation(Image[] frames, int[] durations) {
         this(frames, durations, true);
     }
-
+    
     /**
      * Create an empty animation
      *
@@ -83,7 +83,7 @@ public class Animation implements Renderable {
         currentFrame = 0;
         this.autoUpdate = autoUpdate;
     }
-
+    
     /**
      * Create a new animation from a set of images
      *
@@ -102,7 +102,7 @@ public class Animation implements Renderable {
         currentFrame = 0;
         this.autoUpdate = autoUpdate;
     }
-
+    
     /**
      * Create a new animation from a set of images
      *
@@ -117,15 +117,15 @@ public class Animation implements Renderable {
     public Animation(Image[] frames, int[] durations, boolean autoUpdate) {
         this.autoUpdate = autoUpdate;
         if (frames.length != durations.length) {
-            throw new RuntimeException("There must be one duration per frame");
+            throw new SlickException("There must be one duration per frame");
         }
-
+        
         for (int i = 0; i < frames.length; i++) {
             addFrame(frames[i], durations[i]);
         }
         currentFrame = 0;
     }
-
+    
     /**
      * Create a new animation based on the sprite from a sheet. It assumed that
      * the sprites are organised on horizontal scan lines and that every sprite
@@ -139,7 +139,7 @@ public class Animation implements Renderable {
     public Animation(SpriteSheet frames, int duration) {
         this(frames, 0, 0, frames.getHorizontalCount() - 1, frames.getVerticalCount() - 1, true, duration, true);
     }
-
+    
     /**
      * Create a new animation based on a selection of sprites from a sheet
      *
@@ -163,7 +163,7 @@ public class Animation implements Renderable {
      */
     public Animation(SpriteSheet frames, int x1, int y1, int x2, int y2, boolean horizontalScan, int duration, boolean autoUpdate) {
         this.autoUpdate = autoUpdate;
-
+        
         if (!horizontalScan) {
             for (int x = x1; x <= x2; x++) {
                 for (int y = y1; y <= y2; y++) {
@@ -178,7 +178,7 @@ public class Animation implements Renderable {
             }
         }
     }
-
+    
     /**
      * Creates a new Animation where each frame is a sub-image of <tt>SpriteSheet</tt> ss.
      *
@@ -193,14 +193,14 @@ public class Animation implements Renderable {
         spriteSheet = ss;
         int x = -1;
         int y = -1;
-
+        
         for (int i = 0; i < frames.length / 2; i++) {
             x = frames[i * 2];
             y = frames[i * 2 + 1];
             addFrame(duration[i], x, y);
         }
     }
-
+    
     /**
      * Add animation frame to the animation.
      *
@@ -214,17 +214,17 @@ public class Animation implements Renderable {
     public void addFrame(int duration, int x, int y) {
         if (duration == 0) {
             Log.error("Invalid duration: " + duration);
-            throw new RuntimeException("Invalid duration: " + duration);
+            throw new SlickException("Invalid duration: " + duration);
         }
-
+        
         if (frames.isEmpty()) {
             nextChange = (int) (duration / speed);
         }
-
+        
         frames.add(new Frame(duration, x, y));
         currentFrame = 0;
     }
-
+    
     /**
      * Indicate if this animation should automatically update based on the
      * time between renders or if it should need updating via the update()
@@ -236,7 +236,7 @@ public class Animation implements Renderable {
     public void setAutoUpdate(boolean auto) {
         autoUpdate = auto;
     }
-
+    
     /**
      * Indicate if this animation should ping pong back and forth
      *
@@ -246,7 +246,7 @@ public class Animation implements Renderable {
     public void setPingPong(boolean pingPong) {
         this.pingPong = pingPong;
     }
-
+    
     /**
      * Check if this animation has stopped (either explictly or because it's reached its target frame)
      *
@@ -256,7 +256,7 @@ public class Animation implements Renderable {
     public boolean isStopped() {
         return stopped;
     }
-
+    
     /**
      * Adjust the overall speed of the animation.
      *
@@ -267,11 +267,11 @@ public class Animation implements Renderable {
         if (spd > 0) {
             // Adjust nextChange
             nextChange = (long) (nextChange * speed / spd);
-
+            
             speed = spd;
         }
     }
-
+    
     /**
      * Returns the current speed of the animation.
      *
@@ -280,7 +280,7 @@ public class Animation implements Renderable {
     public float getSpeed() {
         return speed;
     }
-
+    
     /**
      * Stop the animation
      */
@@ -291,7 +291,7 @@ public class Animation implements Renderable {
         timeLeft = nextChange;
         stopped = true;
     }
-
+    
     /**
      * Start the animation playing again
      */
@@ -305,7 +305,7 @@ public class Animation implements Renderable {
         stopped = false;
         nextChange = timeLeft;
     }
-
+    
     /**
      * Restart the animation from the beginning
      */
@@ -319,7 +319,7 @@ public class Animation implements Renderable {
         firstUpdate = true;
         lastUpdate = 0;
     }
-
+    
     /**
      * Add animation frame to the animation
      *
@@ -331,24 +331,24 @@ public class Animation implements Renderable {
     public void addFrame(Image frame, int duration) {
         if (duration == 0) {
             Log.error("Invalid duration: " + duration);
-            throw new RuntimeException("Invalid duration: " + duration);
+            throw new SlickException("Invalid duration: " + duration);
         }
-
+        
         if (frames.isEmpty()) {
             nextChange = (int) (duration / speed);
         }
-
+        
         frames.add(new Frame(frame, duration));
         currentFrame = 0;
     }
-
+    
     /**
      * Draw the animation to the screen
      */
     public void draw() {
         draw(0, 0);
     }
-
+    
     /**
      * Draw the animation at a specific location
      *
@@ -361,7 +361,7 @@ public class Animation implements Renderable {
     public void draw(float x, float y) {
         draw(x, y, getWidth(), getHeight());
     }
-
+    
     /**
      * Draw the animation at a specific location
      *
@@ -376,7 +376,7 @@ public class Animation implements Renderable {
     public void draw(float x, float y, Color filter) {
         draw(x, y, getWidth(), getHeight(), filter);
     }
-
+    
     /**
      * Draw the animation
      *
@@ -393,7 +393,7 @@ public class Animation implements Renderable {
     public void draw(float x, float y, float width, float height) {
         draw(x, y, width, height, Color.white);
     }
-
+    
     /**
      * Draw the animation
      *
@@ -413,7 +413,7 @@ public class Animation implements Renderable {
         if (frames.size() == 0) {
             return;
         }
-
+        
         if (autoUpdate) {
             long now = getTime();
             long delta = now - lastUpdate;
@@ -424,11 +424,11 @@ public class Animation implements Renderable {
             lastUpdate = now;
             nextFrame(delta);
         }
-
+        
         Frame frame = frames.get(currentFrame);
         frame.image.draw(x, y, width, height, col);
     }
-
+    
     /**
      * Render the appropriate frame when the spriteSheet backing this Animation is in use.
      *
@@ -441,7 +441,7 @@ public class Animation implements Renderable {
         if (frames.size() == 0) {
             return;
         }
-
+        
         if (autoUpdate) {
             long now = getTime();
             long delta = now - lastUpdate;
@@ -452,11 +452,11 @@ public class Animation implements Renderable {
             lastUpdate = now;
             nextFrame(delta);
         }
-
+        
         Frame frame = frames.get(currentFrame);
         spriteSheet.renderInUse(x, y, frame.x, frame.y);
     }
-
+    
     /**
      * Get the width of the current frame
      *
@@ -465,7 +465,7 @@ public class Animation implements Renderable {
     public int getWidth() {
         return frames.get(currentFrame).image.getWidth();
     }
-
+    
     /**
      * Get the height of the current frame
      *
@@ -474,7 +474,7 @@ public class Animation implements Renderable {
     public int getHeight() {
         return frames.get(currentFrame).image.getHeight();
     }
-
+    
     /**
      * Draw the animation
      *
@@ -490,7 +490,7 @@ public class Animation implements Renderable {
     public void drawFlash(float x, float y, float width, float height) {
         drawFlash(x, y, width, height, Color.white);
     }
-
+    
     /**
      * Draw the animation
      *
@@ -509,7 +509,7 @@ public class Animation implements Renderable {
         if (frames.size() == 0) {
             return;
         }
-
+        
         if (autoUpdate) {
             long now = getTime();
             long delta = now - lastUpdate;
@@ -520,11 +520,11 @@ public class Animation implements Renderable {
             lastUpdate = now;
             nextFrame(delta);
         }
-
+        
         Frame frame = frames.get(currentFrame);
         frame.image.drawFlash(x, y, width, height, col);
     }
-
+    
     /**
      * Update the animation cycle without draw the image, useful
      * for keeping two animations in sync
@@ -544,7 +544,7 @@ public class Animation implements Renderable {
             nextFrame(delta);
         }
     }
-
+    
     /**
      * Update the animation, note that this will have odd effects if auto update
      * is also turned on
@@ -556,7 +556,7 @@ public class Animation implements Renderable {
     public void update(long delta) {
         nextFrame(delta);
     }
-
+    
     /**
      * Get the index of the current frame
      *
@@ -565,7 +565,7 @@ public class Animation implements Renderable {
     public int getFrame() {
         return currentFrame;
     }
-
+    
     /**
      * Set the current frame to be rendered
      *
@@ -575,7 +575,7 @@ public class Animation implements Renderable {
     public void setCurrentFrame(int index) {
         currentFrame = index;
     }
-
+    
     /**
      * Get the image assocaited with a given frame index
      *
@@ -587,7 +587,7 @@ public class Animation implements Renderable {
         Frame frame = frames.get(index);
         return frame.image;
     }
-
+    
     /**
      * Get the number of frames that are in the animation
      *
@@ -596,7 +596,7 @@ public class Animation implements Renderable {
     public int getFrameCount() {
         return frames.size();
     }
-
+    
     /**
      * Get the image associated with the current animation frame
      *
@@ -606,7 +606,7 @@ public class Animation implements Renderable {
         Frame frame = frames.get(currentFrame);
         return frame.image;
     }
-
+    
     /**
      * Check if we need to move to the next frame
      *
@@ -620,9 +620,9 @@ public class Animation implements Renderable {
         if (frames.size() == 0) {
             return;
         }
-
+        
         nextChange -= delta;
-
+        
         while (nextChange < 0 && !stopped) {
             if (currentFrame == stopAt) {
                 stopped = true;
@@ -633,7 +633,7 @@ public class Animation implements Renderable {
                 break;
             }
             currentFrame = (currentFrame + direction) % frames.size();
-
+            
             if (pingPong) {
                 if (currentFrame <= 0) {
                     currentFrame = 0;
@@ -651,7 +651,7 @@ public class Animation implements Renderable {
             nextChange = nextChange + realDuration;
         }
     }
-
+    
     /**
      * Indicate if this animation should loop or stop at the last frame
      *
@@ -661,7 +661,7 @@ public class Animation implements Renderable {
     public void setLooping(boolean loop) {
         this.loop = loop;
     }
-
+    
     /**
      * Get the accurate system time
      *
@@ -670,7 +670,7 @@ public class Animation implements Renderable {
     private long getTime() {
         return Sys.getTime() * 1000 / Sys.getTimerResolution();
     }
-
+    
     /**
      * Indicate the animation should stop when it reaches the specified
      * frame index (note, not frame number but index in the animation
@@ -681,7 +681,7 @@ public class Animation implements Renderable {
     public void stopAt(int frameIndex) {
         stopAt = frameIndex;
     }
-
+    
     /**
      * Get the duration of a particular frame
      *
@@ -692,7 +692,7 @@ public class Animation implements Renderable {
     public int getDuration(int index) {
         return frames.get(index).duration;
     }
-
+    
     /**
      * Set the duration of the given frame
      *
@@ -704,7 +704,7 @@ public class Animation implements Renderable {
     public void setDuration(int index, int duration) {
         frames.get(index).duration = duration;
     }
-
+    
     /**
      * Get the durations of all the frames in this animation
      *
@@ -715,10 +715,10 @@ public class Animation implements Renderable {
         for (int i = 0; i < frames.size(); i++) {
             durations[i] = getDuration(i);
         }
-
+        
         return durations;
     }
-
+    
     /**
      * @see java.lang.Object#toString()
      */
@@ -729,11 +729,11 @@ public class Animation implements Renderable {
             Frame frame = frames.get(i);
             res += frame.duration + ",";
         }
-
+        
         res += "]";
         return res;
     }
-
+    
     /**
      * Create a copy of this animation. Note that the frames
      * are not duplicated but shared with the original
@@ -742,7 +742,7 @@ public class Animation implements Renderable {
      */
     public Animation copy() {
         Animation copy = new Animation();
-
+        
         copy.spriteSheet = spriteSheet;
         copy.frames = frames;
         copy.autoUpdate = autoUpdate;
@@ -750,10 +750,10 @@ public class Animation implements Renderable {
         copy.loop = loop;
         copy.pingPong = pingPong;
         copy.speed = speed;
-
+        
         return copy;
     }
-
+    
     /**
      * A single frame within the animation
      *
@@ -768,7 +768,7 @@ public class Animation implements Renderable {
         public int x = -1;
         /** The y location of this frame on a SpriteSheet */
         public int y = -1;
-
+        
         /**
          * Create a new animation frame
          *
@@ -781,7 +781,7 @@ public class Animation implements Renderable {
             this.image = image;
             this.duration = duration;
         }
-
+        
         /**
          * Creates a new animation frame with the frames image location on a sprite sheet
          *

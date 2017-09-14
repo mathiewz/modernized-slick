@@ -18,6 +18,8 @@ import java.util.Hashtable;
 
 import javax.imageio.ImageIO;
 
+import org.newdawn.slick.SlickException;
+
 /**
  * An image data provider that uses ImageIO to retrieve image data in a format
  * suitable for creating OpenGL textures. This implementation is used when
@@ -28,10 +30,10 @@ import javax.imageio.ImageIO;
 public class ImageIOImageData implements LoadableImageData {
     /** The colour model including alpha for the GL image */
     private static final ColorModel glAlphaColorModel = new ComponentColorModel(ColorSpace.getInstance(ColorSpace.CS_sRGB), new int[] { 8, 8, 8, 8 }, true, false, ComponentColorModel.TRANSLUCENT, DataBuffer.TYPE_BYTE);
-
+    
     /** The colour model for the GL image */
     private static final ColorModel glColorModel = new ComponentColorModel(ColorSpace.getInstance(ColorSpace.CS_sRGB), new int[] { 8, 8, 8, 0 }, false, false, ComponentColorModel.OPAQUE, DataBuffer.TYPE_BYTE);
-
+    
     /** The bit depth of the image */
     private int depth;
     /** The height of the image */
@@ -44,7 +46,7 @@ public class ImageIOImageData implements LoadableImageData {
     private int texHeight;
     /** True if we should edge */
     private boolean edging = true;
-
+    
     /**
      * @see org.newdawn.slick.opengl.ImageData#getDepth()
      */
@@ -52,7 +54,7 @@ public class ImageIOImageData implements LoadableImageData {
     public int getDepth() {
         return depth;
     }
-
+    
     /**
      * @see org.newdawn.slick.opengl.ImageData#getHeight()
      */
@@ -60,7 +62,7 @@ public class ImageIOImageData implements LoadableImageData {
     public int getHeight() {
         return height;
     }
-
+    
     /**
      * @see org.newdawn.slick.opengl.ImageData#getTexHeight()
      */
@@ -68,7 +70,7 @@ public class ImageIOImageData implements LoadableImageData {
     public int getTexHeight() {
         return texHeight;
     }
-
+    
     /**
      * @see org.newdawn.slick.opengl.ImageData#getTexWidth()
      */
@@ -76,7 +78,7 @@ public class ImageIOImageData implements LoadableImageData {
     public int getTexWidth() {
         return texWidth;
     }
-
+    
     /**
      * @see org.newdawn.slick.opengl.ImageData#getWidth()
      */
@@ -84,7 +86,7 @@ public class ImageIOImageData implements LoadableImageData {
     public int getWidth() {
         return width;
     }
-
+    
     /**
      * @see org.newdawn.slick.opengl.LoadableImageData#loadImage(java.io.InputStream)
      */
@@ -92,7 +94,7 @@ public class ImageIOImageData implements LoadableImageData {
     public ByteBuffer loadImage(InputStream fis) throws IOException {
         return loadImage(fis, true, null);
     }
-
+    
     /**
      * @see org.newdawn.slick.opengl.LoadableImageData#loadImage(java.io.InputStream, boolean, int[])
      */
@@ -100,7 +102,7 @@ public class ImageIOImageData implements LoadableImageData {
     public ByteBuffer loadImage(InputStream fis, boolean flipped, int[] transparent) throws IOException {
         return loadImage(fis, flipped, false, transparent);
     }
-
+    
     /**
      * @see org.newdawn.slick.opengl.LoadableImageData#loadImage(java.io.InputStream, boolean, boolean, int[])
      */
@@ -109,38 +111,38 @@ public class ImageIOImageData implements LoadableImageData {
         if (transparent != null) {
             forceAlpha = true;
         }
-
+        
         BufferedImage bufferedImage = ImageIO.read(fis);
         return imageToByteBuffer(bufferedImage, flipped, forceAlpha, transparent);
     }
-
+    
     public ByteBuffer imageToByteBuffer(BufferedImage image, boolean flipped, boolean forceAlpha, int[] transparent) {
         ByteBuffer imageBuffer = null;
         WritableRaster raster;
         BufferedImage texImage;
-
+        
         int texWidth = 2;
         int texHeight = 2;
-
+        
         // find the closest power of 2 for the width and height
         // of the produced texture
-
+        
         while (texWidth < image.getWidth()) {
             texWidth *= 2;
         }
         while (texHeight < image.getHeight()) {
             texHeight *= 2;
         }
-
+        
         width = image.getWidth();
         height = image.getHeight();
         this.texHeight = texHeight;
         this.texWidth = texWidth;
-
+        
         // create a raster that can be used by OpenGL as a source
         // for a texture
         boolean useAlpha = image.getColorModel().hasAlpha() || forceAlpha;
-
+        
         if (useAlpha) {
             depth = 32;
             raster = Raster.createInterleavedRaster(DataBuffer.TYPE_BYTE, texWidth, texHeight, 4, null);
@@ -150,23 +152,23 @@ public class ImageIOImageData implements LoadableImageData {
             raster = Raster.createInterleavedRaster(DataBuffer.TYPE_BYTE, texWidth, texHeight, 3, null);
             texImage = new BufferedImage(glColorModel, raster, false, new Hashtable<>());
         }
-
+        
         // copy the source image into the produced image
         Graphics2D g = (Graphics2D) texImage.getGraphics();
-
+        
         // only need to blank the image for mac compatibility if we're using alpha
         if (useAlpha) {
             g.setColor(new Color(0f, 0f, 0f, 0f));
             g.fillRect(0, 0, texWidth, texHeight);
         }
-
+        
         if (flipped) {
             g.scale(1, -1);
             g.drawImage(image, 0, -height, null);
         } else {
             g.drawImage(image, 0, 0, null);
         }
-
+        
         if (edging) {
             if (height < texHeight - 1) {
                 copyArea(texImage, 0, 0, width, 1, 0, texHeight - 1);
@@ -177,11 +179,11 @@ public class ImageIOImageData implements LoadableImageData {
                 copyArea(texImage, width - 1, 0, 1, height, 1, 0);
             }
         }
-
+        
         // build a byte buffer from the temporary image
         // that be used by OpenGL to produce a texture.
         byte[] data = ((DataBufferByte) texImage.getRaster().getDataBuffer()).getData();
-
+        
         if (transparent != null) {
             for (int i = 0; i < data.length; i += 4) {
                 boolean match = true;
@@ -191,30 +193,30 @@ public class ImageIOImageData implements LoadableImageData {
                         match = false;
                     }
                 }
-
+                
                 if (match) {
                     data[i + 3] = 0;
                 }
             }
         }
-
+        
         imageBuffer = ByteBuffer.allocateDirect(data.length);
         imageBuffer.order(ByteOrder.nativeOrder());
         imageBuffer.put(data, 0, data.length);
         imageBuffer.flip();
         g.dispose();
-
+        
         return imageBuffer;
     }
-
+    
     /**
      * @see org.newdawn.slick.opengl.ImageData#getImageBufferData()
      */
     @Override
     public ByteBuffer getImageBufferData() {
-        throw new RuntimeException("ImageIOImageData doesn't store it's image.");
+        throw new SlickException("ImageIOImageData doesn't store it's image.");
     }
-
+    
     /**
      * Implement of transform copy area for 1.4
      *
@@ -235,10 +237,10 @@ public class ImageIOImageData implements LoadableImageData {
      */
     private void copyArea(BufferedImage image, int x, int y, int width, int height, int dx, int dy) {
         Graphics2D g = (Graphics2D) image.getGraphics();
-
+        
         g.drawImage(image.getSubimage(x, y, width, height), x + dx, y + dy, null);
     }
-
+    
     /**
      * @see org.newdawn.slick.opengl.LoadableImageData#configureEdging(boolean)
      */
