@@ -1,9 +1,12 @@
 package org.newdawn.slick;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.StringJoiner;
+import java.util.function.BiConsumer;
+import java.util.stream.IntStream;
 
 import org.lwjgl.Sys;
-import org.newdawn.slick.util.Log;
 
 /**
  * A utility to hold and render animations
@@ -47,31 +50,7 @@ public class Animation implements Renderable {
     public Animation() {
         this(true);
     }
-    
-    /**
-     * Create a new animation from a set of images
-     *
-     * @param frames
-     *            The images for the animation frames
-     * @param duration
-     *            The duration to show each frame
-     */
-    public Animation(Image[] frames, int duration) {
-        this(frames, duration, true);
-    }
-    
-    /**
-     * Create a new animation from a set of images
-     *
-     * @param frames
-     *            The images for the animation frames
-     * @param durations
-     *            The duration to show each frame
-     */
-    public Animation(Image[] frames, int[] durations) {
-        this(frames, durations, true);
-    }
-    
+
     /**
      * Create an empty animation
      *
@@ -85,48 +64,6 @@ public class Animation implements Renderable {
     }
     
     /**
-     * Create a new animation from a set of images
-     *
-     * @param frames
-     *            The images for the animation frames
-     * @param duration
-     *            The duration to show each frame
-     * @param autoUpdate
-     *            True if this animation should automatically update. This means that the
-     *            current frame will be caculated based on the time between renders
-     */
-    public Animation(Image[] frames, int duration, boolean autoUpdate) {
-        for (Image frame : frames) {
-            addFrame(frame, duration);
-        }
-        currentFrame = 0;
-        this.autoUpdate = autoUpdate;
-    }
-    
-    /**
-     * Create a new animation from a set of images
-     *
-     * @param frames
-     *            The images for the animation frames
-     * @param durations
-     *            The duration to show each frame
-     * @param autoUpdate
-     *            True if this animation should automatically update. This means that the
-     *            current frame will be caculated based on the time between renders
-     */
-    public Animation(Image[] frames, int[] durations, boolean autoUpdate) {
-        this.autoUpdate = autoUpdate;
-        if (frames.length != durations.length) {
-            throw new SlickException("There must be one duration per frame");
-        }
-        
-        for (int i = 0; i < frames.length; i++) {
-            addFrame(frames[i], durations[i]);
-        }
-        currentFrame = 0;
-    }
-    
-    /**
      * Create a new animation based on the sprite from a sheet. It assumed that
      * the sprites are organised on horizontal scan lines and that every sprite
      * in the sheet should be used.
@@ -137,7 +74,7 @@ public class Animation implements Renderable {
      *            The duration each frame should be displayed for
      */
     public Animation(SpriteSheet frames, int duration) {
-        this(frames, 0, 0, frames.getHorizontalCount() - 1, frames.getVerticalCount() - 1, true, duration, true);
+        this(frames, true, duration, true);
     }
     
     /**
@@ -161,19 +98,19 @@ public class Animation implements Renderable {
      * @param autoUpdate
      *            True if this animation should automatically update based on the render times
      */
-    public Animation(SpriteSheet frames, int x1, int y1, int x2, int y2, boolean horizontalScan, int duration, boolean autoUpdate) {
+    public Animation(SpriteSheet frames, boolean horizontalScan, int duration, boolean autoUpdate) {
         this.autoUpdate = autoUpdate;
-        
+        BiConsumer<Integer, Integer> addFrame = (x, y) -> addFrame(frames.getSprite(x, y), duration);
         if (!horizontalScan) {
-            for (int x = x1; x <= x2; x++) {
-                for (int y = y1; y <= y2; y++) {
-                    addFrame(frames.getSprite(x, y), duration);
+            for (int x = 0; x < frames.getHorizontalCount(); x++) {
+                for (int y = 0; y < frames.getVerticalCount(); y++) {
+                    addFrame.accept(x, y);
                 }
             }
         } else {
-            for (int y = y1; y <= y2; y++) {
-                for (int x = x1; x <= x2; x++) {
-                    addFrame(frames.getSprite(x, y), duration);
+            for (int y = 0; y < frames.getVerticalCount(); y++) {
+                for (int x = 0; x < frames.getHorizontalCount(); x++) {
+                    addFrame.accept(x, y);
                 }
             }
         }
@@ -213,7 +150,6 @@ public class Animation implements Renderable {
      */
     public void addFrame(int duration, int x, int y) {
         if (duration == 0) {
-            Log.error("Invalid duration: " + duration);
             throw new SlickException("Invalid duration: " + duration);
         }
         
@@ -285,7 +221,7 @@ public class Animation implements Renderable {
      * Stop the animation
      */
     public void stop() {
-        if (frames.size() == 0) {
+        if (frames.isEmpty()) {
             return;
         }
         timeLeft = nextChange;
@@ -296,10 +232,7 @@ public class Animation implements Renderable {
      * Start the animation playing again
      */
     public void start() {
-        if (!stopped) {
-            return;
-        }
-        if (frames.size() == 0) {
+        if (!stopped || frames.isEmpty()) {
             return;
         }
         stopped = false;
@@ -310,7 +243,7 @@ public class Animation implements Renderable {
      * Restart the animation from the beginning
      */
     public void restart() {
-        if (frames.size() == 0) {
+        if (frames.isEmpty()) {
             return;
         }
         stopped = false;
@@ -330,7 +263,6 @@ public class Animation implements Renderable {
      */
     public void addFrame(Image frame, int duration) {
         if (duration == 0) {
-            Log.error("Invalid duration: " + duration);
             throw new SlickException("Invalid duration: " + duration);
         }
         
@@ -410,22 +342,11 @@ public class Animation implements Renderable {
      */
     @Override
     public void draw(float x, float y, float width, float height, Color col) {
-        if (frames.size() == 0) {
+        if (frames.isEmpty()) {
             return;
         }
-        
-        if (autoUpdate) {
-            long now = getTime();
-            long delta = now - lastUpdate;
-            if (firstUpdate) {
-                delta = 0;
-                firstUpdate = false;
-            }
-            lastUpdate = now;
-            nextFrame(delta);
-        }
-        
-        Frame frame = frames.get(currentFrame);
+        autoUpdateRendering();
+        Frame frame = getCurrentFrame();
         frame.image.draw(x, y, width, height, col);
     }
     
@@ -438,10 +359,15 @@ public class Animation implements Renderable {
      *            The y position to draw the animation at
      */
     public void renderInUse(int x, int y) {
-        if (frames.size() == 0) {
+        if (frames.isEmpty()) {
             return;
         }
-        
+        autoUpdateRendering();
+        Frame frame = getCurrentFrame();
+        spriteSheet.renderInUse(x, y, frame.x, frame.y);
+    }
+    
+    private void autoUpdateRendering() {
         if (autoUpdate) {
             long now = getTime();
             long delta = now - lastUpdate;
@@ -452,18 +378,15 @@ public class Animation implements Renderable {
             lastUpdate = now;
             nextFrame(delta);
         }
-        
-        Frame frame = frames.get(currentFrame);
-        spriteSheet.renderInUse(x, y, frame.x, frame.y);
     }
-    
+
     /**
      * Get the width of the current frame
      *
      * @return The width of the current frame
      */
     public int getWidth() {
-        return frames.get(currentFrame).image.getWidth();
+        return getCurrentImage().getWidth();
     }
     
     /**
@@ -472,7 +395,7 @@ public class Animation implements Renderable {
      * @return The height of the current frame
      */
     public int getHeight() {
-        return frames.get(currentFrame).image.getHeight();
+        return getCurrentImage().getHeight();
     }
     
     /**
@@ -505,44 +428,16 @@ public class Animation implements Renderable {
      * @param col
      *            The colour for the flash
      */
+
     public void drawFlash(float x, float y, float width, float height, Color col) {
-        if (frames.size() == 0) {
+        if (frames.isEmpty()) {
             return;
         }
         
-        if (autoUpdate) {
-            long now = getTime();
-            long delta = now - lastUpdate;
-            if (firstUpdate) {
-                delta = 0;
-                firstUpdate = false;
-            }
-            lastUpdate = now;
-            nextFrame(delta);
-        }
+        autoUpdateRendering();
         
-        Frame frame = frames.get(currentFrame);
+        Frame frame = getCurrentFrame();
         frame.image.drawFlash(x, y, width, height, col);
-    }
-    
-    /**
-     * Update the animation cycle without draw the image, useful
-     * for keeping two animations in sync
-     *
-     * @deprecated
-     */
-    @Deprecated
-    public void updateNoDraw() {
-        if (autoUpdate) {
-            long now = getTime();
-            long delta = now - lastUpdate;
-            if (firstUpdate) {
-                delta = 0;
-                firstUpdate = false;
-            }
-            lastUpdate = now;
-            nextFrame(delta);
-        }
     }
     
     /**
@@ -584,8 +479,7 @@ public class Animation implements Renderable {
      * @return The image of the specified animation frame
      */
     public Image getImage(int index) {
-        Frame frame = frames.get(index);
-        return frame.image;
+        return frames.get(index).image;
     }
     
     /**
@@ -602,9 +496,8 @@ public class Animation implements Renderable {
      *
      * @return The image associated with the current animation frame
      */
-    public Image getCurrentFrame() {
-        Frame frame = frames.get(currentFrame);
-        return frame.image;
+    public Image getCurrentImage() {
+        return getCurrentFrame().image;
     }
     
     /**
@@ -614,42 +507,38 @@ public class Animation implements Renderable {
      *            The amount of time thats passed since last update
      */
     private void nextFrame(long delta) {
-        if (stopped) {
-            return;
-        }
-        if (frames.size() == 0) {
+        if (stopped || frames.isEmpty()) {
             return;
         }
         
         nextChange -= delta;
         
         while (nextChange < 0 && !stopped) {
-            if (currentFrame == stopAt) {
+            if (currentFrame == stopAt || currentFrame == frames.size() - 1 && !loop && !pingPong) {
                 stopped = true;
-                break;
+            } else {
+                nextFrame();
             }
-            if (currentFrame == frames.size() - 1 && !loop && !pingPong) {
-                stopped = true;
-                break;
-            }
-            currentFrame = (currentFrame + direction) % frames.size();
-            
-            if (pingPong) {
-                if (currentFrame <= 0) {
-                    currentFrame = 0;
-                    direction = 1;
-                    if (!loop) {
-                        stopped = true;
-                        break;
-                    }
-                } else if (currentFrame >= frames.size() - 1) {
-                    currentFrame = frames.size() - 1;
-                    direction = -1;
-                }
-            }
-            int realDuration = (int) (frames.get(currentFrame).duration / speed);
-            nextChange = nextChange + realDuration;
         }
+    }
+    
+    private void nextFrame() {
+        currentFrame = (currentFrame + direction) % frames.size();
+        if (pingPong) {
+            currentFrame = Math.max(currentFrame, 0);
+            if (currentFrame == 0) {
+                direction = 1;
+                if (!loop) {
+                    stopped = true;
+                    return;
+                }
+            } else if (currentFrame >= frames.size() - 1) {
+                currentFrame = frames.size() - 1;
+                direction = -1;
+            }
+        }
+        int realDuration = (int) (getCurrentFrame().duration / speed);
+        nextChange = nextChange + realDuration;
     }
     
     /**
@@ -711,12 +600,9 @@ public class Animation implements Renderable {
      * @return The durations of all the frames in this animation
      */
     public int[] getDurations() {
-        int[] durations = new int[frames.size()];
-        for (int i = 0; i < frames.size(); i++) {
-            durations[i] = getDuration(i);
-        }
-        
-        return durations;
+        return IntStream.range(0, frames.size())
+                .map(this::getDuration)
+                .toArray();
     }
     
     /**
@@ -724,14 +610,9 @@ public class Animation implements Renderable {
      */
     @Override
     public String toString() {
-        String res = "[Animation (" + frames.size() + ") ";
-        for (int i = 0; i < frames.size(); i++) {
-            Frame frame = frames.get(i);
-            res += frame.duration + ",";
-        }
-        
-        res += "]";
-        return res;
+        StringJoiner joiner = new StringJoiner(",");
+        frames.forEach(frame -> joiner.add(String.valueOf(frame.duration)));
+        return MessageFormat.format("[Animation ({0}) {1}]", frames.size(), joiner);
     }
     
     /**
@@ -761,13 +642,13 @@ public class Animation implements Renderable {
      */
     private class Frame {
         /** The image to display for this frame */
-        public Image image;
-        /** The duration to display the image fro */
-        public int duration;
+        private Image image;
+        /** The duration to display the image frame */
+        private int duration;
         /** The x location of this frame on a SpriteSheet */
-        public int x = -1;
+        private int x = -1;
         /** The y location of this frame on a SpriteSheet */
-        public int y = -1;
+        private int y = -1;
         
         /**
          * Create a new animation frame
@@ -798,5 +679,10 @@ public class Animation implements Renderable {
             this.x = x;
             this.y = y;
         }
+
+    }
+
+    private Frame getCurrentFrame() {
+        return frames.get(currentFrame);
     }
 }
