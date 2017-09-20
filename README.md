@@ -1,4 +1,4 @@
-# Modernized Slick
+# Modernized Slick [![Build Status](https://travis-ci.org/mathiewz/modernized-slick.svg?branch=master)](https://travis-ci.org/mathiewz/modernized-slick)
 
 fork from [this repository](https://bitbucket.org/kevglass/slick)
 
