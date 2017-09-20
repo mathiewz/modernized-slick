@@ -4,7 +4,7 @@ package com.github.mathiewz.openal;
  * The description of of audio data loaded by the AudioLoader
  *
  * @author kevin
- * @author Nathan Sweet <misc@n4te.com>
+ * @author Nathan Sweet 
  */
 public interface Audio {
 

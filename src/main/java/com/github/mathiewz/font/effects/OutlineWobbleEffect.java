@@ -23,7 +23,7 @@ import java.util.List;
  * An effect that genrates a wobbly line around the outline of the text
  *
  * @author Jerry Huxtable
- * @author Nathan Sweet <misc@n4te.com>
+ * @author Nathan Sweet 
  */
 public class OutlineWobbleEffect extends OutlineEffect {
     /** How often the line wobbles */
@@ -128,7 +128,7 @@ public class OutlineWobbleEffect extends OutlineEffect {
      * A stroke that generate a wobbly line
      *
      * @author Jerry Huxtable
-     * @author Nathan Sweet <misc@n4te.com>
+     * @author Nathan Sweet 
      */
     private class WobbleStroke implements Stroke {
         /** The flattening factor of the stroke */

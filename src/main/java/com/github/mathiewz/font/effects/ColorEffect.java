@@ -13,18 +13,18 @@ import com.github.mathiewz.font.Glyph;
 /**
  * Makes glyphs a solid color.
  *
- * @author Nathan Sweet <misc@n4te.com>
+ * @author Nathan Sweet
  */
 public class ColorEffect implements ConfigurableEffect {
     /** The colour that will be applied across the text */
     private Color color = Color.white;
-
+    
     /**
      * Default constructor for injection
      */
     public ColorEffect() {
     }
-
+    
     /**
      * Create a new effect to colour the text
      *
@@ -34,7 +34,7 @@ public class ColorEffect implements ConfigurableEffect {
     public ColorEffect(Color color) {
         this.color = color;
     }
-
+    
     /**
      * @see com.github.mathiewz.font.effects.Effect#draw(java.awt.image.BufferedImage, java.awt.Graphics2D, com.github.mathiewz.UnicodeFont, com.github.mathiewz.font.Glyph)
      */
@@ -43,7 +43,7 @@ public class ColorEffect implements ConfigurableEffect {
         g.setColor(color);
         g.fill(glyph.getShape());
     }
-
+    
     /**
      * Get the colour being applied by this effect
      *
@@ -52,7 +52,7 @@ public class ColorEffect implements ConfigurableEffect {
     public Color getColor() {
         return color;
     }
-
+    
     /**
      * Set the colour being applied by this effect
      *
@@ -65,7 +65,7 @@ public class ColorEffect implements ConfigurableEffect {
         }
         this.color = color;
     }
-
+    
     /**
      * @see java.lang.Object#toString()
      */
@@ -73,7 +73,7 @@ public class ColorEffect implements ConfigurableEffect {
     public String toString() {
         return "Color";
     }
-
+    
     /**
      * @see com.github.mathiewz.font.effects.ConfigurableEffect#getValues()
      */
@@ -83,7 +83,7 @@ public class ColorEffect implements ConfigurableEffect {
         values.add(EffectUtil.colorValue("Color", color));
         return values;
     }
-
+    
     /**
      * @see com.github.mathiewz.font.effects.ConfigurableEffect#setValues(java.util.List)
      */

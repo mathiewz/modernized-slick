@@ -23,7 +23,7 @@ import java.util.List;
  * An effect to generate a uniformly zigzaging line around text
  *
  * @author Jerry Huxtable
- * @author Nathan Sweet <misc@n4te.com>
+ * @author Nathan Sweet 
  */
 public class OutlineZigzagEffect extends OutlineEffect {
     /** The amount the line moves away from the text */
@@ -127,7 +127,7 @@ public class OutlineZigzagEffect extends OutlineEffect {
      * A stroke to generate zigzags
      *
      * @author Jerry Huxtable
-     * @author Nathan Sweet <misc@n4te.com>
+     * @author Nathan Sweet 
      */
     private class ZigzagStroke implements Stroke {
         /** The flattening factor applied to the path iterator */

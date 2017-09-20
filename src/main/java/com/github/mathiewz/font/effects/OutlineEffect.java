@@ -15,7 +15,7 @@ import com.github.mathiewz.font.Glyph;
 /**
  * Strokes glyphs with an outline.
  *
- * @author Nathan Sweet <misc@n4te.com>
+ * @author Nathan Sweet 
  */
 public class OutlineEffect implements ConfigurableEffect {
     /** The width of the outline in pixels */

@@ -10,7 +10,7 @@ import com.github.mathiewz.font.Glyph;
 /**
  * A graphical effect that is applied to glyphs in a {@link UnicodeFont}.
  *
- * @author Nathan Sweet <misc@n4te.com>
+ * @author Nathan Sweet 
  */
 public interface Effect {
     /**

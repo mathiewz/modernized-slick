@@ -18,7 +18,7 @@ import com.github.mathiewz.util.ResourceLoader;
  * as required.
  *
  * @author Kevin Glass
- * @author Nathan Sweet <misc@n4te.com>
+ * @author Nathan Sweet 
  * @author Rockstar play and setPosition cleanup
  */
 public class OpenALStreamPlayer {

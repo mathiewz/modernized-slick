@@ -43,9 +43,9 @@ public class CursorLoader {
      * @param ref
      *            The reference to the image to be loaded
      * @param x
-     *            The x-coordinate of the cursor hotspot (left -> right)
+     *            The x-coordinate of the cursor hotspot (left to right)
      * @param y
-     *            The y-coordinate of the cursor hotspot (bottom -> top)
+     *            The y-coordinate of the cursor hotspot (bottom to top)
      * @return The create cursor
      * @throws IOException
      *             Indicates a failure to load the image
@@ -90,9 +90,9 @@ public class CursorLoader {
      * @param buf
      *            The image data (stored in RGBA) to load the cursor from
      * @param x
-     *            The x-coordinate of the cursor hotspot (left -> right)
+     *            The x-coordinate of the cursor hotspot (left to right)
      * @param y
-     *            The y-coordinate of the cursor hotspot (bottom -> top)
+     *            The y-coordinate of the cursor hotspot (bottom to top)
      * @param width
      *            The width of the image data provided
      * @param height
@@ -134,9 +134,9 @@ public class CursorLoader {
      * @param imageData
      *            The data from which the cursor can read it's contents
      * @param x
-     *            The x-coordinate of the cursor hotspot (left -> right)
+     *            The x-coordinate of the cursor hotspot (left to right)
      * @param y
-     *            The y-coordinate of the cursor hotspot (bottom -> top)
+     *            The y-coordinate of the cursor hotspot (bottom to top)
      * @return The create cursor
      * @throws IOException
      *             Indicates a failure to load the image
@@ -177,9 +177,9 @@ public class CursorLoader {
      * @param ref
      *            The reference to the image to be loaded
      * @param x
-     *            The x-coordinate of the cursor hotspot (left -> right)
+     *            The x-coordinate of the cursor hotspot (left to right)
      * @param y
-     *            The y-coordinate of the cursor hotspot (bottom -> top)
+     *            The y-coordinate of the cursor hotspot (bottom to top)
      * @param width
      *            The x width of the cursor
      * @param height

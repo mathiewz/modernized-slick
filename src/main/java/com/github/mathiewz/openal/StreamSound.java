@@ -13,7 +13,7 @@ import com.github.mathiewz.util.Log;
  * a stream. This supplies streaming audio
  *
  * @author kevin
- * @author Nathan Sweet <misc@n4te.com>
+ * @author Nathan Sweet 
  * @author Rockstar playAsMusic cleanup
  */
 public class StreamSound extends AudioImpl {

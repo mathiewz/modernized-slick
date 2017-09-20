@@ -31,7 +31,7 @@ public class ImageBuffer implements ImageData {
     private final int texHeight;
     /** The raw data generated for the image */
     private final byte[] rawData;
-    
+
     /**
      *
      * @param width
@@ -40,13 +40,13 @@ public class ImageBuffer implements ImageData {
     public ImageBuffer(int width, int height) {
         this.width = width;
         this.height = height;
-        
+
         texWidth = get2Fold(width);
         texHeight = get2Fold(height);
-        
+
         rawData = new byte[texWidth * texHeight * 4];
     }
-    
+
     /**
      * Retrieve the raw data stored within the image buffer
      *
@@ -55,7 +55,7 @@ public class ImageBuffer implements ImageData {
     public byte[] getRGBA() {
         return rawData;
     }
-    
+
     /**
      * @see com.github.mathiewz.opengl.ImageData#getDepth()
      */
@@ -63,7 +63,7 @@ public class ImageBuffer implements ImageData {
     public int getDepth() {
         return 32;
     }
-    
+
     /**
      * @see com.github.mathiewz.opengl.ImageData#getHeight()
      */
@@ -71,7 +71,7 @@ public class ImageBuffer implements ImageData {
     public int getHeight() {
         return height;
     }
-    
+
     /**
      * @see com.github.mathiewz.opengl.ImageData#getTexHeight()
      */
@@ -79,7 +79,7 @@ public class ImageBuffer implements ImageData {
     public int getTexHeight() {
         return texHeight;
     }
-    
+
     /**
      * @see com.github.mathiewz.opengl.ImageData#getTexWidth()
      */
@@ -87,7 +87,7 @@ public class ImageBuffer implements ImageData {
     public int getTexWidth() {
         return texWidth;
     }
-    
+
     /**
      * @see com.github.mathiewz.opengl.ImageData#getWidth()
      */
@@ -95,7 +95,7 @@ public class ImageBuffer implements ImageData {
     public int getWidth() {
         return width;
     }
-    
+
     /**
      * @see com.github.mathiewz.opengl.ImageData#getImageBufferData()
      */
@@ -104,10 +104,10 @@ public class ImageBuffer implements ImageData {
         ByteBuffer scratch = BufferUtils.createByteBuffer(rawData.length);
         scratch.put(rawData);
         scratch.flip();
-        
+
         return scratch;
     }
-    
+
     /**
      * Set a pixel in the image buffer
      *
@@ -116,21 +116,21 @@ public class ImageBuffer implements ImageData {
      * @param y
      *            The y position of the pixel to set
      * @param r
-     *            The red component to set (0->255)
+     *            The red component to set (0 to 255)
      * @param g
-     *            The green component to set (0->255)
+     *            The green component to set (0 to 255)
      * @param b
-     *            The blue component to set (0->255)
+     *            The blue component to set (0 to 255)
      * @param a
-     *            The alpha component to set (0->255)
+     *            The alpha component to set (0 to 255)
      */
     public void setRGBA(int x, int y, int r, int g, int b, int a) {
         if (x < 0 || x >= width || y < 0 || y >= height) {
             throw new SlickException("Specified location: " + x + "," + y + " outside of image");
         }
-        
+
         int ofs = (x + y * texWidth) * 4;
-        
+
         if (ByteOrder.nativeOrder() == ByteOrder.BIG_ENDIAN) {
             rawData[ofs] = (byte) b;
             rawData[ofs + 1] = (byte) g;
@@ -143,7 +143,7 @@ public class ImageBuffer implements ImageData {
             rawData[ofs + 3] = (byte) a;
         }
     }
-    
+
     /**
      * Get an image generated based on this buffer
      *
@@ -152,7 +152,7 @@ public class ImageBuffer implements ImageData {
     public Image getImage() {
         return new Image(this);
     }
-    
+
     /**
      * Get an image generated based on this buffer
      *
@@ -163,7 +163,7 @@ public class ImageBuffer implements ImageData {
     public Image getImage(int filter) {
         return new Image(this, filter);
     }
-    
+
     /**
      * Get the closest greater power of 2 to the fold number
      *
@@ -178,5 +178,5 @@ public class ImageBuffer implements ImageData {
         }
         return ret;
     }
-    
+
 }

@@ -12,7 +12,7 @@ import com.github.mathiewz.UnicodeFont;
 /**
  * Represents the glyph in a font for a unicode codepoint.
  *
- * @author Nathan Sweet <misc@n4te.com>
+ * @author Nathan Sweet 
  */
 public class Glyph {
     /** The code point in which this glyph is found */

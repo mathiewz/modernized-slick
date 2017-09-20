@@ -12,7 +12,7 @@ import com.github.mathiewz.font.Glyph;
  * Applys a {@link BufferedImageOp} filter to glyphs. Many filters can be found
  * here: http://www.jhlabs.com/ip/filters/index.html
  *
- * @author Nathan Sweet <misc@n4te.com>
+ * @author Nathan Sweet 
  */
 public class FilterEffect implements Effect {
     /** The filter to be applied */

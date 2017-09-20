@@ -15,12 +15,12 @@ import com.github.mathiewz.svg.NonGeometricData;
 import com.github.mathiewz.svg.ParsingException;
 
 /**
- * A processor for the <polygon> and <path> elements marked as not an arc.
+ * A processor for the polygon and path elements marked as not an arc.
  *
  * @author kevin
  */
 public class PathProcessor implements ElementProcessor {
-
+    
     /**
      * Process the points in a polygon definition
      *
@@ -34,7 +34,7 @@ public class PathProcessor implements ElementProcessor {
         boolean moved = false;
         boolean reasonToBePath = false;
         Optional<Path> optPath = Optional.empty();
-
+        
         while (tokens.hasMoreTokens()) {
             try {
                 String nextToken = tokens.nextToken();
@@ -77,14 +77,14 @@ public class PathProcessor implements ElementProcessor {
                 throw new ParsingException(element.getAttribute("id"), "Invalid token in points list", e);
             }
         }
-
+        
         if (!reasonToBePath) {
             return null;
         }
-
+        
         return optPath.orElse(null);
     }
-
+    
     /**
      * @see com.github.mathiewz.svg.inkscape.ElementProcessor#process(com.github.mathiewz.svg.Loader, org.w3c.dom.Element, com.github.mathiewz.svg.Diagram, com.github.mathiewz.geom.Transform)
      */
@@ -92,22 +92,22 @@ public class PathProcessor implements ElementProcessor {
     public void process(Loader loader, Element element, Diagram diagram, Transform t) {
         Transform transform = Util.getTransform(element);
         transform = new Transform(t, transform);
-
+        
         String points = element.getAttribute("points");
         if (element.getNodeName().equals("path")) {
             points = element.getAttribute("d");
         }
-
+        
         StringTokenizer tokens = new StringTokenizer(points, ", ");
         Path path = processPoly(element, tokens);
         NonGeometricData data = Util.getNonGeometricData(element);
         if (path != null) {
             Shape shape = path.transform(transform);
-
+            
             diagram.addFigure(new Figure(Figure.PATH, shape, data, transform));
         }
     }
-
+    
     /**
      * @see com.github.mathiewz.svg.inkscape.ElementProcessor#handles(org.w3c.dom.Element)
      */
@@ -115,5 +115,5 @@ public class PathProcessor implements ElementProcessor {
     public boolean handles(Element element) {
         return element.getNodeName().equals("path") && !"arc".equals(element.getAttributeNS(Util.SODIPODI, "type"));
     }
-
+    
 }

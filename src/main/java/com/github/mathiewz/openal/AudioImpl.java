@@ -7,7 +7,7 @@ import org.lwjgl.openal.AL11;
  * A sound that can be played through OpenAL
  *
  * @author Kevin Glass
- * @author Nathan Sweet <misc@n4te.com>
+ * @author Nathan Sweet 
  */
 public class AudioImpl implements Audio {
     /** The store from which this sound was loaded */

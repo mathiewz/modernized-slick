@@ -14,7 +14,7 @@ import com.github.mathiewz.util.Log;
  * play at any given time and a channel is reserved so music will always play.
  *
  * @author kevin
- * @author Nathan Sweet <misc@n4te.com>
+ * @author Nathan Sweet 
  */
 public class Music {
     /** The music currently being played or null if none */

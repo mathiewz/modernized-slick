@@ -31,7 +31,7 @@ import com.github.mathiewz.util.ResourceLoader;
  * supports the text BMFont format definition file.
  *
  * @author kevin
- * @author Nathan Sweet <misc@n4te.com>
+ * @author Nathan Sweet 
  */
 public class AngelCodeFont implements Font {
     /** The renderer to use for all GL operations */
@@ -643,7 +643,7 @@ public class AngelCodeFont implements Font {
     /**
      * A descriptor for a single display list
      *
-     * @author Nathan Sweet <misc@n4te.com>
+     * @author Nathan Sweet 
      */
     private static class DisplayList {
         /** The if of the distance list */

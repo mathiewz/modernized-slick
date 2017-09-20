@@ -14,7 +14,7 @@ import com.github.mathiewz.font.Glyph;
 /**
  * Paints glyphs with a gradient fill.
  *
- * @author Nathan Sweet <misc@n4te.com>
+ * @author Nathan Sweet 
  */
 public class GradientEffect implements ConfigurableEffect {
     /** The top of gradients colour */

@@ -26,10 +26,10 @@ import com.github.mathiewz.util.Log;
 public class TextureImpl implements Texture {
     /** The renderer to use for all GL operations */
     protected static final SGL GL = Renderer.get();
-
+    
     /** The last texture that was bound to */
     private static Texture lastBind;
-
+    
     /**
      * Retrieve the last texture bound through the texture interface
      *
@@ -38,7 +38,7 @@ public class TextureImpl implements Texture {
     public static Texture getLastBind() {
         return lastBind;
     }
-
+    
     /** The GL target type */
     private int target;
     /** The GL texture ID */
@@ -61,16 +61,16 @@ public class TextureImpl implements Texture {
     private String ref;
     /** The name the texture has in the cache */
     private String cacheName;
-
+    
     /** Data used to reload this texture */
     private ReloadData reloadData;
-
+    
     /**
      * For subclasses to utilise
      */
     protected TextureImpl() {
     }
-
+    
     /**
      * Create a new texture
      *
@@ -88,7 +88,7 @@ public class TextureImpl implements Texture {
         bind();
         lastBind = this;
     }
-
+    
     /**
      * Set the name this texture is stored against in the cache
      *
@@ -98,7 +98,7 @@ public class TextureImpl implements Texture {
     public void setCacheName(String cacheName) {
         this.cacheName = cacheName;
     }
-
+    
     /**
      * @see com.github.mathiewz.opengl.Texture#hasAlpha()
      */
@@ -106,7 +106,7 @@ public class TextureImpl implements Texture {
     public boolean hasAlpha() {
         return alpha;
     }
-
+    
     /**
      * @see com.github.mathiewz.opengl.Texture#getTextureRef()
      */
@@ -114,7 +114,7 @@ public class TextureImpl implements Texture {
     public String getTextureRef() {
         return ref;
     }
-
+    
     /**
      * If this texture has alpha
      *
@@ -124,7 +124,7 @@ public class TextureImpl implements Texture {
     public void setAlpha(boolean alpha) {
         this.alpha = alpha;
     }
-
+    
     /**
      * Clear the binding of the texture
      */
@@ -132,7 +132,7 @@ public class TextureImpl implements Texture {
         unbind();
         GL.glDisable(SGL.GL_TEXTURE_2D);
     }
-
+    
     /**
      * Clear slick caching of the last bound texture so that an
      * external texture binder can play with the context before returning
@@ -141,7 +141,7 @@ public class TextureImpl implements Texture {
     public static void unbind() {
         lastBind = null;
     }
-
+    
     /**
      * @see com.github.mathiewz.opengl.Texture#bind()
      */
@@ -153,7 +153,7 @@ public class TextureImpl implements Texture {
             GL.glBindTexture(target, textureID);
         }
     }
-
+    
     /**
      * Set the height of the image
      *
@@ -164,7 +164,7 @@ public class TextureImpl implements Texture {
         this.height = height;
         setHeight();
     }
-
+    
     /**
      * Set the width of the image
      *
@@ -175,7 +175,7 @@ public class TextureImpl implements Texture {
         this.width = width;
         setWidth();
     }
-
+    
     /**
      * @see com.github.mathiewz.opengl.Texture#getImageHeight()
      */
@@ -183,7 +183,7 @@ public class TextureImpl implements Texture {
     public int getImageHeight() {
         return height;
     }
-
+    
     /**
      * @see com.github.mathiewz.opengl.Texture#getImageWidth()
      */
@@ -191,7 +191,7 @@ public class TextureImpl implements Texture {
     public int getImageWidth() {
         return width;
     }
-
+    
     /**
      * @see com.github.mathiewz.opengl.Texture#getHeight()
      */
@@ -199,7 +199,7 @@ public class TextureImpl implements Texture {
     public float getHeight() {
         return heightRatio;
     }
-
+    
     /**
      * @see com.github.mathiewz.opengl.Texture#getWidth()
      */
@@ -207,7 +207,7 @@ public class TextureImpl implements Texture {
     public float getWidth() {
         return widthRatio;
     }
-
+    
     /**
      * @see com.github.mathiewz.opengl.Texture#getTextureHeight()
      */
@@ -215,7 +215,7 @@ public class TextureImpl implements Texture {
     public int getTextureHeight() {
         return texHeight;
     }
-
+    
     /**
      * @see com.github.mathiewz.opengl.Texture#getTextureWidth()
      */
@@ -223,7 +223,7 @@ public class TextureImpl implements Texture {
     public int getTextureWidth() {
         return texWidth;
     }
-
+    
     /**
      * Set the height of this texture
      *
@@ -234,7 +234,7 @@ public class TextureImpl implements Texture {
         this.texHeight = texHeight;
         setHeight();
     }
-
+    
     /**
      * Set the width of this texture
      *
@@ -245,7 +245,7 @@ public class TextureImpl implements Texture {
         this.texWidth = texWidth;
         setWidth();
     }
-
+    
     /**
      * Set the height of the texture. This will update the
      * ratio also.
@@ -255,7 +255,7 @@ public class TextureImpl implements Texture {
             heightRatio = (float) height / texHeight;
         }
     }
-
+    
     /**
      * Set the width of the texture. This will update the
      * ratio also.
@@ -265,7 +265,7 @@ public class TextureImpl implements Texture {
             widthRatio = (float) width / texWidth;
         }
     }
-
+    
     /**
      * @see com.github.mathiewz.opengl.Texture#release()
      */
@@ -274,20 +274,20 @@ public class TextureImpl implements Texture {
         IntBuffer texBuf = createIntBuffer(1);
         texBuf.put(textureID);
         texBuf.flip();
-
+        
         GL.glDeleteTextures(texBuf);
-
+        
         if (lastBind == this) {
             bindNone();
         }
-
+        
         if (cacheName != null) {
             InternalTextureLoader.get().clear(cacheName);
         } else {
             InternalTextureLoader.get().clear(ref);
         }
     }
-
+    
     /**
      * @see com.github.mathiewz.opengl.Texture#getTextureID()
      */
@@ -295,7 +295,7 @@ public class TextureImpl implements Texture {
     public int getTextureID() {
         return textureID;
     }
-
+    
     /**
      * Set the OpenGL texture ID for this texture
      *
@@ -305,7 +305,7 @@ public class TextureImpl implements Texture {
     public void setTextureID(int textureID) {
         this.textureID = textureID;
     }
-
+    
     /**
      * Creates an integer buffer to hold specified ints
      * - strictly a utility method
@@ -317,10 +317,10 @@ public class TextureImpl implements Texture {
     protected IntBuffer createIntBuffer(int size) {
         ByteBuffer temp = ByteBuffer.allocateDirect(4 * size);
         temp.order(ByteOrder.nativeOrder());
-
+        
         return temp.asIntBuffer();
     }
-
+    
     /**
      * @see com.github.mathiewz.opengl.Texture#getTextureData()
      */
@@ -332,10 +332,10 @@ public class TextureImpl implements Texture {
         byte[] data = new byte[buffer.limit()];
         buffer.get(data);
         buffer.clear();
-
+        
         return data;
     }
-
+    
     /**
      * @see com.github.mathiewz.opengl.Texture#setTextureFilter(int)
      */
@@ -345,14 +345,12 @@ public class TextureImpl implements Texture {
         GL.glTexParameteri(target, SGL.GL_TEXTURE_MIN_FILTER, textureFilter);
         GL.glTexParameteri(target, SGL.GL_TEXTURE_MAG_FILTER, textureFilter);
     }
-
+    
     /**
      * Set the texture data that this texture can be reloaded from
      *
      * @param srcPixelFormat
      *            The pixel format
-     * @param componentCount
-     *            The component count
      * @param minFilter
      *            The OpenGL minification filter
      * @param magFilter
@@ -367,7 +365,7 @@ public class TextureImpl implements Texture {
         reloadData.magFilter = magFilter;
         reloadData.textureBuffer = textureBuffer;
     }
-
+    
     /**
      * Reload this texture
      */
@@ -376,7 +374,7 @@ public class TextureImpl implements Texture {
             textureID = reloadData.reload();
         }
     }
-
+    
     /**
      * Reload this texture from it's original source data
      */
@@ -389,7 +387,7 @@ public class TextureImpl implements Texture {
         private int magFilter;
         /** The texture buffer of pixel data */
         private ByteBuffer textureBuffer;
-
+        
         /**
          * Reload this texture
          *

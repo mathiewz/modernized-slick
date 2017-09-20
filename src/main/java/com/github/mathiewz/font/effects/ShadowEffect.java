@@ -18,7 +18,7 @@ import com.github.mathiewz.font.Glyph;
 /**
  * An effect to generate soft shadows beneath text
  *
- * @author Nathan Sweet <misc@n4te.com>
+ * @author Nathan Sweet 
  */
 public class ShadowEffect implements ConfigurableEffect {
     /** The number of kernels to apply */

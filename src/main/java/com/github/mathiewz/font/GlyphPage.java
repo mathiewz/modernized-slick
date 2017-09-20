@@ -26,7 +26,7 @@ import com.github.mathiewz.opengl.renderer.SGL;
 /**
  * Stores a number of glyphs on a single texture.
  *
- * @author Nathan Sweet <misc@n4te.com>
+ * @author Nathan Sweet 
  */
 public class GlyphPage {
     /** The interface to OpenGL */

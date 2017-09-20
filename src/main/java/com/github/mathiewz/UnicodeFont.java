@@ -34,7 +34,7 @@ import com.github.mathiewz.util.ResourceLoader;
  * For efficiency, glyphs are packed on to textures. Glyphs can be loaded to the textures on the fly, when they are first needed
  * for display. However, it is best to load the glyphs that are known to be needed at startup.
  *
- * @author Nathan Sweet <misc@n4te.com>
+ * @author Nathan Sweet 
  */
 public class UnicodeFont implements com.github.mathiewz.Font {
     /** The number of display lists that will be cached for strings from this font */

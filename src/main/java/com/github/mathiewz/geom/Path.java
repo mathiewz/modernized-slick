@@ -21,7 +21,7 @@ public class Path extends Shape {
     private final ArrayList<ArrayList<Float[]>> holes = new ArrayList<>();
     /** The current hole being built */
     private ArrayList<Float[]> hole;
-
+    
     /**
      * Create a new path
      *
@@ -36,20 +36,15 @@ public class Path extends Shape {
         cy = sy;
         pointsDirty = true;
     }
-
+    
     /**
      * Start building a hole in the previously defined contour
-     *
-     * @param sx
-     *            The start point of the hole
-     * @param sy
-     *            The start point of the hole
      */
     public void startHole() {
         hole = new ArrayList<>();
         holes.add(hole);
     }
-
+    
     /**
      * Add a line to the contour or hole which ends at the specified
      * location.
@@ -69,14 +64,14 @@ public class Path extends Shape {
         cy = y;
         pointsDirty = true;
     }
-
+    
     /**
      * Close the path to form a polygon
      */
     public void close() {
         closed = true;
     }
-
+    
     /**
      * Add a curve to the specified location (using the default segments 10)
      *
@@ -96,7 +91,7 @@ public class Path extends Shape {
     public void curveTo(Float x, Float y, Float cx1, Float cy1, Float cx2, Float cy2) {
         curveTo(x, y, cx1, cy1, cx2, cy2, 10);
     }
-
+    
     /**
      * Add a curve to the specified location (specifing the number of segments)
      *
@@ -120,10 +115,10 @@ public class Path extends Shape {
         if (cx == x && cy == y) {
             return;
         }
-
+        
         Curve curve = new Curve(new Vector2f(cx, cy), new Vector2f(cx1, cy1), new Vector2f(cx2, cy2), new Vector2f(x, y));
         Float step = 1.0f / segments;
-
+        
         for (int i = 1; i < segments + 1; i++) {
             Float t = i * step;
             Vector2f p = curve.pointAt(t);
@@ -137,7 +132,7 @@ public class Path extends Shape {
         }
         pointsDirty = true;
     }
-
+    
     /**
      * @see com.github.mathiewz.geom.Shape#createPoints()
      */
@@ -150,7 +145,7 @@ public class Path extends Shape {
             points[i * 2 + 1] = p[1];
         }
     }
-
+    
     /**
      * @see com.github.mathiewz.geom.Shape#transform(com.github.mathiewz.geom.Transform)
      */
@@ -162,10 +157,10 @@ public class Path extends Shape {
             p.holes.add(transform(holes.get(i), transform));
         }
         p.closed = closed;
-
+        
         return p;
     }
-
+    
     /**
      * Transform a list of points
      *
@@ -178,21 +173,21 @@ public class Path extends Shape {
     private ArrayList<Float[]> transform(ArrayList<Float[]> pts, Transform t) {
         Float[] in = new Float[pts.size() * 2];
         Float[] out = new Float[pts.size() * 2];
-
+        
         for (int i = 0; i < pts.size(); i++) {
             in[i * 2] = pts.get(i)[0];
             in[i * 2 + 1] = pts.get(i)[1];
         }
         t.transform(in, 0, out, 0, pts.size());
-
+        
         ArrayList<Float[]> outList = new ArrayList<>();
         for (int i = 0; i < pts.size(); i++) {
             outList.add(new Float[] { out[i * 2], out[i * 2 + 1] });
         }
-
+        
         return outList;
     }
-
+    
     /**
      * True if this is a closed shape
      *

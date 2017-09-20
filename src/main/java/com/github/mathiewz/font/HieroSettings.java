@@ -20,7 +20,7 @@ import com.github.mathiewz.util.ResourceLoader;
 /**
  * Holds the settings needed to configure a UnicodeFont.
  *
- * @author Nathan Sweet <misc@n4te.com>
+ * @author Nathan Sweet 
  */
 public class HieroSettings {
     /** The size of the font to be generated */

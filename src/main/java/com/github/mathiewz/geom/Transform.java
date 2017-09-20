@@ -17,7 +17,7 @@ public class Transform {
      * |6 7 8|
      */
     private float[] matrixPosition;
-
+    
     /**
      * Create and identity transform
      *
@@ -25,7 +25,7 @@ public class Transform {
     public Transform() {
         matrixPosition = new float[] { 1, 0, 0, 0, 1, 0, 0, 0, 1 };
     }
-
+    
     /**
      * Copy a transform
      *
@@ -38,7 +38,7 @@ public class Transform {
             matrixPosition[i] = other.matrixPosition[i];
         }
     }
-
+    
     /**
      * Concatanate to transform into one
      *
@@ -51,7 +51,7 @@ public class Transform {
         this(t1);
         concatenate(t2);
     }
-
+    
     /**
      * Create a transform for the given positions
      *
@@ -64,7 +64,7 @@ public class Transform {
         }
         this.matrixPosition = new float[] { matrixPosition[0], matrixPosition[1], matrixPosition[2], matrixPosition[3], matrixPosition[4], matrixPosition[5], 0, 0, 1 };
     }
-
+    
     /**
      * Create a transform for the given positions
      *
@@ -84,7 +84,7 @@ public class Transform {
     public Transform(float point00, float point01, float point02, float point10, float point11, float point12) {
         matrixPosition = new float[] { point00, point01, point02, point10, point11, point12, 0, 0, 1 };
     }
-
+    
     /**
      * Transform the point pairs in the source array and store them in the destination array.
      * All operations will be done before storing the results in the destination. This way the source
@@ -101,18 +101,18 @@ public class Transform {
      * @param numberOfPoints
      *            Number of points to be transformed
      * @throws ArrayIndexOutOfBoundsException
-     *             if sourceOffset + numberOfPoints * 2 > source.length or the same operation on the destination array
+     *             if sourceOffset + numberOfPoints * 2 &gt; source.length or the same operation on the destination array
      */
     public void transform(Float[] source, int sourceOffset, Float[] destination, int destOffset, int numberOfPoints) {
         // TODO performance can be improved by removing the safety to the destination array
         Float[] result = source == destination ? new Float[numberOfPoints * 2] : destination;
-
+        
         for (int i = 0; i < numberOfPoints * 2; i += 2) {
             for (int j = 0; j < 6; j += 3) {
                 result[i + j / 3] = source[i + sourceOffset] * matrixPosition[j] + source[i + sourceOffset + 1] * matrixPosition[j + 1] + 1 * matrixPosition[j + 2];
             }
         }
-
+        
         if (source == destination) {
             // for safety of the destination, the results are copied after the entire operation.
             for (int i = 0; i < numberOfPoints * 2; i += 2) {
@@ -121,7 +121,7 @@ public class Transform {
             }
         }
     }
-
+    
     /**
      * Update this Transform by concatenating the given Transform to this one.
      *
@@ -146,7 +146,7 @@ public class Transform {
         matrixPosition = mp;
         return this;
     }
-
+    
     /**
      * Convert this Transform to a String.
      *
@@ -156,7 +156,7 @@ public class Transform {
     public String toString() {
         return "Transform[[" + matrixPosition[0] + "," + matrixPosition[1] + "," + matrixPosition[2] + "][" + matrixPosition[3] + "," + matrixPosition[4] + "," + matrixPosition[5] + "][" + matrixPosition[6] + "," + matrixPosition[7] + "," + matrixPosition[8] + "]]";
     }
-
+    
     /**
      * Get an array representing this Transform.
      *
@@ -165,7 +165,7 @@ public class Transform {
     public float[] getMatrixPosition() {
         return matrixPosition;
     }
-
+    
     /**
      * Create a new rotation Transform
      *
@@ -176,7 +176,7 @@ public class Transform {
     public static Transform createRotateTransform(float angle) {
         return new Transform((float) FastTrig.cos(angle), -(float) FastTrig.sin(angle), 0, (float) FastTrig.sin(angle), (float) FastTrig.cos(angle), 0);
     }
-
+    
     /**
      * Create a new rotation Transform around the specified point
      *
@@ -194,10 +194,10 @@ public class Transform {
         float oneMinusCosAngle = 1.0f - temp.matrixPosition[4];
         temp.matrixPosition[2] = x * oneMinusCosAngle + y * sinAngle;
         temp.matrixPosition[5] = y * oneMinusCosAngle - x * sinAngle;
-
+        
         return temp;
     }
-
+    
     /**
      * Create a new translation Transform
      *
@@ -210,7 +210,7 @@ public class Transform {
     public static Transform createTranslateTransform(float xOffset, float yOffset) {
         return new Transform(1, 0, xOffset, 0, 1, yOffset);
     }
-
+    
     /**
      * Create an new scaling Transform
      *
@@ -223,7 +223,7 @@ public class Transform {
     public static Transform createScaleTransform(float xScale, float yScale) {
         return new Transform(xScale, 0, 0, 0, yScale, 0);
     }
-
+    
     /**
      * Transform the vector2f based on the matrix defined in this transform
      *
@@ -234,9 +234,9 @@ public class Transform {
     public Vector2f transform(Vector2f pt) {
         Float[] in = new Float[] { pt.getX(), pt.getY() };
         Float[] out = new Float[2];
-
+        
         transform(in, 0, out, 0, 1);
-
+        
         return new Vector2f(out[0], out[1]);
     }
 }

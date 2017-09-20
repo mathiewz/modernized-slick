@@ -31,13 +31,15 @@ public class SpriteSheetFont implements Font {
      * fixed-width character set in ASCII order. To only get upper-case characters
      * working you would usually set up a SpriteSheet with characters for these values:
      *
-     * <pre>
-     * !"#$%&'()*+,-./
-     * 0123456789:;<=>?
+     * <code>
+     *
+     * !"#$%&amp;'()*+,-./
+     * 0123456789:;&lt;=&gt;?
      * &#0064;ABCDEFGHIJKLMNO
      * PQRSTUVWXYZ[\]^_
      *
-     * <pre>
+     * </code>
+     *
      * In this set, ' ' (SPACE) would be the startingCharacter of your characterSet.
      *
      * @param font

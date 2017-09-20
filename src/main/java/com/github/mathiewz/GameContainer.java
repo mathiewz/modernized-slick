@@ -30,7 +30,7 @@ public abstract class GameContainer implements GUIContext {
     protected static SGL GL = Renderer.get();
     /** The shared drawable if any */
     protected static Drawable SHARED_DRAWABLE;
-    
+
     /** The time the last frame was rendered */
     protected long lastFrame;
     /** The last time the FPS recorded */
@@ -41,19 +41,19 @@ public abstract class GameContainer implements GUIContext {
     protected int fps;
     /** True if we're currently running the game loop */
     protected boolean running = true;
-    
+
     /** The width of the display */
     protected int width;
     /** The height of the display */
     protected int height;
     /** The game being managed */
     protected Game game;
-    
+
     /** The default font to use in the graphics context */
     private Font defaultFont;
     /** The graphics context to be passed to the game */
     private Graphics graphics;
-    
+
     /** The input system to pass to the game */
     protected Input input;
     /** The FPS we want to lock to */
@@ -70,7 +70,7 @@ public abstract class GameContainer implements GUIContext {
     protected Game lastGame;
     /** True if we should clear the screen each frame */
     protected boolean clearEachFrame = true;
-    
+
     /** True if the game is paused */
     protected boolean paused;
     /** True if we should force exit */
@@ -81,15 +81,15 @@ public abstract class GameContainer implements GUIContext {
     protected boolean smoothDeltas;
     /** The number of samples we'll attempt through hardware */
     protected int samples;
-    
+
     /** True if this context supports multisample */
     protected boolean supportsMultiSample;
-    
+
     /** True if we should render when not focused */
     protected boolean alwaysRender;
     /** True if we require stencil bits */
     protected static boolean stencil;
-    
+
     /**
      * Create a new game container wrapping a given game
      *
@@ -99,15 +99,15 @@ public abstract class GameContainer implements GUIContext {
     protected GameContainer(Game game) {
         this.game = game;
         lastFrame = getTime();
-        
+
         getBuildVersion();
         Log.checkVerboseLogSetting();
     }
-    
+
     public static void enableStencil() {
         stencil = true;
     }
-    
+
     /**
      * Set the default font that will be intialised in the graphics held in this container
      *
@@ -121,7 +121,7 @@ public abstract class GameContainer implements GUIContext {
             Log.warn("Please provide a non null font");
         }
     }
-    
+
     /**
      * Indicate whether we want to try to use fullscreen multisampling. This will
      * give antialiasing across the whole scene using a hardware feature.
@@ -132,7 +132,7 @@ public abstract class GameContainer implements GUIContext {
     public void setMultiSample(int samples) {
         this.samples = samples;
     }
-    
+
     /**
      * Check if this hardware can support multi-sampling
      *
@@ -141,7 +141,7 @@ public abstract class GameContainer implements GUIContext {
     public boolean supportsMultiSample() {
         return supportsMultiSample;
     }
-    
+
     /**
      * The number of samples we're attempting to performing using
      * hardware multisampling
@@ -151,7 +151,7 @@ public abstract class GameContainer implements GUIContext {
     public int getSamples() {
         return samples;
     }
-    
+
     /**
      * Indicate if we should force exitting the VM at the end
      * of the game (default = true)
@@ -162,7 +162,7 @@ public abstract class GameContainer implements GUIContext {
     public void setForceExit(boolean forceExit) {
         this.forceExit = forceExit;
     }
-    
+
     /**
      * Indicate if we want to smooth deltas. This feature will report
      * a delta based on the FPS not the time passed. This works well with
@@ -174,7 +174,7 @@ public abstract class GameContainer implements GUIContext {
     public void setSmoothDeltas(boolean smoothDeltas) {
         this.smoothDeltas = smoothDeltas;
     }
-    
+
     /**
      * Check if the display is in fullscreen mode
      *
@@ -183,7 +183,7 @@ public abstract class GameContainer implements GUIContext {
     public boolean isFullscreen() {
         return false;
     }
-    
+
     /**
      * Get the aspect ratio of the screen
      *
@@ -192,7 +192,7 @@ public abstract class GameContainer implements GUIContext {
     public float getAspectRatio() {
         return getWidth() / getHeight();
     }
-    
+
     /**
      * Indicate whether we want to be in fullscreen mode. Note that the current
      * display mode must be valid as a fullscreen mode for this to work
@@ -202,7 +202,7 @@ public abstract class GameContainer implements GUIContext {
      */
     public void setFullscreen(boolean fullscreen) {
     }
-    
+
     /**
      * Enable shared OpenGL context. After calling this all containers created
      * will shared a single parent context
@@ -215,7 +215,7 @@ public abstract class GameContainer implements GUIContext {
             throw new SlickException("Unable to create the pbuffer used for shard context, buffers not supported", e);
         }
     }
-    
+
     /**
      * Get the context shared by all containers
      *
@@ -224,7 +224,7 @@ public abstract class GameContainer implements GUIContext {
     public static Drawable getSharedContext() {
         return SHARED_DRAWABLE;
     }
-    
+
     /**
      * Indicate if we should clear the screen at the beginning of each frame. If you're
      * rendering to the whole screen each frame then setting this to false can give
@@ -236,28 +236,28 @@ public abstract class GameContainer implements GUIContext {
     public void setClearEachFrame(boolean clear) {
         clearEachFrame = clear;
     }
-    
+
     /**
      * Renitialise the game and the context in which it's being rendered
      *
      */
     public void reinit() {
     }
-    
+
     /**
      * Pause the game - i.e. suspend updates
      */
     public void pause() {
         setPaused(true);
     }
-    
+
     /**
      * Resumt the game - i.e. continue updates
      */
     public void resume() {
         setPaused(false);
     }
-    
+
     /**
      * Check if the container is currently paused.
      *
@@ -266,7 +266,7 @@ public abstract class GameContainer implements GUIContext {
     public boolean isPaused() {
         return paused;
     }
-    
+
     /**
      * Indicates if the game should be paused, i.e. if updates
      * should be propogated through to the game.
@@ -277,7 +277,7 @@ public abstract class GameContainer implements GUIContext {
     public void setPaused(boolean paused) {
         this.paused = paused;
     }
-    
+
     /**
      * True if this container should render when it has focus
      *
@@ -286,7 +286,7 @@ public abstract class GameContainer implements GUIContext {
     public boolean getAlwaysRender() {
         return alwaysRender;
     }
-    
+
     /**
      * Indicate whether we want this container to render when it has focus
      *
@@ -296,7 +296,7 @@ public abstract class GameContainer implements GUIContext {
     public void setAlwaysRender(boolean alwaysRender) {
         this.alwaysRender = alwaysRender;
     }
-    
+
     /**
      * Get the build number of slick
      *
@@ -306,17 +306,17 @@ public abstract class GameContainer implements GUIContext {
         try {
             Properties props = new Properties();
             props.load(ResourceLoader.getResourceAsStream("version"));
-            
+
             int build = Integer.parseInt(props.getProperty("build"));
             Log.info("Slick Build #" + build);
-            
+
             return build;
         } catch (Exception e) {
             Log.error("Unable to determine Slick build number");
             return -1;
         }
     }
-    
+
     /**
      * Get the default system font
      *
@@ -326,7 +326,7 @@ public abstract class GameContainer implements GUIContext {
     public Font getDefaultFont() {
         return defaultFont;
     }
-    
+
     /**
      * Check if sound effects are enabled
      *
@@ -335,7 +335,7 @@ public abstract class GameContainer implements GUIContext {
     public boolean isSoundOn() {
         return SoundStore.get().soundsOn();
     }
-    
+
     /**
      * Check if music is enabled
      *
@@ -344,7 +344,7 @@ public abstract class GameContainer implements GUIContext {
     public boolean isMusicOn() {
         return SoundStore.get().musicOn();
     }
-    
+
     /**
      * Indicate whether music should be enabled
      *
@@ -354,7 +354,7 @@ public abstract class GameContainer implements GUIContext {
     public void setMusicOn(boolean on) {
         SoundStore.get().setMusicOn(on);
     }
-    
+
     /**
      * Indicate whether sound effects should be enabled
      *
@@ -364,7 +364,7 @@ public abstract class GameContainer implements GUIContext {
     public void setSoundOn(boolean on) {
         SoundStore.get().setSoundsOn(on);
     }
-    
+
     /**
      * Retrieve the current default volume for music
      *
@@ -373,7 +373,7 @@ public abstract class GameContainer implements GUIContext {
     public float getMusicVolume() {
         return SoundStore.get().getMusicVolume();
     }
-    
+
     /**
      * Retrieve the current default volume for sound fx
      *
@@ -382,7 +382,7 @@ public abstract class GameContainer implements GUIContext {
     public float getSoundVolume() {
         return SoundStore.get().getSoundVolume();
     }
-    
+
     /**
      * Set the default volume for sound fx
      *
@@ -392,7 +392,7 @@ public abstract class GameContainer implements GUIContext {
     public void setSoundVolume(float volume) {
         SoundStore.get().setSoundVolume(volume);
     }
-    
+
     /**
      * Set the default volume for music
      *
@@ -402,7 +402,7 @@ public abstract class GameContainer implements GUIContext {
     public void setMusicVolume(float volume) {
         SoundStore.get().setMusicVolume(volume);
     }
-    
+
     /**
      * Get the width of the game canvas
      *
@@ -412,7 +412,7 @@ public abstract class GameContainer implements GUIContext {
     public int getWidth() {
         return width;
     }
-    
+
     /**
      * Get the height of the game canvas
      *
@@ -422,7 +422,7 @@ public abstract class GameContainer implements GUIContext {
     public int getHeight() {
         return height;
     }
-    
+
     /**
      * Set the icon to be displayed if possible in this type of
      * container
@@ -431,7 +431,7 @@ public abstract class GameContainer implements GUIContext {
      *            The reference to the icon to be displayed
      */
     public abstract void setIcon(String ref);
-    
+
     /**
      * Set the icons to be used for this application. Note that the size of the icon
      * defines how it will be used. Important ones to note
@@ -443,7 +443,7 @@ public abstract class GameContainer implements GUIContext {
      *            The reference to the icon to be displayed
      */
     public abstract void setIcons(String[] refs);
-    
+
     /**
      * Get the accurate system time
      *
@@ -453,7 +453,7 @@ public abstract class GameContainer implements GUIContext {
     public long getTime() {
         return Sys.getTime() * 1000 / Sys.getTimerResolution();
     }
-    
+
     /**
      * Sleep for a given period
      *
@@ -469,7 +469,7 @@ public abstract class GameContainer implements GUIContext {
             }
         }
     }
-    
+
     /**
      * Set the mouse cursor based on the contents of the image. Note that this will not take
      * account of render state type changes to images (rotation and such). If these effects
@@ -485,7 +485,7 @@ public abstract class GameContainer implements GUIContext {
      *            The y coordinate of the hotspot within the cursor image
      */
     public abstract void setMouseCursor(Image image, int hotSpotX, int hotSpotY);
-    
+
     /**
      * Get a cursor based on a image reference on the classpath. The image
      * is assumed to be a set/strip of cursor animation frames running from top to
@@ -494,9 +494,9 @@ public abstract class GameContainer implements GUIContext {
      * @param ref
      *            The reference to the image to be loaded
      * @param x
-     *            The x-coordinate of the cursor hotspot (left -> right)
+     *            The x-coordinate of the cursor hotspot (left to right)
      * @param y
-     *            The y-coordinate of the cursor hotspot (bottom -> top)
+     *            The y-coordinate of the cursor hotspot (bottom to top)
      * @param width
      *            The x width of the cursor
      * @param height
@@ -516,7 +516,7 @@ public abstract class GameContainer implements GUIContext {
             throw new SlickException("Failed to set mouse cursor", e);
         }
     }
-    
+
     /**
      * Get the input system
      *
@@ -526,7 +526,7 @@ public abstract class GameContainer implements GUIContext {
     public Input getInput() {
         return input;
     }
-    
+
     /**
      * Get the current recorded FPS (frames per second)
      *
@@ -535,7 +535,7 @@ public abstract class GameContainer implements GUIContext {
     public int getFPS() {
         return recordedFPS;
     }
-    
+
     /**
      * Indicate whether mouse cursor should be grabbed or not
      *
@@ -543,7 +543,7 @@ public abstract class GameContainer implements GUIContext {
      *            True if mouse cursor should be grabbed
      */
     public abstract void setMouseGrabbed(boolean grabbed);
-    
+
     /**
      * Check if the mouse cursor is current grabbed. This will cause it not
      * to be seen.
@@ -551,7 +551,7 @@ public abstract class GameContainer implements GUIContext {
      * @return True if the mouse is currently grabbed
      */
     public abstract boolean isMouseGrabbed();
-    
+
     /**
      * Retrieve the time taken to render the last frame, i.e. the change in time - delta.
      *
@@ -561,10 +561,10 @@ public abstract class GameContainer implements GUIContext {
         long time = getTime();
         int delta = (int) (time - lastFrame);
         lastFrame = time;
-        
+
         return delta;
     }
-    
+
     /**
      * Updated the FPS counter
      */
@@ -576,7 +576,7 @@ public abstract class GameContainer implements GUIContext {
         }
         fps++;
     }
-    
+
     /**
      * Set the minimum amount of time in milliseonds that has to
      * pass before update() is called on the container game. This gives
@@ -588,7 +588,7 @@ public abstract class GameContainer implements GUIContext {
     public void setMinimumLogicUpdateInterval(int interval) {
         minimumLogicInterval = interval;
     }
-    
+
     /**
      * Set the maximum amount of time in milliseconds that can passed
      * into the update method. Useful for collision detection without
@@ -600,7 +600,7 @@ public abstract class GameContainer implements GUIContext {
     public void setMaximumLogicUpdateInterval(int interval) {
         maximumLogicInterval = interval;
     }
-    
+
     /**
      * Update and render the game
      *
@@ -613,13 +613,13 @@ public abstract class GameContainer implements GUIContext {
                 delta = 1000 / getFPS();
             }
         }
-        
+
         input.poll(width, height);
-        
+
         Music.poll(delta);
         if (!paused) {
             storedDelta += delta;
-            
+
             if (storedDelta >= minimumLogicInterval) {
                 try {
                     if (maximumLogicInterval != 0) {
@@ -627,7 +627,7 @@ public abstract class GameContainer implements GUIContext {
                         for (int i = 0; i < cycles; i++) {
                             game.update(this, (int) maximumLogicInterval);
                         }
-                        
+
                         int remainder = (int) (storedDelta % maximumLogicInterval);
                         if (remainder > minimumLogicInterval) {
                             game.update(this, (int) (remainder % maximumLogicInterval));
@@ -639,7 +639,7 @@ public abstract class GameContainer implements GUIContext {
                         game.update(this, (int) storedDelta);
                         storedDelta = 0;
                     }
-                    
+
                 } catch (Throwable e) {
                     Log.error(e);
                     throw new SlickException("Game.update() failure - check the game code.");
@@ -648,14 +648,14 @@ public abstract class GameContainer implements GUIContext {
         } else {
             game.update(this, 0);
         }
-        
+
         if (hasFocus() || getAlwaysRender()) {
             if (clearEachFrame) {
                 GL.glClear(SGL.GL_COLOR_BUFFER_BIT | SGL.GL_DEPTH_BUFFER_BIT);
             }
-            
+
             GL.glLoadIdentity();
-            
+
             graphics.resetTransform();
             graphics.resetFont();
             graphics.resetLineWidth();
@@ -667,19 +667,19 @@ public abstract class GameContainer implements GUIContext {
                 throw new SlickException("Game.render() failure - check the game code.");
             }
             graphics.resetTransform();
-            
+
             if (showFPS) {
                 defaultFont.drawString(10, 10, "FPS: " + recordedFPS);
             }
-            
+
             GL.flush();
         }
-        
+
         if (targetFPS != -1) {
             Display.sync(targetFPS);
         }
     }
-    
+
     /**
      * Indicate if the display should update only when the game is visible
      * (the default is true)
@@ -689,7 +689,7 @@ public abstract class GameContainer implements GUIContext {
      */
     public void setUpdateOnlyWhenVisible(boolean updateOnlyWhenVisible) {
     }
-    
+
     /**
      * Check if this game is only updating when visible to the user (default = true)
      *
@@ -698,14 +698,14 @@ public abstract class GameContainer implements GUIContext {
     public boolean isUpdatingOnlyWhenVisible() {
         return true;
     }
-    
+
     /**
      * Initialise the GL context
      */
     protected void initGL() {
         Log.info("Starting display " + width + "x" + height);
         GL.initDisplay(width, height);
-        
+
         if (input == null) {
             input = new Input(height);
         }
@@ -716,13 +716,13 @@ public abstract class GameContainer implements GUIContext {
             input.removeListener((InputListener) game);
             input.addListener((InputListener) game);
         }
-        
+
         if (graphics != null) {
             graphics.setDimensions(getWidth(), getHeight());
         }
         lastGame = game;
     }
-    
+
     /**
      * Initialise the system components, OpenGL and OpenAL.
      *
@@ -731,18 +731,18 @@ public abstract class GameContainer implements GUIContext {
         initGL();
         setMusicVolume(1.0f);
         setSoundVolume(1.0f);
-        
+
         graphics = new Graphics(width, height);
         defaultFont = graphics.getFont();
     }
-    
+
     /**
      * Enter the orthographic mode
      */
     protected void enterOrtho() {
         enterOrtho(width, height);
     }
-    
+
     /**
      * Indicate whether the container should show the FPS
      *
@@ -752,7 +752,7 @@ public abstract class GameContainer implements GUIContext {
     public void setShowFPS(boolean show) {
         showFPS = show;
     }
-    
+
     /**
      * Check if the FPS is currently showing
      *
@@ -761,7 +761,7 @@ public abstract class GameContainer implements GUIContext {
     public boolean isShowingFPS() {
         return showFPS;
     }
-    
+
     /**
      * Set the target fps we're hoping to get
      *
@@ -771,7 +771,7 @@ public abstract class GameContainer implements GUIContext {
     public void setTargetFrameRate(int fps) {
         targetFPS = fps;
     }
-    
+
     /**
      * Indicate whether the display should be synced to the
      * vertical refresh (stops tearing)
@@ -783,7 +783,7 @@ public abstract class GameContainer implements GUIContext {
         this.vsync = vsync;
         Display.setVSyncEnabled(vsync);
     }
-    
+
     /**
      * True if vsync is requested
      *
@@ -792,7 +792,7 @@ public abstract class GameContainer implements GUIContext {
     public boolean isVSyncRequested() {
         return vsync;
     }
-    
+
     /**
      * True if the game is running
      *
@@ -801,7 +801,7 @@ public abstract class GameContainer implements GUIContext {
     protected boolean running() {
         return running;
     }
-    
+
     /**
      * Inidcate we want verbose logging
      *
@@ -811,21 +811,21 @@ public abstract class GameContainer implements GUIContext {
     public void setVerbose(boolean verbose) {
         Log.setVerbose(verbose);
     }
-    
+
     /**
      * Cause the game to exit and shutdown cleanly
      */
     public void exit() {
         running = false;
     }
-    
+
     /**
      * Check if the game currently has focus
      *
      * @return True if the game currently has focus
      */
     public abstract boolean hasFocus();
-    
+
     /**
      * Get the graphics context used by this container. Note that this
      * value may vary over the life time of the game.
@@ -835,7 +835,7 @@ public abstract class GameContainer implements GUIContext {
     public Graphics getGraphics() {
         return graphics;
     }
-    
+
     /**
      * Enter the orthographic mode
      *
