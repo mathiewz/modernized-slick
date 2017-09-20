@@ -25,7 +25,7 @@ public class Point extends Shape {
      */
     @Override
     public Shape transform(Transform transform) {
-        Float result[] = new Float[points.length];
+        Float[] result = new Float[points.length];
         transform.transform(points, 0, result, 0, points.length / 2);
 
         return new Point(points[0], points[1]);
@@ -66,4 +66,5 @@ public class Point extends Shape {
     protected void calculateRadius() {
         boundingCircleRadius = 0;
     }
+
 }

@@ -105,6 +105,20 @@ public abstract class Shape implements Serializable {
             trianglesDirty = true;
         }
     }
+
+    public void addX(float delta) {
+        setX(getX() + delta);
+    }
+    
+    /**
+     * Get the y position of the top of this shape.
+     *
+     * @return The y position of the top of this shape.
+     */
+    public float getY() {
+        checkPoints();
+        return y;
+    }
     
     /**
      * Set the y position of the top of this shape.
@@ -131,14 +145,8 @@ public abstract class Shape implements Serializable {
         }
     }
     
-    /**
-     * Get the y position of the top of this shape.
-     *
-     * @return The y position of the top of this shape.
-     */
-    public float getY() {
-        checkPoints();
-        return y;
+    public void addY(float delta) {
+        setY(getY() + delta);
     }
     
     /**
@@ -744,4 +752,5 @@ public abstract class Shape implements Serializable {
     public float getHeight() {
         return maxY - minY;
     }
+    
 }

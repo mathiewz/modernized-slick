@@ -12,18 +12,18 @@ import org.newdawn.slick.util.FastTrig;
 public strictfp class Vector2f implements Serializable {
     /** The version ID for this class */
     private static final long serialVersionUID = 1339934L;
-
+    
     /** The x component of this vector */
     private float x;
     /** The y component of this vector */
     private float y;
-
+    
     /**
      * Create an empty vector
      */
     public Vector2f() {
     }
-
+    
     /**
      * Create a vector based on the contents of a coordinate array
      *
@@ -34,7 +34,7 @@ public strictfp class Vector2f implements Serializable {
         x = coords[0];
         y = coords[1];
     }
-
+    
     /**
      * Create a new vector based on an angle
      *
@@ -46,7 +46,7 @@ public strictfp class Vector2f implements Serializable {
         y = 0;
         setTheta(theta);
     }
-
+    
     /**
      * Calculate the components of the vectors based on a angle
      *
@@ -56,18 +56,13 @@ public strictfp class Vector2f implements Serializable {
     public void setTheta(double theta) {
         // Next lines are to prevent numbers like -1.8369701E-16
         // when working with negative numbers
-        if (theta < -360 || theta > 360) {
-            theta = theta % 360;
-        }
-        if (theta < 0) {
-            theta = 360 + theta;
-        }
+        double radians = StrictMath.toRadians(theta % 360);
         float len = length();
-        x = len * (float) FastTrig.cos(StrictMath.toRadians(theta));
-        y = len * (float) FastTrig.sin(StrictMath.toRadians(theta));
-
+        x = len * (float) FastTrig.cos(radians);
+        y = len * (float) FastTrig.sin(radians);
+        
     }
-
+    
     /**
      * Adjust this vector by a given angle
      *
@@ -78,10 +73,10 @@ public strictfp class Vector2f implements Serializable {
      */
     public Vector2f add(double theta) {
         setTheta(getTheta() + theta);
-
+        
         return this;
     }
-
+    
     /**
      * Adjust this vector by a given angle
      *
@@ -91,10 +86,10 @@ public strictfp class Vector2f implements Serializable {
      */
     public Vector2f sub(double theta) {
         setTheta(getTheta() - theta);
-
+        
         return this;
     }
-
+    
     /**
      * Get the angle this vector is at
      *
@@ -108,10 +103,10 @@ public strictfp class Vector2f implements Serializable {
         if (theta < 0) {
             theta = 360 + theta;
         }
-
+        
         return theta;
     }
-
+    
     /**
      * Get the x component
      *
@@ -120,7 +115,7 @@ public strictfp class Vector2f implements Serializable {
     public float getX() {
         return x;
     }
-
+    
     /**
      * Get the y component
      *
@@ -129,7 +124,7 @@ public strictfp class Vector2f implements Serializable {
     public float getY() {
         return y;
     }
-
+    
     /**
      * Create a new vector based on another
      *
@@ -139,7 +134,7 @@ public strictfp class Vector2f implements Serializable {
     public Vector2f(Vector2f other) {
         this(other.getX(), other.getY());
     }
-
+    
     /**
      * Create a new vector
      *
@@ -152,7 +147,7 @@ public strictfp class Vector2f implements Serializable {
         this.x = x;
         this.y = y;
     }
-
+    
     /**
      * Set the value of this vector
      *
@@ -162,7 +157,7 @@ public strictfp class Vector2f implements Serializable {
     public void set(Vector2f other) {
         set(other.getX(), other.getY());
     }
-
+    
     /**
      * Dot this vector against another
      *
@@ -173,7 +168,7 @@ public strictfp class Vector2f implements Serializable {
     public float dot(Vector2f other) {
         return x * other.getX() + y * other.getY();
     }
-
+    
     /**
      * Set the values in this vector
      *
@@ -186,10 +181,10 @@ public strictfp class Vector2f implements Serializable {
     public Vector2f set(float x, float y) {
         this.x = x;
         this.y = y;
-
+        
         return this;
     }
-
+    
     /**
      * A vector perpendicular to this vector.
      *
@@ -198,7 +193,7 @@ public strictfp class Vector2f implements Serializable {
     public Vector2f getPerpendicular() {
         return new Vector2f(-y, x);
     }
-
+    
     /**
      * Set the values in this vector
      *
@@ -209,7 +204,7 @@ public strictfp class Vector2f implements Serializable {
     public Vector2f set(float[] pt) {
         return set(pt[0], pt[1]);
     }
-
+    
     /**
      * Negate this vector
      *
@@ -218,7 +213,7 @@ public strictfp class Vector2f implements Serializable {
     public Vector2f negate() {
         return new Vector2f(-x, -y);
     }
-
+    
     /**
      * Negate this vector without creating a new copy
      *
@@ -227,10 +222,10 @@ public strictfp class Vector2f implements Serializable {
     public Vector2f negateLocal() {
         x = -x;
         y = -y;
-
+        
         return this;
     }
-
+    
     /**
      * Add a vector to this vector
      *
@@ -241,10 +236,10 @@ public strictfp class Vector2f implements Serializable {
     public Vector2f add(Vector2f v) {
         x += v.getX();
         y += v.getY();
-
+        
         return this;
     }
-
+    
     /**
      * Subtract a vector from this vector
      *
@@ -255,10 +250,10 @@ public strictfp class Vector2f implements Serializable {
     public Vector2f sub(Vector2f v) {
         x -= v.getX();
         y -= v.getY();
-
+        
         return this;
     }
-
+    
     /**
      * Scale this vector by a value
      *
@@ -269,10 +264,10 @@ public strictfp class Vector2f implements Serializable {
     public Vector2f scale(float a) {
         x *= a;
         y *= a;
-
+        
         return this;
     }
-
+    
     /**
      * Normalise the vector
      *
@@ -280,16 +275,16 @@ public strictfp class Vector2f implements Serializable {
      */
     public Vector2f normalise() {
         float l = length();
-
+        
         if (l == 0) {
             return this;
         }
-
+        
         x /= l;
         y /= l;
         return this;
     }
-
+    
     /**
      * The normal of the vector
      *
@@ -300,7 +295,7 @@ public strictfp class Vector2f implements Serializable {
         cp.normalise();
         return cp;
     }
-
+    
     /**
      * The length of the vector squared
      *
@@ -309,7 +304,7 @@ public strictfp class Vector2f implements Serializable {
     public float lengthSquared() {
         return x * x + y * y;
     }
-
+    
     /**
      * Get the length of this vector
      *
@@ -318,7 +313,7 @@ public strictfp class Vector2f implements Serializable {
     public float length() {
         return (float) Math.sqrt(lengthSquared());
     }
-
+    
     /**
      * Project this vector onto another
      *
@@ -329,12 +324,12 @@ public strictfp class Vector2f implements Serializable {
      */
     public void projectOntoUnit(Vector2f b, Vector2f result) {
         float dp = b.dot(this);
-
+        
         result.x = dp * b.getX();
         result.y = dp * b.getY();
-
+        
     }
-
+    
     /**
      * Return a copy of this vector
      *
@@ -343,7 +338,7 @@ public strictfp class Vector2f implements Serializable {
     public Vector2f copy() {
         return new Vector2f(x, y);
     }
-
+    
     /**
      * @see java.lang.Object#toString()
      */
@@ -351,7 +346,7 @@ public strictfp class Vector2f implements Serializable {
     public String toString() {
         return "[Vector2f " + x + "," + y + " (" + length() + ")]";
     }
-
+    
     /**
      * Get the distance from this point to another
      *
@@ -362,7 +357,7 @@ public strictfp class Vector2f implements Serializable {
     public float distance(Vector2f other) {
         return (float) Math.sqrt(distanceSquared(other));
     }
-
+    
     /**
      * Get the distance from this point to another, squared. This
      * can sometimes be used in place of distance and avoids the
@@ -375,10 +370,10 @@ public strictfp class Vector2f implements Serializable {
     public float distanceSquared(Vector2f other) {
         float dx = other.getX() - getX();
         float dy = other.getY() - getY();
-
+        
         return dx * dx + dy * dy;
     }
-
+    
     /**
      * @see java.lang.Object#hashCode()
      */
@@ -386,7 +381,7 @@ public strictfp class Vector2f implements Serializable {
     public int hashCode() {
         return 997 * (int) x ^ 991 * (int) y; // large primes!
     }
-
+    
     /**
      * @see java.lang.Object#equals(java.lang.Object)
      */
@@ -396,14 +391,14 @@ public strictfp class Vector2f implements Serializable {
             Vector2f o = (Vector2f) other;
             return o.x == x && o.y == y;
         }
-
+        
         return false;
     }
-    
+
     public void setY(float y) {
         this.y = y;
     }
-    
+
     public void setX(float x) {
         this.x = x;
     }
