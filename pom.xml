@@ -3,9 +3,9 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.github.mathiewz</groupId>
+    <groupId>com.github.mathiewz.slick</groupId>
     <artifactId>modernized-slick</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <packaging>jar</packaging>
     
     <name>${project.groupId} :: ${project.artifactId}</name>
