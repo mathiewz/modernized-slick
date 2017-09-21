@@ -19,7 +19,7 @@ public class Point extends Shape {
         this.y = y;
         checkPoints();
     }
-
+    
     /**
      * @see com.github.mathiewz.geom.Shape#transform(com.github.mathiewz.geom.Transform)
      */
@@ -27,28 +27,28 @@ public class Point extends Shape {
     public Shape transform(Transform transform) {
         Float[] result = new Float[points.length];
         transform.transform(points, 0, result, 0, points.length / 2);
-
+        
         return new Point(points[0], points[1]);
     }
-
+    
     /**
      * @see com.github.mathiewz.geom.Shape#createPoints()
      */
     @Override
     protected void createPoints() {
         points = new Float[2];
-        points[0] = getX();
-        points[1] = getY();
-
+        points[0] = x;
+        points[1] = y;
+        
         maxX = x;
         maxY = y;
         minX = x;
         minY = y;
-
+        
         findCenter();
         calculateRadius();
     }
-
+    
     /**
      * @see com.github.mathiewz.geom.Shape#findCenter()
      */
@@ -58,7 +58,7 @@ public class Point extends Shape {
         center[0] = points[0];
         center[1] = points[1];
     }
-
+    
     /**
      * @see com.github.mathiewz.geom.Shape#calculateRadius()
      */
@@ -66,5 +66,5 @@ public class Point extends Shape {
     protected void calculateRadius() {
         boundingCircleRadius = 0;
     }
-
+    
 }
