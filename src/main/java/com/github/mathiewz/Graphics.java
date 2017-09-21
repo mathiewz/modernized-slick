@@ -8,6 +8,7 @@ import java.security.PrivilegedAction;
 import java.util.ArrayList;
 
 import org.lwjgl.BufferUtils;
+import org.lwjgl.opengl.GL11;
 
 import com.github.mathiewz.geom.Rectangle;
 import com.github.mathiewz.geom.Shape;
@@ -179,33 +180,33 @@ public class Graphics {
         glOperation(() -> {
             currentDrawingMode = mode;
             if (currentDrawingMode == MODE_NORMAL) {
-                GL.glEnable(SGL.GL_BLEND);
+                GL.glEnable(GL11.GL_BLEND);
                 GL.glColorMask(true, true, true, true);
-                GL.glBlendFunc(SGL.GL_SRC_ALPHA, SGL.GL_ONE_MINUS_SRC_ALPHA);
+                GL.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
             }
             if (currentDrawingMode == MODE_ALPHA_MAP) {
-                GL.glDisable(SGL.GL_BLEND);
+                GL.glDisable(GL11.GL_BLEND);
                 GL.glColorMask(false, false, false, true);
             }
             if (currentDrawingMode == MODE_ALPHA_BLEND) {
-                GL.glEnable(SGL.GL_BLEND);
+                GL.glEnable(GL11.GL_BLEND);
                 GL.glColorMask(true, true, true, false);
-                GL.glBlendFunc(SGL.GL_DST_ALPHA, SGL.GL_ONE_MINUS_DST_ALPHA);
+                GL.glBlendFunc(GL11.GL_DST_ALPHA, GL11.GL_ONE_MINUS_DST_ALPHA);
             }
             if (currentDrawingMode == MODE_COLOR_MULTIPLY) {
-                GL.glEnable(SGL.GL_BLEND);
+                GL.glEnable(GL11.GL_BLEND);
                 GL.glColorMask(true, true, true, true);
-                GL.glBlendFunc(SGL.GL_ONE_MINUS_SRC_COLOR, SGL.GL_SRC_COLOR);
+                GL.glBlendFunc(GL11.GL_ONE_MINUS_SRC_COLOR, GL11.GL_SRC_COLOR);
             }
             if (currentDrawingMode == MODE_ADD) {
-                GL.glEnable(SGL.GL_BLEND);
+                GL.glEnable(GL11.GL_BLEND);
                 GL.glColorMask(true, true, true, true);
-                GL.glBlendFunc(SGL.GL_ONE, SGL.GL_ONE);
+                GL.glBlendFunc(GL11.GL_ONE, GL11.GL_ONE);
             }
             if (currentDrawingMode == MODE_SCREEN) {
-                GL.glEnable(SGL.GL_BLEND);
+                GL.glEnable(GL11.GL_BLEND);
                 GL.glColorMask(true, true, true, true);
-                GL.glBlendFunc(SGL.GL_ONE, SGL.GL_ONE_MINUS_SRC_COLOR);
+                GL.glBlendFunc(GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_COLOR);
             }
         });
     }
@@ -297,7 +298,7 @@ public class Graphics {
     public Color getBackground() {
         predraw();
         FloatBuffer buffer = BufferUtils.createFloatBuffer(16);
-        GL.glGetFloat(SGL.GL_COLOR_CLEAR_VALUE, buffer);
+        GL.glGetFloat(GL11.GL_COLOR_CLEAR_VALUE, buffer);
         postdraw();
         
         return new Color(buffer);
@@ -308,7 +309,7 @@ public class Graphics {
      */
     public void clear() {
         glOperation(() -> {
-            GL.glClear(SGL.GL_COLOR_BUFFER_BIT);
+            GL.glClear(GL11.GL_COLOR_BUFFER_BIT);
         });
     }
     
@@ -693,9 +694,7 @@ public class Graphics {
      */
     public void clearClip() {
         clip = null;
-        glOperation(() -> {
-            GL.glDisable(SGL.GL_SCISSOR_TEST);
-        });
+        glOperation(() -> GL.glDisable(GL11.GL_SCISSOR_TEST));
     }
     
     /**
@@ -717,19 +716,19 @@ public class Graphics {
         glOperation(() -> {
             worldClipRecord = new Rectangle(x, y, width, height);
             
-            GL.glEnable(SGL.GL_CLIP_PLANE0);
+            GL.glEnable(GL11.GL_CLIP_PLANE0);
             worldClip.put(1).put(0).put(0).put(-x).flip();
-            GL.glClipPlane(SGL.GL_CLIP_PLANE0, worldClip);
-            GL.glEnable(SGL.GL_CLIP_PLANE1);
+            GL.glClipPlane(GL11.GL_CLIP_PLANE0, worldClip);
+            GL.glEnable(GL11.GL_CLIP_PLANE1);
             worldClip.put(-1).put(0).put(0).put(x + width).flip();
-            GL.glClipPlane(SGL.GL_CLIP_PLANE1, worldClip);
+            GL.glClipPlane(GL11.GL_CLIP_PLANE1, worldClip);
             
-            GL.glEnable(SGL.GL_CLIP_PLANE2);
+            GL.glEnable(GL11.GL_CLIP_PLANE2);
             worldClip.put(0).put(1).put(0).put(-y).flip();
-            GL.glClipPlane(SGL.GL_CLIP_PLANE2, worldClip);
-            GL.glEnable(SGL.GL_CLIP_PLANE3);
+            GL.glClipPlane(GL11.GL_CLIP_PLANE2, worldClip);
+            GL.glEnable(GL11.GL_CLIP_PLANE3);
             worldClip.put(0).put(-1).put(0).put(y + height).flip();
-            GL.glClipPlane(SGL.GL_CLIP_PLANE3, worldClip);
+            GL.glClipPlane(GL11.GL_CLIP_PLANE3, worldClip);
         });
     }
     
@@ -739,10 +738,10 @@ public class Graphics {
     public void clearWorldClip() {
         glOperation(() -> {
             worldClipRecord = null;
-            GL.glDisable(SGL.GL_CLIP_PLANE0);
-            GL.glDisable(SGL.GL_CLIP_PLANE1);
-            GL.glDisable(SGL.GL_CLIP_PLANE2);
-            GL.glDisable(SGL.GL_CLIP_PLANE3);
+            GL.glDisable(GL11.GL_CLIP_PLANE0);
+            GL.glDisable(GL11.GL_CLIP_PLANE1);
+            GL.glDisable(GL11.GL_CLIP_PLANE2);
+            GL.glDisable(GL11.GL_CLIP_PLANE3);
         });
     }
     
@@ -788,7 +787,7 @@ public class Graphics {
         glOperation(() -> {
             
             if (clip == null) {
-                GL.glEnable(SGL.GL_SCISSOR_TEST);
+                GL.glEnable(GL11.GL_SCISSOR_TEST);
                 clip = new Rectangle(x, y, width, height);
             } else {
                 clip.setBounds(x, y, width, height);
@@ -881,7 +880,7 @@ public class Graphics {
             TextureImpl.bindNone();
             currentColor.bind();
             
-            GL.glBegin(SGL.GL_QUADS);
+            GL.glBegin(GL11.GL_QUADS);
             GL.glVertex2f(x1, y1);
             GL.glVertex2f(x1 + width, y1);
             GL.glVertex2f(x1 + width, y1 + height);
@@ -1091,7 +1090,7 @@ public class Graphics {
         float cx = x1 + width / 2.0f;
         float cy = y1 + height / 2.0f;
         
-        GL.glBegin(SGL.GL_TRIANGLE_FAN);
+        GL.glBegin(GL11.GL_TRIANGLE_FAN);
         int step = 360 / segments;
         
         GL.glVertex2f(cx, cy);
@@ -1110,7 +1109,7 @@ public class Graphics {
         GL.glEnd();
         
         if (antialias) {
-            GL.glBegin(SGL.GL_TRIANGLE_FAN);
+            GL.glBegin(GL11.GL_TRIANGLE_FAN);
             GL.glVertex2f(cx, cy);
             if (end != 360) {
                 end -= 10;
@@ -1313,9 +1312,9 @@ public class Graphics {
             antialias = anti;
             LSR.setAntiAlias(anti);
             if (anti) {
-                GL.glEnable(SGL.GL_POLYGON_SMOOTH);
+                GL.glEnable(GL11.GL_POLYGON_SMOOTH);
             } else {
-                GL.glDisable(SGL.GL_POLYGON_SMOOTH);
+                GL.glDisable(GL11.GL_POLYGON_SMOOTH);
             }
         });
     }
@@ -1484,9 +1483,9 @@ public class Graphics {
      *            The y position to copy from
      */
     public void copyArea(Image target, int x, int y) {
-        int format = target.getTexture().hasAlpha() ? SGL.GL_RGBA : SGL.GL_RGB;
+        int format = target.getTexture().hasAlpha() ? GL11.GL_RGBA : GL11.GL_RGB;
         target.bind();
-        GL.glCopyTexImage2D(SGL.GL_TEXTURE_2D, 0, format, x, screenHeight - (y + target.getHeight()), target.getTexture().getTextureWidth(), target.getTexture().getTextureHeight(), 0);
+        GL.glCopyTexImage2D(GL11.GL_TEXTURE_2D, 0, format, x, screenHeight - (y + target.getHeight()), target.getTexture().getTextureWidth(), target.getTexture().getTextureHeight(), 0);
         target.ensureInverted();
     }
     
@@ -1516,7 +1515,7 @@ public class Graphics {
      */
     public Color getPixel(int x, int y) {
         glOperation(() -> {
-            GL.glReadPixels(x, screenHeight - y, 1, 1, SGL.GL_RGBA, SGL.GL_UNSIGNED_BYTE, readBuffer);
+            GL.glReadPixels(x, screenHeight - y, 1, 1, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, readBuffer);
         });
         
         return new Color(translate(readBuffer.get(0)), translate(readBuffer.get(1)), translate(readBuffer.get(2)), translate(readBuffer.get(3)));
@@ -1542,7 +1541,7 @@ public class Graphics {
         }
         
         glOperation(() -> {
-            GL.glReadPixels(x, screenHeight - y - height, width, height, SGL.GL_RGBA, SGL.GL_UNSIGNED_BYTE, target);
+            GL.glReadPixels(x, screenHeight - y - height, width, height, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, target);
         });
     }
     
@@ -1644,7 +1643,7 @@ public class Graphics {
             
             TextureImpl.bindNone();
             
-            GL.glBegin(SGL.GL_LINES);
+            GL.glBegin(GL11.GL_LINES);
             
             GL.glColor4f(red1, green1, blue1, alpha1);
             GL.glVertex2f(x1, y1);
@@ -1678,7 +1677,7 @@ public class Graphics {
             
             TextureImpl.bindNone();
             
-            GL.glBegin(SGL.GL_LINES);
+            GL.glBegin(GL11.GL_LINES);
             
             Color1.bind();
             GL.glVertex2f(x1, y1);
@@ -1708,7 +1707,7 @@ public class Graphics {
                 buffer = stack.get(stackIndex);
             }
             
-            GL.glGetFloat(SGL.GL_MODELVIEW_MATRIX, buffer);
+            GL.glGetFloat(GL11.GL_MODELVIEW_MATRIX, buffer);
             buffer.put(16, sx);
             buffer.put(17, sy);
             stackIndex++;

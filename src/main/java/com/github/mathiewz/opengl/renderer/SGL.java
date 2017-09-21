@@ -5,11 +5,6 @@ import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
-import org.lwjgl.opengl.EXTSecondaryColor;
-import org.lwjgl.opengl.EXTTextureMirrorClamp;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
-
 /**
  * The description of the OpenGL functions used Slick. Any other rendering method will
  * need to emulate these.
@@ -17,126 +12,7 @@ import org.lwjgl.opengl.GL12;
  * @author kevin
  */
 public interface SGL {
-    /** OpenGL Enum - @url http://www.opengl.org/documentation */
-    public static final int GL_TEXTURE_2D = GL11.GL_TEXTURE_2D;
-
-    /** OpenGL Enum - @url http://www.opengl.org/documentation */
-    public static final int GL_RGBA = GL11.GL_RGBA;
-    /** OpenGL Enum - @url http://www.opengl.org/documentation */
-    public static final int GL_RGB = GL11.GL_RGB;
-    /** OpenGL Enum - @url http://www.opengl.org/documentation */
-    public static final int GL_UNSIGNED_BYTE = GL11.GL_UNSIGNED_BYTE;
-    /** OpenGL Enum - @url http://www.opengl.org/documentation */
-    public static final int GL_LINEAR = GL11.GL_LINEAR;
-    /** OpenGL Enum - @url http://www.opengl.org/documentation */
-    public static final int GL_NEAREST = GL11.GL_NEAREST;
-    /** OpenGL Enum - @url http://www.opengl.org/documentation */
-    public static final int GL_TEXTURE_MIN_FILTER = GL11.GL_TEXTURE_MIN_FILTER;
-    /** OpenGL Enum - @url http://www.opengl.org/documentation */
-    public static final int GL_TEXTURE_MAG_FILTER = GL11.GL_TEXTURE_MAG_FILTER;
-    /** OpenGL Enum - @url http://www.opengl.org/documentation */
-    public static final int GL_POINT_SMOOTH = GL11.GL_POINT_SMOOTH;
-    /** OpenGL Enum - @url http://www.opengl.org/documentation */
-    public static final int GL_POLYGON_SMOOTH = GL11.GL_POLYGON_SMOOTH;
-    /** OpenGL Enum - @url http://www.opengl.org/documentation */
-    public static final int GL_LINE_SMOOTH = GL11.GL_LINE_SMOOTH;
-    /** OpenGL Enum - @url http://www.opengl.org/documentation */
-    public static final int GL_SCISSOR_TEST = GL11.GL_SCISSOR_TEST;
-
-    /** OpenGL Enum - @url http://www.opengl.org/documentation */
-    public static final int GL_MODULATE = GL11.GL_MODULATE;
-    /** OpenGL Enum - @url http://www.opengl.org/documentation */
-    public static final int GL_TEXTURE_ENV = GL11.GL_TEXTURE_ENV;
-    /** OpenGL Enum - @url http://www.opengl.org/documentation */
-    public static final int GL_TEXTURE_ENV_MODE = GL11.GL_TEXTURE_ENV_MODE;
-
-    /** OpenGL Enum - @url http://www.opengl.org/documentation */
-    public static final int GL_QUADS = GL11.GL_QUADS;
-    /** OpenGL Enum - @url http://www.opengl.org/documentation */
-    public static final int GL_POINTS = GL11.GL_POINTS;
-    /** OpenGL Enum - @url http://www.opengl.org/documentation */
-    public static final int GL_LINES = GL11.GL_LINES;
-    /** OpenGL Enum - @url http://www.opengl.org/documentation */
-    public static final int GL_LINE_STRIP = GL11.GL_LINE_STRIP;
-    /** OpenGL Enum - @url http://www.opengl.org/documentation */
-    public static final int GL_TRIANGLES = GL11.GL_TRIANGLES;
-    /** OpenGL Enum - @url http://www.opengl.org/documentation */
-    public static final int GL_TRIANGLE_FAN = GL11.GL_TRIANGLE_FAN;
-
-    /** OpenGL Enum - @url http://www.opengl.org/documentation */
-    public static final int GL_SRC_ALPHA = GL11.GL_SRC_ALPHA;
-    /** OpenGL Enum - @url http://www.opengl.org/documentation */
-    public static final int GL_ONE = GL11.GL_ONE;
-    /** OpenGL Enum - @url http://www.opengl.org/documentation */
-    public static final int GL_ONE_MINUS_DST_ALPHA = GL11.GL_ONE_MINUS_DST_ALPHA;
-    /** OpenGL Enum - @url http://www.opengl.org/documentation */
-    public static final int GL_DST_ALPHA = GL11.GL_DST_ALPHA;
-    /** OpenGL Enum - @url http://www.opengl.org/documentation */
-    public static final int GL_ONE_MINUS_SRC_ALPHA = GL11.GL_ONE_MINUS_SRC_ALPHA;
-
-    /** OpenGL Enum - @url http://www.opengl.org/documentation */
-    public static final int GL_COMPILE = GL11.GL_COMPILE;
-    /** OpenGL Enum - @url http://www.opengl.org/documentation */
-    public static final int GL_MAX_TEXTURE_SIZE = GL11.GL_MAX_TEXTURE_SIZE;
-    /** OpenGL Enum - @url http://www.opengl.org/documentation */
-    public static final int GL_COLOR_BUFFER_BIT = GL11.GL_COLOR_BUFFER_BIT;
-    /** OpenGL Enum - @url http://www.opengl.org/documentation */
-    public static final int GL_DEPTH_BUFFER_BIT = GL11.GL_DEPTH_BUFFER_BIT;
-    /** OpenGL Enum - @url http://www.opengl.org/documentation */
-    public static final int GL_BLEND = GL11.GL_BLEND;
-    /** OpenGL Enum - @url http://www.opengl.org/documentation */
-    public static final int GL_COLOR_CLEAR_VALUE = GL11.GL_COLOR_CLEAR_VALUE;
-    /** OpenGL Enum - @url http://www.opengl.org/documentation */
-    public static final int GL_LINE_WIDTH = GL11.GL_LINE_WIDTH;
-    /** OpenGL Enum - @url http://www.opengl.org/documentation */
-    public static final int GL_CLIP_PLANE0 = GL11.GL_CLIP_PLANE0;
-    /** OpenGL Enum - @url http://www.opengl.org/documentation */
-    public static final int GL_CLIP_PLANE1 = GL11.GL_CLIP_PLANE1;
-    /** OpenGL Enum - @url http://www.opengl.org/documentation */
-    public static final int GL_CLIP_PLANE2 = GL11.GL_CLIP_PLANE2;
-    /** OpenGL Enum - @url http://www.opengl.org/documentation */
-    public static final int GL_CLIP_PLANE3 = GL11.GL_CLIP_PLANE3;
-
-    /** OpenGL Enum - @url http://www.opengl.org/documentation */
-    public static final int GL_COMPILE_AND_EXECUTE = GL11.GL_COMPILE_AND_EXECUTE;
-
-    /** OpenGL Enum - @url http://www.opengl.org/documentation */
-    public static final int GL_RGBA8 = GL11.GL_RGBA;
-    /** OpenGL Enum - @url http://www.opengl.org/documentation */
-    public static final int GL_RGBA16 = GL11.GL_RGBA16;
-    /** OpenGL Enum - @url http://www.opengl.org/documentation */
-    public static final int GL_BGRA = GL12.GL_BGRA;
-    /** OpenGL Enum - @url http://www.opengl.org/documentation */
-    public static final int GL_MIRROR_CLAMP_TO_EDGE_EXT = EXTTextureMirrorClamp.GL_MIRROR_CLAMP_TO_EDGE_EXT;
-
-    /** OpenGL Enum - @url http://www.opengl.org/documentation */
-    public static final int GL_TEXTURE_WRAP_S = GL11.GL_TEXTURE_WRAP_S;
-    /** OpenGL Enum - @url http://www.opengl.org/documentation */
-    public static final int GL_TEXTURE_WRAP_T = GL11.GL_TEXTURE_WRAP_T;
-
-    /** OpenGL Enum - @url http://www.opengl.org/documentation */
-    public static final int GL_CLAMP = GL11.GL_CLAMP;
-
-    /** OpenGL Enum - @url http://www.opengl.org/documentation */
-    public static final int GL_COLOR_SUM_EXT = EXTSecondaryColor.GL_COLOR_SUM_EXT;
-
-    /** OpenGL Enum - @url http://www.opengl.org/documentation */
-    public static final int GL_ALWAYS = GL11.GL_ALWAYS;
-
-    /** OpenGL Enum - @url http://www.opengl.org/documentation */
-    public static final int GL_DEPTH_TEST = GL11.GL_DEPTH_TEST;
-
-    /** OpenGL Enum - @url http://www.opengl.org/documentation */
-    public static final int GL_NOTEQUAL = GL11.GL_NOTEQUAL;
-    /** OpenGL Enum - @url http://www.opengl.org/documentation */
-    public static final int GL_EQUAL = GL11.GL_EQUAL;
-    /** OpenGL Enum - @url http://www.opengl.org/documentation */
-    public static final int GL_SRC_COLOR = GL11.GL_SRC_COLOR;
-    /** OpenGL Enum - @url http://www.opengl.org/documentation */
-    public static final int GL_ONE_MINUS_SRC_COLOR = GL11.GL_ONE_MINUS_SRC_COLOR;
-    /** OpenGL Enum - @url http://www.opengl.org/documentation */
-    public static final int GL_MODELVIEW_MATRIX = GL11.GL_MODELVIEW_MATRIX;
-
+    
     /**
      * Flush the current state of the renderer down to GL
      */

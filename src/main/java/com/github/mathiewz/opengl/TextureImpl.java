@@ -5,6 +5,7 @@ import java.nio.ByteOrder;
 import java.nio.IntBuffer;
 
 import org.lwjgl.BufferUtils;
+import org.lwjgl.opengl.GL11;
 
 import com.github.mathiewz.opengl.renderer.Renderer;
 import com.github.mathiewz.opengl.renderer.SGL;
@@ -130,7 +131,7 @@ public class TextureImpl implements Texture {
      */
     public static void bindNone() {
         unbind();
-        GL.glDisable(SGL.GL_TEXTURE_2D);
+        GL.glDisable(GL11.GL_TEXTURE_2D);
     }
     
     /**
@@ -149,7 +150,7 @@ public class TextureImpl implements Texture {
     public void bind() {
         if (lastBind != this) {
             lastBind = this;
-            GL.glEnable(SGL.GL_TEXTURE_2D);
+            GL.glEnable(GL11.GL_TEXTURE_2D);
             GL.glBindTexture(target, textureID);
         }
     }
@@ -328,7 +329,7 @@ public class TextureImpl implements Texture {
     public byte[] getTextureData() {
         ByteBuffer buffer = BufferUtils.createByteBuffer((hasAlpha() ? 4 : 3) * texWidth * texHeight);
         bind();
-        GL.glGetTexImage(SGL.GL_TEXTURE_2D, 0, hasAlpha() ? SGL.GL_RGBA : SGL.GL_RGB, SGL.GL_UNSIGNED_BYTE, buffer);
+        GL.glGetTexImage(GL11.GL_TEXTURE_2D, 0, hasAlpha() ? GL11.GL_RGBA : GL11.GL_RGB, GL11.GL_UNSIGNED_BYTE, buffer);
         byte[] data = new byte[buffer.limit()];
         buffer.get(data);
         buffer.clear();
@@ -342,8 +343,8 @@ public class TextureImpl implements Texture {
     @Override
     public void setTextureFilter(int textureFilter) {
         bind();
-        GL.glTexParameteri(target, SGL.GL_TEXTURE_MIN_FILTER, textureFilter);
-        GL.glTexParameteri(target, SGL.GL_TEXTURE_MAG_FILTER, textureFilter);
+        GL.glTexParameteri(target, GL11.GL_TEXTURE_MIN_FILTER, textureFilter);
+        GL.glTexParameteri(target, GL11.GL_TEXTURE_MAG_FILTER, textureFilter);
     }
     
     /**

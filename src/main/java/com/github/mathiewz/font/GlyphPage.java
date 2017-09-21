@@ -16,6 +16,9 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.NoSuchElementException;
 
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
+
 import com.github.mathiewz.Color;
 import com.github.mathiewz.Image;
 import com.github.mathiewz.UnicodeFont;
@@ -26,7 +29,7 @@ import com.github.mathiewz.opengl.renderer.SGL;
 /**
  * Stores a number of glyphs on a single texture.
  *
- * @author Nathan Sweet 
+ * @author Nathan Sweet
  */
 public class GlyphPage {
     /** The interface to OpenGL */
@@ -215,7 +218,7 @@ public class GlyphPage {
             raster.getDataElements(0, y, width, 1, row);
             scratchIntBuffer.put(row);
         }
-        GL.glTexSubImage2D(SGL.GL_TEXTURE_2D, 0, pageX, pageY, width, height, SGL.GL_BGRA, SGL.GL_UNSIGNED_BYTE, scratchByteBuffer);
+        GL.glTexSubImage2D(GL11.GL_TEXTURE_2D, 0, pageX, pageY, width, height, GL12.GL_BGRA, GL11.GL_UNSIGNED_BYTE, scratchByteBuffer);
         scratchIntBuffer.clear();
         
         glyph.setImage(pageImage.getSubImage(pageX, pageY, width, height));

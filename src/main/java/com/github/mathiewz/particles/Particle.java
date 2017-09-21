@@ -1,5 +1,7 @@
 package com.github.mathiewz.particles;
 
+import org.lwjgl.opengl.GL11;
+
 import com.github.mathiewz.Color;
 import com.github.mathiewz.Image;
 import com.github.mathiewz.opengl.TextureImpl;
@@ -14,14 +16,14 @@ import com.github.mathiewz.opengl.renderer.SGL;
 public class Particle {
     /** The renderer to use for all GL operations */
     protected static SGL GL = Renderer.get();
-
+    
     /** Indicates the particle should inherit it's use of points */
     public static final int INHERIT_POINTS = 1;
     /** Indicates the particle should explicitly use points */
     public static final int USE_POINTS = 2;
     /** Indicates the particle should explicitly not use points */
     public static final int USE_QUADS = 3;
-
+    
     /** The x coordinate of the particle */
     protected float x;
     /** The y coordinate of the particle */
@@ -52,7 +54,7 @@ public class Particle {
     protected boolean oriented = false;
     /** The currently scalar applied on the y axis */
     protected float scaleY = 1.0f;
-
+    
     /**
      * Create a new particle belonging to given engine
      *
@@ -62,7 +64,7 @@ public class Particle {
     public Particle(ParticleSystem engine) {
         this.engine = engine;
     }
-
+    
     /**
      * Get the x offset of this particle
      *
@@ -71,7 +73,7 @@ public class Particle {
     public float getX() {
         return x;
     }
-
+    
     /**
      * Get the y offset of this particle
      *
@@ -80,7 +82,7 @@ public class Particle {
     public float getY() {
         return y;
     }
-
+    
     /**
      * Move this particle a fixed amount
      *
@@ -93,7 +95,7 @@ public class Particle {
         this.x += x;
         this.y += y;
     }
-
+    
     /**
      * Get the size of this particle
      *
@@ -102,7 +104,7 @@ public class Particle {
     public float getSize() {
         return size;
     }
-
+    
     /**
      * Get the color of this particle
      *
@@ -111,7 +113,7 @@ public class Particle {
     public Color getColor() {
         return color;
     }
-
+    
     /**
      * Set the image used to render this particle
      *
@@ -121,7 +123,7 @@ public class Particle {
     public void setImage(Image image) {
         this.image = image;
     }
-
+    
     /**
      * Get the original life of this particle
      *
@@ -130,7 +132,7 @@ public class Particle {
     public float getOriginalLife() {
         return originalLife;
     }
-
+    
     /**
      * Get the life remaining in the particle in milliseconds
      *
@@ -139,7 +141,7 @@ public class Particle {
     public float getLife() {
         return life;
     }
-
+    
     /**
      * Check if this particle is currently in use (i.e. is it rendering?)
      *
@@ -148,32 +150,32 @@ public class Particle {
     public boolean inUse() {
         return life > 0;
     }
-
+    
     /**
      * Render this particle
      */
     public void render() {
         if (engine.usePoints() && usePoints == INHERIT_POINTS || usePoints == USE_POINTS) {
             TextureImpl.bindNone();
-            GL.glEnable(SGL.GL_POINT_SMOOTH);
+            GL.glEnable(GL11.GL_POINT_SMOOTH);
             GL.glPointSize(size / 2);
             color.bind();
-            GL.glBegin(SGL.GL_POINTS);
+            GL.glBegin(GL11.GL_POINTS);
             GL.glVertex2f(x, y);
             GL.glEnd();
         } else if (oriented || scaleY != 1.0f) {
             GL.glPushMatrix();
-
+            
             GL.glTranslatef(x, y, 0f);
-
+            
             if (oriented) {
                 float angle = (float) (Math.atan2(y, x) * 180 / Math.PI);
                 GL.glRotatef(angle, 0f, 0f, 1.0f);
             }
-
+            
             // scale
             GL.glScalef(1.0f, scaleY, 1.0f);
-
+            
             image.draw((int) -(size / 2), (int) -(size / 2), (int) size, (int) size, color);
             GL.glPopMatrix();
         } else {
@@ -181,7 +183,7 @@ public class Particle {
             image.drawEmbedded((int) (x - size / 2), (int) (y - size / 2), (int) size, (int) size);
         }
     }
-
+    
     /**
      * Update the state of this particle
      *
@@ -191,7 +193,7 @@ public class Particle {
     public void update(int delta) {
         emitter.updateParticle(this, delta);
         life -= delta;
-
+        
         if (life > 0) {
             x += delta * velx;
             y += delta * vely;
@@ -199,7 +201,7 @@ public class Particle {
             engine.release(this);
         }
     }
-
+    
     /**
      * Initialise the state of the particle as it's reused
      *
@@ -220,7 +222,7 @@ public class Particle {
         oriented = false;
         scaleY = 1.0f;
     }
-
+    
     /**
      * Set the type of this particle
      *
@@ -230,7 +232,7 @@ public class Particle {
     public void setType(int type) {
         this.type = type;
     }
-
+    
     /**
      * Indicate how this particle should be renered
      *
@@ -243,7 +245,7 @@ public class Particle {
     public void setUsePoint(int usePoints) {
         this.usePoints = usePoints;
     }
-
+    
     /**
      * Get the type of this particle
      *
@@ -252,7 +254,7 @@ public class Particle {
     public int getType() {
         return type;
     }
-
+    
     /**
      * Set the size of the particle
      *
@@ -262,7 +264,7 @@ public class Particle {
     public void setSize(float size) {
         this.size = size;
     }
-
+    
     /**
      * Adjust the size of the particle
      *
@@ -273,7 +275,7 @@ public class Particle {
         size += delta;
         size = Math.max(0, size);
     }
-
+    
     /**
      * Set the life of the particle
      *
@@ -283,7 +285,7 @@ public class Particle {
     public void setLife(float life) {
         this.life = life;
     }
-
+    
     /**
      * Adjust the life othe particle
      *
@@ -293,7 +295,7 @@ public class Particle {
     public void adjustLife(float delta) {
         life += delta;
     }
-
+    
     /**
      * Kill the particle, stop it rendering and send it back to the engine for
      * use.
@@ -301,7 +303,7 @@ public class Particle {
     public void kill() {
         life = 1;
     }
-
+    
     /**
      * Set the color of the particle
      *
@@ -324,7 +326,7 @@ public class Particle {
             color.a = a;
         }
     }
-
+    
     /**
      * Set the position of this particle
      *
@@ -337,7 +339,7 @@ public class Particle {
         this.x = x;
         this.y = y;
     }
-
+    
     /**
      * Set the velocity of the particle
      *
@@ -352,7 +354,7 @@ public class Particle {
         velx = dirx * speed;
         vely = diry * speed;
     }
-
+    
     /**
      * Set the current speed of this particle
      *
@@ -366,7 +368,7 @@ public class Particle {
         velx /= currentSpeed;
         vely /= currentSpeed;
     }
-
+    
     /**
      * Set the velocity of the particle
      *
@@ -378,7 +380,7 @@ public class Particle {
     public void setVelocity(float velx, float vely) {
         setVelocity(velx, vely, 1);
     }
-
+    
     /**
      * Adjust (add) the position of this particle
      *
@@ -391,7 +393,7 @@ public class Particle {
         x += dx;
         y += dy;
     }
-
+    
     /**
      * Adjust (add) the color of the particle
      *
@@ -413,7 +415,7 @@ public class Particle {
         color.b += b;
         color.a += a;
     }
-
+    
     /**
      * Adjust (add) the color of the particle
      *
@@ -430,13 +432,13 @@ public class Particle {
         if (color == Color.white) {
             color = new Color(1, 1, 1, 1f);
         }
-
+        
         color.r += r / 255.0f;
         color.g += g / 255.0f;
         color.b += b / 255.0f;
         color.a += a / 255.0f;
     }
-
+    
     /**
      * Adjust (add) the direction of this particle
      *
@@ -449,7 +451,7 @@ public class Particle {
         velx += dx;
         vely += dy;
     }
-
+    
     /**
      * Get the emitter that owns this particle
      *
@@ -458,7 +460,7 @@ public class Particle {
     public ParticleEmitter getEmitter() {
         return emitter;
     }
-
+    
     /**
      * @see java.lang.Object#toString()
      */
@@ -466,7 +468,7 @@ public class Particle {
     public String toString() {
         return super.toString() + " : " + life;
     }
-
+    
     /**
      * Check if this particle is being oriented based on it's velocity
      *
@@ -475,7 +477,7 @@ public class Particle {
     public boolean isOriented() {
         return oriented;
     }
-
+    
     /**
      * Indicate if this particle should be oriented based on it's velocity
      *
@@ -485,7 +487,7 @@ public class Particle {
     public void setOriented(boolean oriented) {
         this.oriented = oriented;
     }
-
+    
     /**
      * Get the current scalar applied on the y axis
      *
@@ -494,7 +496,7 @@ public class Particle {
     public float getScaleY() {
         return scaleY;
     }
-
+    
     /**
      * Set the current scalar applied on the y axis
      *

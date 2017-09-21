@@ -3,6 +3,10 @@ package com.github.mathiewz;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.lwjgl.opengl.EXTSecondaryColor;
+import org.lwjgl.opengl.EXTTextureMirrorClamp;
+import org.lwjgl.opengl.GL11;
+
 import com.github.mathiewz.opengl.ImageData;
 import com.github.mathiewz.opengl.InternalTextureLoader;
 import com.github.mathiewz.opengl.Texture;
@@ -75,7 +79,7 @@ public class Image implements Renderable {
     /** The colours for each of the corners */
     protected Color[] corners;
     /** The OpenGL max filter */
-    private int filter = SGL.GL_LINEAR;
+    private int filter = GL11.GL_LINEAR;
     
     /**
      * Create a texture as a copy of another
@@ -177,7 +181,7 @@ public class Image implements Renderable {
      *            The color to treat as transparent
      */
     public Image(String ref, boolean flipped, int f, Color transparent) {
-        filter = f == FILTER_LINEAR ? SGL.GL_LINEAR : SGL.GL_NEAREST;
+        filter = f == FILTER_LINEAR ? GL11.GL_LINEAR : GL11.GL_NEAREST;
         
         try {
             this.ref = ref;
@@ -203,11 +207,11 @@ public class Image implements Renderable {
      *            The filtering mode to use
      */
     public void setFilter(int f) {
-        filter = f == FILTER_LINEAR ? SGL.GL_LINEAR : SGL.GL_NEAREST;
+        filter = f == FILTER_LINEAR ? GL11.GL_LINEAR : GL11.GL_NEAREST;
         
         texture.bind();
-        GL.glTexParameteri(SGL.GL_TEXTURE_2D, SGL.GL_TEXTURE_MIN_FILTER, filter);
-        GL.glTexParameteri(SGL.GL_TEXTURE_2D, SGL.GL_TEXTURE_MAG_FILTER, filter);
+        GL.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, filter);
+        GL.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, filter);
     }
     
     /**
@@ -234,7 +238,7 @@ public class Image implements Renderable {
      */
     public Image(int width, int height, int f) {
         ref = super.toString();
-        filter = f == FILTER_LINEAR ? SGL.GL_LINEAR : SGL.GL_NEAREST;
+        filter = f == FILTER_LINEAR ? GL11.GL_LINEAR : GL11.GL_NEAREST;
         
         try {
             texture = InternalTextureLoader.get().createTexture(width, height, filter);
@@ -320,7 +324,7 @@ public class Image implements Renderable {
      */
     public Image(ImageData data, int f) {
         try {
-            filter = f == FILTER_LINEAR ? SGL.GL_LINEAR : SGL.GL_NEAREST;
+            filter = f == FILTER_LINEAR ? GL11.GL_LINEAR : GL11.GL_NEAREST;
             texture = InternalTextureLoader.get().getTexture(data, filter);
             ref = texture.toString();
         } catch (IOException e) {
@@ -437,11 +441,11 @@ public class Image implements Renderable {
      */
     public void clampTexture() {
         if (GL.canTextureMirrorClamp()) {
-            GL.glTexParameteri(SGL.GL_TEXTURE_2D, SGL.GL_TEXTURE_WRAP_S, SGL.GL_MIRROR_CLAMP_TO_EDGE_EXT);
-            GL.glTexParameteri(SGL.GL_TEXTURE_2D, SGL.GL_TEXTURE_WRAP_T, SGL.GL_MIRROR_CLAMP_TO_EDGE_EXT);
+            GL.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, EXTTextureMirrorClamp.GL_MIRROR_CLAMP_TO_EDGE_EXT);
+            GL.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, EXTTextureMirrorClamp.GL_MIRROR_CLAMP_TO_EDGE_EXT);
         } else {
-            GL.glTexParameteri(SGL.GL_TEXTURE_2D, SGL.GL_TEXTURE_WRAP_S, SGL.GL_CLAMP);
-            GL.glTexParameteri(SGL.GL_TEXTURE_2D, SGL.GL_TEXTURE_WRAP_T, SGL.GL_CLAMP);
+            GL.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL11.GL_CLAMP);
+            GL.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL11.GL_CLAMP);
         }
     }
     
@@ -489,7 +493,7 @@ public class Image implements Renderable {
      *            The color to treat as transparent
      */
     private void load(InputStream in, String ref, boolean flipped, int f, Color transparent) {
-        filter = f == FILTER_LINEAR ? SGL.GL_LINEAR : SGL.GL_NEAREST;
+        filter = f == FILTER_LINEAR ? GL11.GL_LINEAR : GL11.GL_NEAREST;
         
         try {
             this.ref = ref;
@@ -789,7 +793,7 @@ public class Image implements Renderable {
             GL.glTranslatef(-centerX, -centerY, 0.0f);
         }
         
-        GL.glBegin(SGL.GL_QUADS);
+        GL.glBegin(GL11.GL_QUADS);
         init();
         
         GL.glTexCoord2f(textureOffsetX, textureOffsetY);
@@ -848,7 +852,7 @@ public class Image implements Renderable {
             GL.glTranslatef(-centerX, -centerY, 0.0f);
         }
         
-        GL.glBegin(SGL.GL_QUADS);
+        GL.glBegin(GL11.GL_QUADS);
         drawEmbedded(0, 0, width, height);
         GL.glEnd();
         
@@ -932,11 +936,11 @@ public class Image implements Renderable {
         texture.bind();
         
         if (GL.canSecondaryColor()) {
-            GL.glEnable(SGL.GL_COLOR_SUM_EXT);
+            GL.glEnable(EXTSecondaryColor.GL_COLOR_SUM_EXT);
             GL.glSecondaryColor3ubEXT((byte) (col.r * 255), (byte) (col.g * 255), (byte) (col.b * 255));
         }
         
-        GL.glTexEnvi(SGL.GL_TEXTURE_ENV, SGL.GL_TEXTURE_ENV_MODE, SGL.GL_MODULATE);
+        GL.glTexEnvi(GL11.GL_TEXTURE_ENV, GL11.GL_TEXTURE_ENV_MODE, GL11.GL_MODULATE);
         
         GL.glTranslatef(x, y, 0);
         if (angle != 0) {
@@ -945,7 +949,7 @@ public class Image implements Renderable {
             GL.glTranslatef(-centerX, -centerY, 0.0f);
         }
         
-        GL.glBegin(SGL.GL_QUADS);
+        GL.glBegin(GL11.GL_QUADS);
         drawEmbedded(0, 0, width, height);
         GL.glEnd();
         
@@ -957,7 +961,7 @@ public class Image implements Renderable {
         GL.glTranslatef(-x, -y, 0);
         
         if (GL.canSecondaryColor()) {
-            GL.glDisable(SGL.GL_COLOR_SUM_EXT);
+            GL.glDisable(EXTSecondaryColor.GL_COLOR_SUM_EXT);
         }
     }
     
@@ -1151,7 +1155,7 @@ public class Image implements Renderable {
             GL.glTranslatef(-centerX, -centerY, 0.0f);
         }
         
-        GL.glBegin(SGL.GL_QUADS);
+        GL.glBegin(GL11.GL_QUADS);
         drawEmbedded(0, 0, x2 - x, y2 - y, srcx, srcy, srcx2, srcy2);
         GL.glEnd();
         
@@ -1269,7 +1273,7 @@ public class Image implements Renderable {
             GL.glTranslatef(-centerX, -centerY, 0.0f);
         }
         
-        GL.glBegin(SGL.GL_QUADS);
+        GL.glBegin(GL11.GL_QUADS);
         init();
         
         GL.glTexCoord2f(textureOffsetX, textureOffsetY);
@@ -1415,7 +1419,7 @@ public class Image implements Renderable {
         
         Color.white.bind();
         texture.bind();
-        GL.glBegin(SGL.GL_QUADS);
+        GL.glBegin(GL11.GL_QUADS);
     }
     
     /**

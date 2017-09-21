@@ -1,5 +1,7 @@
 package com.github.mathiewz.geom;
 
+import org.lwjgl.opengl.GL11;
+
 import com.github.mathiewz.Image;
 import com.github.mathiewz.ShapeFill;
 import com.github.mathiewz.opengl.Texture;
@@ -69,7 +71,7 @@ public final class ShapeRenderer {
         Texture t = TextureImpl.getLastBind();
         TextureImpl.bindNone();
         
-        GL.glBegin(SGL.GL_LINE_STRIP);
+        GL.glBegin(GL11.GL_LINE_STRIP);
         for (int i = 0; i < points.length; i += 2) {
             fill.colorAt(shape, points[i], points[i + 1]).bind();
             Vector2f offset = fill.getOffsetAt(shape, points[i], points[i + 1]);
@@ -140,7 +142,7 @@ public final class ShapeRenderer {
     private static final void fill(Shape shape, PointCallback callback) {
         Triangulator tris = shape.getTriangles();
         
-        GL.glBegin(SGL.GL_TRIANGLES);
+        GL.glBegin(GL11.GL_TRIANGLES);
         for (int i = 0; i < tris.getTriangleCount(); i++) {
             for (int p = 0; p < 3; p++) {
                 float[] pt = tris.getTrianglePoint(i, p);

@@ -18,6 +18,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.lwjgl.opengl.GL11;
+
 import com.github.mathiewz.font.Glyph;
 import com.github.mathiewz.font.GlyphPage;
 import com.github.mathiewz.font.HieroSettings;
@@ -34,7 +36,7 @@ import com.github.mathiewz.util.ResourceLoader;
  * For efficiency, glyphs are packed on to textures. Glyphs can be loaded to the textures on the fly, when they are first needed
  * for display. However, it is best to load the glyphs that are known to be needed at startup.
  *
- * @author Nathan Sweet 
+ * @author Nathan Sweet
  */
 public class UnicodeFont implements com.github.mathiewz.Font {
     /** The number of display lists that will be cached for strings from this font */
@@ -49,7 +51,7 @@ public class UnicodeFont implements com.github.mathiewz.Font {
     private static final SGL GL = Renderer.get();
     /** A dummy display list used as a place holder */
     private static final DisplayList EMPTY_DISPLAY_LIST = new DisplayList();
-    
+
     /**
      * Utility to create a Java font for a TTF file reference
      *
@@ -66,12 +68,12 @@ public class UnicodeFont implements com.github.mathiewz.Font {
             throw new SlickException("Error reading font: " + ttfFileRef, ex);
         }
     }
-    
+
     /**
      * Sorts glyphs by height, tallest first.
      */
     private static final Comparator<Glyph> heightComparator = (o1, o2) -> o1.getHeight() - o2.getHeight();
-    
+
     /** The AWT font that is being rendered */
     private Font font;
     /** The reference to the True Type Font file that has kerning information */
@@ -92,7 +94,7 @@ public class UnicodeFont implements com.github.mathiewz.Font {
     private final List<Glyph> queuedGlyphs = new ArrayList<>(256);
     /** The effects that need to be applied to the font */
     private final List<Effect> effects = new ArrayList<>();
-    
+
     /** The padding applied in pixels to the top of the glyph rendered area */
     private int paddingTop;
     /** The padding applied in pixels to the left of the glyph rendered area */
@@ -107,19 +109,19 @@ public class UnicodeFont implements com.github.mathiewz.Font {
     private int paddingAdvanceY;
     /** The glyph to display for missing glyphs in code points */
     private Glyph missingGlyph;
-    
+
     /** The width of the glyph page generated */
     private int glyphPageWidth = 512;
     /** The height of the glyph page generated */
     private int glyphPageHeight = 512;
-    
+
     /** True if display list caching is turned on */
     private boolean displayListCaching = true;
     /** The based display list ID */
     private int baseDisplayListID = -1;
     /** The ID of the display list that has been around the longest time */
     private int eldestDisplayListID;
-    
+
     /** The map fo the display list generated and cached - modified to allow removal of the oldest entry */
     private final LinkedHashMap<String, DisplayList> displayLists = new LinkedHashMap<String, DisplayList>(DISPLAY_LIST_CACHE_SIZE, 1, true) {
         @Override
@@ -131,7 +133,7 @@ public class UnicodeFont implements com.github.mathiewz.Font {
             return size() > DISPLAY_LIST_CACHE_SIZE;
         }
     };
-    
+
     /**
      * Create a new unicode font based on a TTF file
      *
@@ -143,7 +145,7 @@ public class UnicodeFont implements com.github.mathiewz.Font {
     public UnicodeFont(String ttfFileRef, String hieroFileRef) {
         this(ttfFileRef, new HieroSettings(hieroFileRef));
     }
-    
+
     /**
      * Create a new unicode font based on a TTF file and a set of heiro configuration
      *
@@ -158,7 +160,7 @@ public class UnicodeFont implements com.github.mathiewz.Font {
         initializeFont(font, settings.getFontSize(), settings.isBold(), settings.isItalic());
         loadSettings(settings);
     }
-    
+
     /**
      * Create a new unicode font based on a TTF file alone
      *
@@ -175,7 +177,7 @@ public class UnicodeFont implements com.github.mathiewz.Font {
         this.ttfFileRef = ttfFileRef;
         initializeFont(createFont(ttfFileRef), size, bold, italic);
     }
-    
+
     /**
      * Creates a new UnicodeFont.
      *
@@ -187,7 +189,7 @@ public class UnicodeFont implements com.github.mathiewz.Font {
     public UnicodeFont(Font font, String hieroFileRef) {
         this(font, new HieroSettings(hieroFileRef));
     }
-    
+
     /**
      * Creates a new UnicodeFont.
      *
@@ -200,7 +202,7 @@ public class UnicodeFont implements com.github.mathiewz.Font {
         initializeFont(font, settings.getFontSize(), settings.isBold(), settings.isItalic());
         loadSettings(settings);
     }
-    
+
     /**
      * Creates a new UnicodeFont.
      *
@@ -210,7 +212,7 @@ public class UnicodeFont implements com.github.mathiewz.Font {
     public UnicodeFont(Font font) {
         initializeFont(font, font.getSize(), font.isBold(), font.isItalic());
     }
-    
+
     /**
      * Creates a new UnicodeFont.
      *
@@ -226,7 +228,7 @@ public class UnicodeFont implements com.github.mathiewz.Font {
     public UnicodeFont(Font font, int size, boolean bold, boolean italic) {
         initializeFont(font, size, bold, italic);
     }
-    
+
     /**
      * Initialise the font to be used based on configuration
      *
@@ -251,18 +253,18 @@ public class UnicodeFont implements com.github.mathiewz.Font {
         } catch (Exception ignored) {
         }
         font = baseFont.deriveFont(attributes);
-        
+
         FontMetrics metrics = GlyphPage.getScratchGraphics().getFontMetrics(font);
         ascent = metrics.getAscent();
         descent = metrics.getDescent();
         leading = metrics.getLeading();
-        
+
         // Determine width of space glyph (getGlyphPixelBounds gives a width of zero).
         char[] chars = " ".toCharArray();
         GlyphVector vector = font.layoutGlyphVector(GlyphPage.RENDER_CONTEXT, chars, 0, chars.length, Font.LAYOUT_LEFT_TO_RIGHT);
         spaceWidth = vector.getGlyphLogicalBounds(0).getBounds().width;
     }
-    
+
     /**
      * Load the hiero setting and configure the unicode font's rendering
      *
@@ -280,7 +282,7 @@ public class UnicodeFont implements com.github.mathiewz.Font {
         glyphPageHeight = settings.getGlyphPageHeight();
         effects.addAll(settings.getEffects());
     }
-    
+
     /**
      * Queues the glyphs in the specified codepoint range (inclusive) to be loaded. Note that the glyphs are not actually loaded
      * until {@link #loadGlyphs()} is called.
@@ -298,7 +300,7 @@ public class UnicodeFont implements com.github.mathiewz.Font {
             addGlyphs(new String(Character.toChars(codePoint)));
         }
     }
-    
+
     /**
      * Queues the glyphs in the specified text to be loaded. Note that the glyphs are not actually loaded until
      * {@link #loadGlyphs()} is called.
@@ -310,7 +312,7 @@ public class UnicodeFont implements com.github.mathiewz.Font {
         if (text == null) {
             throw new IllegalArgumentException("text cannot be null.");
         }
-        
+
         char[] chars = text.toCharArray();
         GlyphVector vector = font.layoutGlyphVector(GlyphPage.RENDER_CONTEXT, chars, 0, chars.length, Font.LAYOUT_LEFT_TO_RIGHT);
         for (int i = 0, n = vector.getNumGlyphs(); i < n; i++) {
@@ -319,7 +321,7 @@ public class UnicodeFont implements com.github.mathiewz.Font {
             getGlyph(vector.getGlyphCode(i), codePoint, bounds, vector, i);
         }
     }
-    
+
     /**
      * Queues the glyphs in the ASCII character set (codepoints 32 through 255) to be loaded. Note that the glyphs are not actually
      * loaded until {@link #loadGlyphs()} is called.
@@ -327,7 +329,7 @@ public class UnicodeFont implements com.github.mathiewz.Font {
     public void addAsciiGlyphs() {
         addGlyphs(32, 255);
     }
-    
+
     /**
      * Queues the glyphs in the NEHE character set (codepoints 32 through 128) to be loaded. Note that the glyphs are not actually
      * loaded until {@link #loadGlyphs()} is called.
@@ -335,7 +337,7 @@ public class UnicodeFont implements com.github.mathiewz.Font {
     public void addNeheGlyphs() {
         addGlyphs(32, 32 + 96);
     }
-    
+
     /**
      * Loads all queued glyphs to the backing textures. Glyphs that are typically displayed together should be added and loaded at
      * the same time so that they are stored on the same backing texture. This reduces the number of backing texture binds required
@@ -346,7 +348,7 @@ public class UnicodeFont implements com.github.mathiewz.Font {
     public boolean loadGlyphs() {
         return loadGlyphs(-1);
     }
-    
+
     /**
      * Loads up to the specified number of queued glyphs to the backing textures. This is typically called from the game loop to
      * load glyphs on the fly that were requested for display but have not yet been loaded.
@@ -359,21 +361,21 @@ public class UnicodeFont implements com.github.mathiewz.Font {
         if (queuedGlyphs.isEmpty()) {
             return false;
         }
-        
+
         if (effects.isEmpty()) {
             throw new IllegalStateException("The UnicodeFont must have at least one effect before any glyphs can be loaded.");
         }
-        
+
         for (Iterator<Glyph> iter = queuedGlyphs.iterator(); iter.hasNext();) {
             Glyph glyph = iter.next();
             int codePoint = glyph.getCodePoint();
-            
+
             // Don't load an image for a glyph with nothing to display.
             if (glyph.getWidth() == 0 || codePoint == ' ') {
                 iter.remove();
                 continue;
             }
-            
+
             // Only load the first missing glyph.
             if (glyph.isMissing()) {
                 if (missingGlyph != null) {
@@ -385,9 +387,9 @@ public class UnicodeFont implements com.github.mathiewz.Font {
                 missingGlyph = glyph;
             }
         }
-        
+
         Collections.sort(queuedGlyphs, heightComparator);
-        
+
         // Add to existing pages.
         for (GlyphPage glyphPage2 : glyphPages) {
             GlyphPage glyphPage = glyphPage2;
@@ -396,7 +398,7 @@ public class UnicodeFont implements com.github.mathiewz.Font {
                 return true;
             }
         }
-        
+
         // Add to new pages.
         while (!queuedGlyphs.isEmpty()) {
             GlyphPage glyphPage = new GlyphPage(this, glyphPageWidth, glyphPageHeight);
@@ -406,10 +408,10 @@ public class UnicodeFont implements com.github.mathiewz.Font {
                 return true;
             }
         }
-        
+
         return true;
     }
-    
+
     /**
      * Clears all loaded and queued glyphs.
      */
@@ -417,7 +419,7 @@ public class UnicodeFont implements com.github.mathiewz.Font {
         for (int i = 0; i < PAGES; i++) {
             glyphs[i] = null;
         }
-        
+
         for (GlyphPage glyphPage : glyphPages) {
             GlyphPage page = glyphPage;
             try {
@@ -426,16 +428,16 @@ public class UnicodeFont implements com.github.mathiewz.Font {
             }
         }
         glyphPages.clear();
-        
+
         if (baseDisplayListID != -1) {
             GL.glDeleteLists(baseDisplayListID, displayLists.size());
             baseDisplayListID = -1;
         }
-        
+
         queuedGlyphs.clear();
         missingGlyph = null;
     }
-    
+
     /**
      * Releases all resources used by this UnicodeFont. This method should be called when this UnicodeFont instance is no longer
      * needed.
@@ -444,7 +446,7 @@ public class UnicodeFont implements com.github.mathiewz.Font {
         // The destroy() method is just to provide a consistent API for releasing resources.
         clearGlyphs();
     }
-    
+
     /**
      * Identical to {@link #drawString(float, float, String, Color, int, int)} but returns a
      * DisplayList which provides access to the width and height of the text drawn.
@@ -473,15 +475,15 @@ public class UnicodeFont implements com.github.mathiewz.Font {
         if (color == null) {
             throw new IllegalArgumentException("color cannot be null.");
         }
-        
+
         x -= paddingLeft;
         y -= paddingTop;
-        
+
         String displayListKey = text.substring(startIndex, endIndex);
-        
+
         color.bind();
         TextureImpl.bindNone();
-        
+
         DisplayList displayList = null;
         if (displayListCaching && queuedGlyphs.isEmpty()) {
             if (baseDisplayListID == -1) {
@@ -516,16 +518,16 @@ public class UnicodeFont implements com.github.mathiewz.Font {
             }
             displayLists.put(displayListKey, displayList);
         }
-        
+
         GL.glTranslatef(x, y, 0);
-        
+
         if (displayList != null) {
-            GL.glNewList(displayList.id, SGL.GL_COMPILE_AND_EXECUTE);
+            GL.glNewList(displayList.id, GL11.GL_COMPILE_AND_EXECUTE);
         }
-        
+
         char[] chars = text.substring(0, endIndex).toCharArray();
         GlyphVector vector = font.layoutGlyphVector(GlyphPage.RENDER_CONTEXT, chars, 0, chars.length, Font.LAYOUT_LEFT_TO_RIGHT);
-        
+
         int maxWidth = 0, maxLogicWidth = 0, totalHeight = 0, lines = 0;
         int extraX = 0, extraY = ascent;
         boolean startNewLine = false;
@@ -538,18 +540,18 @@ public class UnicodeFont implements com.github.mathiewz.Font {
             if (charIndex > endIndex) {
                 break;
             }
-            
+
             int codePoint = text.codePointAt(charIndex);
-            
+
             Rectangle bounds = getGlyphBounds(vector, glyphIndex, codePoint);
             Rectangle boundsLogic = vector.getLogicalBounds().getBounds();
             Glyph glyph = getGlyph(vector.getGlyphCode(glyphIndex), codePoint, bounds, vector, glyphIndex);
-            
+
             if (startNewLine && codePoint != '\n') {
                 extraX = -bounds.x;
                 startNewLine = false;
             }
-            
+
             Image image = glyph.getImage();
             if (image == null && missingGlyph != null && glyph.isMissing()) {
                 image = missingGlyph.getImage();
@@ -563,19 +565,19 @@ public class UnicodeFont implements com.github.mathiewz.Font {
                 }
                 if (lastBind == null) {
                     texture.bind();
-                    GL.glBegin(SGL.GL_QUADS);
+                    GL.glBegin(GL11.GL_QUADS);
                     lastBind = texture;
                 }
                 image.drawEmbedded(bounds.x + extraX, bounds.y + extraY, image.getWidth(), image.getHeight());
             }
-            
+
             if (glyphIndex >= 0) {
                 extraX += paddingRight + paddingLeft + paddingAdvanceX;
             }
             maxWidth = Math.max(maxWidth, bounds.x + extraX + bounds.width);
             maxLogicWidth = Math.max(maxLogicWidth, boundsLogic.x + extraX + boundsLogic.width);
             totalHeight = Math.max(totalHeight, ascent + bounds.y + bounds.height);
-            
+
             if (codePoint == '\n') {
                 startNewLine = true; // Mac gives -1 for bounds.x of '\n', so use the bounds.x of the next glyph.
                 extraY += getLineHeight();
@@ -586,7 +588,7 @@ public class UnicodeFont implements com.github.mathiewz.Font {
         if (lastBind != null) {
             GL.glEnd();
         }
-        
+
         if (displayList != null) {
             GL.glEndList();
             // Invalidate the display list if it had glyphs that need to be loaded.
@@ -594,9 +596,9 @@ public class UnicodeFont implements com.github.mathiewz.Font {
                 displayList.invalid = true;
             }
         }
-        
+
         GL.glTranslatef(-x, -y, 0);
-        
+
         if (displayList == null) {
             displayList = new DisplayList();
         }
@@ -605,22 +607,22 @@ public class UnicodeFont implements com.github.mathiewz.Font {
         displayList.height = (short) (lines * getLineHeight() + totalHeight);
         return displayList;
     }
-    
+
     @Override
     public void drawString(float x, float y, String text, Color color, int startIndex, int endIndex) {
         drawDisplayList(x, y, text, color, startIndex, endIndex);
     }
-    
+
     @Override
     public void drawString(float x, float y, String text) {
         drawString(x, y, text, Color.white);
     }
-    
+
     @Override
     public void drawString(float x, float y, String text, Color col) {
         drawString(x, y, text, col, 0, text.length());
     }
-    
+
     /**
      * Returns the glyph for the specified codePoint. If the glyph does not exist yet,
      * it is created and queued to be loaded.
@@ -664,7 +666,7 @@ public class UnicodeFont implements com.github.mathiewz.Font {
         queuedGlyphs.add(glyph);
         return glyph;
     }
-    
+
     /**
      * Returns the bounds of the specified glyph.\
      *
@@ -682,14 +684,14 @@ public class UnicodeFont implements com.github.mathiewz.Font {
         }
         return bounds;
     }
-    
+
     /**
      * Returns the width of the space character.
      */
     public int getSpaceWidth() {
         return spaceWidth;
     }
-    
+
     /**
      * @see com.github.mathiewz.Font#getWidth(java.lang.String)
      */
@@ -701,19 +703,19 @@ public class UnicodeFont implements com.github.mathiewz.Font {
         if (text.length() == 0) {
             return 0;
         }
-        
+
         if (displayListCaching) {
             DisplayList displayList = displayLists.get(text);
             if (displayList != null) {
                 return displayList.width;
             }
         }
-        
+
         int width = findWidth(text, false);
-        
+
         return width;
     }
-    
+
     /**
      * @param text
      *            the string to find the width of
@@ -724,32 +726,32 @@ public class UnicodeFont implements com.github.mathiewz.Font {
     private int findWidth(String text, boolean logical) {
         char[] chars = text.toCharArray();
         GlyphVector vector = font.layoutGlyphVector(GlyphPage.RENDER_CONTEXT, chars, 0, chars.length, Font.LAYOUT_LEFT_TO_RIGHT);
-        
+
         int width = 0;
         int extraX = 0;
         boolean startNewLine = false;
         for (int glyphIndex = 0, n = vector.getNumGlyphs(); glyphIndex < n; glyphIndex++) {
             int charIndex = vector.getGlyphCharIndex(glyphIndex);
             int codePoint = text.codePointAt(charIndex);
-            
+
             Rectangle bounds = logical ? vector.getLogicalBounds().getBounds() : getGlyphBounds(vector, glyphIndex, codePoint);
-            
+
             if (startNewLine && codePoint != '\n') {
                 extraX = -bounds.x;
             }
-            
+
             if (glyphIndex > 0) {
                 extraX += paddingLeft + paddingRight + paddingAdvanceX;
             }
             width = Math.max(width, bounds.x + extraX + bounds.width);
-            
+
             if (codePoint == '\n') {
                 startNewLine = true;
             }
         }
         return width;
     }
-    
+
     /**
      * @see com.github.mathiewz.Font#getLogicalWidth(String)
      */
@@ -761,19 +763,19 @@ public class UnicodeFont implements com.github.mathiewz.Font {
         if (text.length() == 0) {
             return 0;
         }
-        
+
         if (displayListCaching) {
             DisplayList displayList = displayLists.get(text);
             if (displayList != null) {
                 return displayList.logicalWidth;
             }
         }
-        
+
         int width = findWidth(text, true);
-        
+
         return width;
     }
-    
+
     /**
      * @see com.github.mathiewz.Font#getHeight(java.lang.String)
      */
@@ -785,17 +787,17 @@ public class UnicodeFont implements com.github.mathiewz.Font {
         if (text.length() == 0) {
             return 0;
         }
-        
+
         if (displayListCaching) {
             DisplayList displayList = displayLists.get(text);
             if (displayList != null) {
                 return displayList.height;
             }
         }
-        
+
         char[] chars = text.toCharArray();
         GlyphVector vector = font.layoutGlyphVector(GlyphPage.RENDER_CONTEXT, chars, 0, chars.length, Font.LAYOUT_LEFT_TO_RIGHT);
-        
+
         int lines = 0, height = 0;
         for (int i = 0, n = vector.getNumGlyphs(); i < n; i++) {
             int charIndex = vector.getGlyphCharIndex(i);
@@ -804,9 +806,9 @@ public class UnicodeFont implements com.github.mathiewz.Font {
                 continue;
             }
             Rectangle bounds = getGlyphBounds(vector, i, codePoint);
-            
+
             height = Math.max(height, ascent + bounds.y + bounds.height);
-            
+
             if (codePoint == '\n') {
                 lines++;
                 height = 0;
@@ -814,7 +816,7 @@ public class UnicodeFont implements com.github.mathiewz.Font {
         }
         return lines * getLineHeight() + height;
     }
-    
+
     /**
      * Returns the distance from the y drawing location to the top most pixel of the
      * specified text.
@@ -827,7 +829,7 @@ public class UnicodeFont implements com.github.mathiewz.Font {
         if (text == null) {
             throw new IllegalArgumentException("text cannot be null.");
         }
-        
+
         DisplayList displayList = null;
         if (displayListCaching) {
             displayList = displayLists.get(text);
@@ -835,7 +837,7 @@ public class UnicodeFont implements com.github.mathiewz.Font {
                 return displayList.yOffset.intValue();
             }
         }
-        
+
         int index = text.indexOf('\n');
         if (index != -1) {
             text = text.substring(0, index);
@@ -843,14 +845,14 @@ public class UnicodeFont implements com.github.mathiewz.Font {
         char[] chars = text.toCharArray();
         GlyphVector vector = font.layoutGlyphVector(GlyphPage.RENDER_CONTEXT, chars, 0, chars.length, Font.LAYOUT_LEFT_TO_RIGHT);
         int yOffset = ascent + vector.getPixelBounds(null, 0, 0).y;
-        
+
         if (displayList != null) {
             displayList.yOffset = new Short((short) yOffset);
         }
-        
+
         return yOffset;
     }
-    
+
     /**
      * Returns the TrueTypeFont for this UnicodeFont.
      *
@@ -859,7 +861,7 @@ public class UnicodeFont implements com.github.mathiewz.Font {
     public Font getFont() {
         return font;
     }
-    
+
     /**
      * Returns the padding above a glyph on the GlyphPage to allow for effects to be drawn.
      *
@@ -868,7 +870,7 @@ public class UnicodeFont implements com.github.mathiewz.Font {
     public int getPaddingTop() {
         return paddingTop;
     }
-    
+
     /**
      * Sets the padding above a glyph on the GlyphPage to allow for effects to be drawn.
      *
@@ -878,7 +880,7 @@ public class UnicodeFont implements com.github.mathiewz.Font {
     public void setPaddingTop(int paddingTop) {
         this.paddingTop = paddingTop;
     }
-    
+
     /**
      * Returns the padding to the left of a glyph on the GlyphPage to allow for effects to be drawn.
      *
@@ -887,7 +889,7 @@ public class UnicodeFont implements com.github.mathiewz.Font {
     public int getPaddingLeft() {
         return paddingLeft;
     }
-    
+
     /**
      * Sets the padding to the left of a glyph on the GlyphPage to allow for effects to be drawn.
      *
@@ -897,7 +899,7 @@ public class UnicodeFont implements com.github.mathiewz.Font {
     public void setPaddingLeft(int paddingLeft) {
         this.paddingLeft = paddingLeft;
     }
-    
+
     /**
      * Returns the padding below a glyph on the GlyphPage to allow for effects to be drawn.
      *
@@ -906,7 +908,7 @@ public class UnicodeFont implements com.github.mathiewz.Font {
     public int getPaddingBottom() {
         return paddingBottom;
     }
-    
+
     /**
      * Sets the padding below a glyph on the GlyphPage to allow for effects to be drawn.
      *
@@ -916,7 +918,7 @@ public class UnicodeFont implements com.github.mathiewz.Font {
     public void setPaddingBottom(int paddingBottom) {
         this.paddingBottom = paddingBottom;
     }
-    
+
     /**
      * Returns the padding to the right of a glyph on the GlyphPage to allow for effects to be drawn.
      *
@@ -925,7 +927,7 @@ public class UnicodeFont implements com.github.mathiewz.Font {
     public int getPaddingRight() {
         return paddingRight;
     }
-    
+
     /**
      * Sets the padding to the right of a glyph on the GlyphPage to allow for effects to be drawn.
      *
@@ -935,7 +937,7 @@ public class UnicodeFont implements com.github.mathiewz.Font {
     public void setPaddingRight(int paddingRight) {
         this.paddingRight = paddingRight;
     }
-    
+
     /**
      * Gets the additional amount to offset glyphs on the x axis.
      *
@@ -944,7 +946,7 @@ public class UnicodeFont implements com.github.mathiewz.Font {
     public int getPaddingAdvanceX() {
         return paddingAdvanceX;
     }
-    
+
     /**
      * Sets the additional amount to offset glyphs on the x axis. This is typically set to a negative number when left or right
      * padding is used so that glyphs are not spaced too far apart.
@@ -955,7 +957,7 @@ public class UnicodeFont implements com.github.mathiewz.Font {
     public void setPaddingAdvanceX(int paddingAdvanceX) {
         this.paddingAdvanceX = paddingAdvanceX;
     }
-    
+
     /**
      * Gets the additional amount to offset a line of text on the y axis.
      *
@@ -964,7 +966,7 @@ public class UnicodeFont implements com.github.mathiewz.Font {
     public int getPaddingAdvanceY() {
         return paddingAdvanceY;
     }
-    
+
     /**
      * Sets the additional amount to offset a line of text on the y axis. This is typically set to a negative number when top or
      * bottom padding is used so that lines of text are not spaced too far apart.
@@ -975,7 +977,7 @@ public class UnicodeFont implements com.github.mathiewz.Font {
     public void setPaddingAdvanceY(int paddingAdvanceY) {
         this.paddingAdvanceY = paddingAdvanceY;
     }
-    
+
     /**
      * Returns the distance from one line of text to the next. This is the sum of the descent, ascent, leading, padding top,
      * padding bottom, and padding advance y. To change the line height, use {@link #setPaddingAdvanceY(int)}.
@@ -984,7 +986,7 @@ public class UnicodeFont implements com.github.mathiewz.Font {
     public int getLineHeight() {
         return descent + ascent + leading + paddingTop + paddingBottom + paddingAdvanceY;
     }
-    
+
     /**
      * Gets the distance from the baseline to the y drawing location.
      *
@@ -993,7 +995,7 @@ public class UnicodeFont implements com.github.mathiewz.Font {
     public int getAscent() {
         return ascent;
     }
-    
+
     /**
      * Gets the distance from the baseline to the bottom of most alphanumeric characters
      * with descenders.
@@ -1003,7 +1005,7 @@ public class UnicodeFont implements com.github.mathiewz.Font {
     public int getDescent() {
         return descent;
     }
-    
+
     /**
      * Gets the extra distance between the descent of one line of text to the ascent of the next.
      *
@@ -1012,7 +1014,7 @@ public class UnicodeFont implements com.github.mathiewz.Font {
     public int getLeading() {
         return leading;
     }
-    
+
     /**
      * Returns the width of the backing textures.
      *
@@ -1021,7 +1023,7 @@ public class UnicodeFont implements com.github.mathiewz.Font {
     public int getGlyphPageWidth() {
         return glyphPageWidth;
     }
-    
+
     /**
      * Sets the width of the backing textures. Default is 512.
      *
@@ -1031,7 +1033,7 @@ public class UnicodeFont implements com.github.mathiewz.Font {
     public void setGlyphPageWidth(int glyphPageWidth) {
         this.glyphPageWidth = glyphPageWidth;
     }
-    
+
     /**
      * Returns the height of the backing textures.
      *
@@ -1040,7 +1042,7 @@ public class UnicodeFont implements com.github.mathiewz.Font {
     public int getGlyphPageHeight() {
         return glyphPageHeight;
     }
-    
+
     /**
      * Sets the height of the backing textures. Default is 512.
      *
@@ -1050,7 +1052,7 @@ public class UnicodeFont implements com.github.mathiewz.Font {
     public void setGlyphPageHeight(int glyphPageHeight) {
         this.glyphPageHeight = glyphPageHeight;
     }
-    
+
     /**
      * Returns the GlyphPages for this UnicodeFont.
      *
@@ -1059,7 +1061,7 @@ public class UnicodeFont implements com.github.mathiewz.Font {
     public List<GlyphPage> getGlyphPages() {
         return glyphPages;
     }
-    
+
     /**
      * Returns a list of {@link com.github.mathiewz.font.effects.Effect}s that will be applied
      * to the glyphs.
@@ -1069,7 +1071,7 @@ public class UnicodeFont implements com.github.mathiewz.Font {
     public List<Effect> getEffects() {
         return effects;
     }
-    
+
     /**
      * Returns true if this UnicodeFont caches the glyph drawing instructions to
      * improve performance.
@@ -1079,7 +1081,7 @@ public class UnicodeFont implements com.github.mathiewz.Font {
     public boolean isCaching() {
         return displayListCaching;
     }
-    
+
     /**
      * Sets if this UnicodeFont caches the glyph drawing instructions to improve performance.
      * Default is true. Text rendering is very slow without display list caching.
@@ -1090,7 +1092,7 @@ public class UnicodeFont implements com.github.mathiewz.Font {
     public void setDisplayListCaching(boolean displayListCaching) {
         this.displayListCaching = displayListCaching;
     }
-    
+
     /**
      * Returns the path to the TTF file for this UnicodeFont, or null. If this UnicodeFont was created without specifying the TTF
      * file, it will try to determine the path using Sun classes. If this fails, null is returned.
@@ -1116,7 +1118,7 @@ public class UnicodeFont implements com.github.mathiewz.Font {
         }
         return ttfFileRef;
     }
-    
+
     /**
      * A simple descriptor for display lists cached within this font
      */
@@ -1127,7 +1129,7 @@ public class UnicodeFont implements com.github.mathiewz.Font {
         int id;
         /** The vertical offset to the top of this display list */
         Short yOffset;
-        
+
         /** The width of rendered text in the list */
         public short width;
         /** The logical width of the text in the list */
@@ -1136,7 +1138,7 @@ public class UnicodeFont implements com.github.mathiewz.Font {
         public short height;
         /** Application data stored in the list */
         public Object userData;
-        
+
         DisplayList() {
         }
     }

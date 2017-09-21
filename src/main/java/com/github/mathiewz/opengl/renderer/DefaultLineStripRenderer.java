@@ -1,5 +1,7 @@
 package com.github.mathiewz.opengl.renderer;
 
+import org.lwjgl.opengl.GL11;
+
 /**
  * The default version of the renderer relies of GL calls to do everything.
  * Unfortunately this is driver dependent and often implemented inconsistantly
@@ -24,9 +26,9 @@ public class DefaultLineStripRenderer implements LineStripRenderer {
     @Override
     public void setAntiAlias(boolean antialias) {
         if (antialias) {
-            GL.glEnable(SGL.GL_LINE_SMOOTH);
+            GL.glEnable(GL11.GL_LINE_SMOOTH);
         } else {
-            GL.glDisable(SGL.GL_LINE_SMOOTH);
+            GL.glDisable(GL11.GL_LINE_SMOOTH);
         }
     }
 
@@ -43,7 +45,7 @@ public class DefaultLineStripRenderer implements LineStripRenderer {
      */
     @Override
     public void start() {
-        GL.glBegin(SGL.GL_LINE_STRIP);
+        GL.glBegin(GL11.GL_LINE_STRIP);
     }
 
     /**

@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import org.lwjgl.opengl.GL11;
+
 import com.github.mathiewz.Color;
 import com.github.mathiewz.Image;
 import com.github.mathiewz.SlickException;
@@ -419,10 +421,10 @@ public class ParticleSystem {
         GL.glTranslatef(x, y, 0);
         
         if (blendingMode == BLEND_ADDITIVE) {
-            GL.glBlendFunc(SGL.GL_SRC_ALPHA, SGL.GL_ONE);
+            GL.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE);
         }
         if (usePoints()) {
-            GL.glEnable(SGL.GL_POINT_SMOOTH);
+            GL.glEnable(GL11.GL_POINT_SMOOTH);
             TextureImpl.bindNone();
         }
         
@@ -437,7 +439,7 @@ public class ParticleSystem {
             
             // check for additive override and enable when set
             if (emitter.useAdditive()) {
-                GL.glBlendFunc(SGL.GL_SRC_ALPHA, SGL.GL_ONE);
+                GL.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE);
             }
             
             // now get the particle pool for this emitter and render all particles that are in use
@@ -463,15 +465,15 @@ public class ParticleSystem {
             
             // reset additive blend mode
             if (emitter.useAdditive()) {
-                GL.glBlendFunc(SGL.GL_SRC_ALPHA, SGL.GL_ONE_MINUS_SRC_ALPHA);
+                GL.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
             }
         }
         
         if (usePoints()) {
-            GL.glDisable(SGL.GL_POINT_SMOOTH);
+            GL.glDisable(GL11.GL_POINT_SMOOTH);
         }
         if (blendingMode == BLEND_ADDITIVE) {
-            GL.glBlendFunc(SGL.GL_SRC_ALPHA, SGL.GL_ONE_MINUS_SRC_ALPHA);
+            GL.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         }
         
         Color.white.bind();

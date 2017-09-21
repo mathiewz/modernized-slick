@@ -31,7 +31,7 @@ import com.github.mathiewz.util.ResourceLoader;
 public class TiledMap {
     /** Indicates if we're running on a headless system */
     private static boolean headless;
-    
+
     /** The width of the map */
     protected int width;
     /** The height of the map */
@@ -40,31 +40,31 @@ public class TiledMap {
     protected int tileWidth;
     /** The height of the tiles used on the map */
     protected int tileHeight;
-    
+
     /** The location prefix where we can find tileset images */
     protected String tilesLocation;
-    
+
     /** the properties of the map */
     protected Properties props;
-    
+
     /** The list of tilesets defined in the map */
     protected ArrayList<TileSet> tileSets = new ArrayList<>();
     /** The list of layers defined in the map */
     protected ArrayList<Layer> layers = new ArrayList<>();
     /** The list of object-groups defined in the map */
     protected ArrayList<ObjectGroup> objectGroups = new ArrayList<>();
-    
+
     /** Indicates a orthogonal map */
     protected static final int ORTHOGONAL = 1;
     /** Indicates an isometric map */
     protected static final int ISOMETRIC = 2;
-    
+
     /** The orientation of this map */
     protected int orientation;
-    
+
     /** True if we want to load tilesets - including their image data */
     private boolean loadTileSets = true;
-    
+
     /**
      * Create a new tile map based on a given TMX file
      *
@@ -74,7 +74,7 @@ public class TiledMap {
     public TiledMap(String ref) {
         this(ref, true);
     }
-    
+
     /**
      * Create a new tile map based on a given TMX file
      *
@@ -88,7 +88,7 @@ public class TiledMap {
         ref = ref.replace('\\', '/');
         load(ResourceLoader.getResourceAsStream(ref), ref.substring(0, ref.lastIndexOf("/")));
     }
-    
+
     /**
      * Create a new tile map based on a given TMX file
      *
@@ -101,7 +101,7 @@ public class TiledMap {
     public TiledMap(String ref, String tileSetsLocation) {
         load(ResourceLoader.getResourceAsStream(ref), tileSetsLocation);
     }
-    
+
     /**
      * Load a tile map from an arbitary input stream
      *
@@ -111,7 +111,7 @@ public class TiledMap {
     public TiledMap(InputStream in) {
         load(in, "");
     }
-    
+
     /**
      * Load a tile map from an arbitary input stream
      *
@@ -123,7 +123,7 @@ public class TiledMap {
     public TiledMap(InputStream in, String tileSetsLocation) {
         load(in, tileSetsLocation);
     }
-    
+
     /**
      * Get the location of the tile images specified
      *
@@ -133,7 +133,7 @@ public class TiledMap {
     public String getTilesLocation() {
         return tilesLocation;
     }
-    
+
     /**
      * Get the index of the layer with given name
      *
@@ -144,15 +144,15 @@ public class TiledMap {
     public int getLayerIndex(String name) {
         for (int i = 0; i < layers.size(); i++) {
             Layer layer = layers.get(i);
-            
+
             if (layer.name.equals(name)) {
                 return i;
             }
         }
-        
+
         return -1;
     }
-    
+
     /**
      * Gets the Image used to draw the tile at the given x and y coordinates.
      *
@@ -168,20 +168,20 @@ public class TiledMap {
      */
     public Image getTileImage(int x, int y, int layerIndex) {
         Layer layer = layers.get(layerIndex);
-        
+
         int tileSetIndex = layer.data[x][y][0];
         if (tileSetIndex >= 0 && tileSetIndex < tileSets.size()) {
             TileSet tileSet = tileSets.get(tileSetIndex);
-            
+
             int sheetX = tileSet.getTileX(layer.data[x][y][1]);
             int sheetY = tileSet.getTileY(layer.data[x][y][1]);
-            
+
             return tileSet.tiles.getSprite(sheetX, sheetY);
         }
-        
+
         return null;
     }
-    
+
     /**
      * Get the width of the map
      *
@@ -190,7 +190,7 @@ public class TiledMap {
     public int getWidth() {
         return width;
     }
-    
+
     /**
      * Get the height of the map
      *
@@ -199,7 +199,7 @@ public class TiledMap {
     public int getHeight() {
         return height;
     }
-    
+
     /**
      * Get the height of a single tile
      *
@@ -208,7 +208,7 @@ public class TiledMap {
     public int getTileHeight() {
         return tileHeight;
     }
-    
+
     /**
      * Get the width of a single tile
      *
@@ -217,7 +217,7 @@ public class TiledMap {
     public int getTileWidth() {
         return tileWidth;
     }
-    
+
     /**
      * Get the global ID of a tile at specified location in the map
      *
@@ -233,7 +233,7 @@ public class TiledMap {
         Layer layer = layers.get(layerIndex);
         return layer.getTileID(x, y);
     }
-    
+
     /**
      * Set the global ID of a tile at specified location in the map
      *
@@ -250,7 +250,7 @@ public class TiledMap {
         Layer layer = layers.get(layerIndex);
         layer.setTileID(x, y, tileid);
     }
-    
+
     /**
      * Get a property given to the map. Note that this method will not perform
      * well and should not be used as part of the default code path in the game
@@ -269,7 +269,7 @@ public class TiledMap {
         }
         return props.getProperty(propertyName, def);
     }
-    
+
     /**
      * Get a property given to a particular layer. Note that this method will
      * not perform well and should not be used as part of the default code path
@@ -291,7 +291,7 @@ public class TiledMap {
         }
         return layer.props.getProperty(propertyName, def);
     }
-    
+
     /**
      * Get a propety given to a particular tile. Note that this method will not
      * perform well and should not be used as part of the default code path in
@@ -310,16 +310,16 @@ public class TiledMap {
         if (tileID == 0) {
             return def;
         }
-        
+
         TileSet set = findTileSet(tileID);
-        
+
         Properties props = set.getProperties(tileID);
         if (props == null) {
             return def;
         }
         return props.getProperty(propertyName, def);
     }
-    
+
     /**
      * Render the whole tile map at a given location
      *
@@ -331,7 +331,7 @@ public class TiledMap {
     public void render(int x, int y) {
         render(x, y, 0, 0, width, height, false);
     }
-    
+
     /**
      * Render a single layer from the map
      *
@@ -345,7 +345,7 @@ public class TiledMap {
     public void render(int x, int y, int layer) {
         render(x, y, 0, 0, getWidth(), getHeight(), layer, false);
     }
-    
+
     /**
      * Render a section of the tile map
      *
@@ -365,7 +365,7 @@ public class TiledMap {
     public void render(int x, int y, int sx, int sy, int width, int height) {
         render(x, y, sx, sy, width, height, false);
     }
-    
+
     /**
      * Render a section of the tile map
      *
@@ -390,7 +390,7 @@ public class TiledMap {
      */
     public void render(int x, int y, int sx, int sy, int width, int height, int l, boolean lineByLine) {
         Layer layer = layers.get(l);
-        
+
         switch (orientation) {
             case ORTHOGONAL:
                 for (int ty = 0; ty < height; ty++) {
@@ -404,7 +404,7 @@ public class TiledMap {
                 // log error or something
         }
     }
-    
+
     /**
      * Render a section of the tile map
      *
@@ -442,7 +442,7 @@ public class TiledMap {
                 // log error or something
         }
     }
-    
+
     /**
      * Render of isometric map renders.
      *
@@ -475,43 +475,43 @@ public class TiledMap {
             drawLayers = new ArrayList<>();
             drawLayers.add(layer);
         }
-        
+
         int maxCount = width * height;
         int allCount = 0;
-        
+
         boolean allProcessed = false;
-        
+
         int initialLineX = x;
         int initialLineY = y;
-        
+
         int startLineTileX = 0;
         int startLineTileY = 0;
         while (!allProcessed) {
-            
+
             int currentTileX = startLineTileX;
             int currentTileY = startLineTileY;
             int currentLineX = initialLineX;
-            
+
             int min = 0;
             if (height > width) {
                 min = startLineTileY < width - 1 ? startLineTileY : width - currentTileX < height ? width - currentTileX - 1 : width - 1;
             } else {
                 min = startLineTileY < height - 1 ? startLineTileY : width - currentTileX < height ? width - currentTileX - 1 : height - 1;
             }
-            
+
             for (int burner = 0; burner <= min; currentTileX++, currentTileY--, burner++) {
                 for (int layerIdx = 0; layerIdx < drawLayers.size(); layerIdx++) {
                     Layer currentLayer = drawLayers.get(layerIdx);
                     currentLayer.render(currentLineX, initialLineY, currentTileX, currentTileY, 1, 0, lineByLine, tileWidth, tileHeight);
                 }
                 currentLineX += tileWidth;
-                
+
                 allCount++;
             }
-            
+
             // System.out.println("Line : " + counter++ + " - " + count +
             // "allcount : " + allCount);
-            
+
             if (startLineTileY < height - 1) {
                 startLineTileY += 1;
                 initialLineX -= tileWidth / 2;
@@ -521,13 +521,13 @@ public class TiledMap {
                 initialLineX += tileWidth / 2;
                 initialLineY += tileHeight / 2;
             }
-            
+
             if (allCount >= maxCount) {
                 allProcessed = true;
             }
         }
     }
-    
+
     /**
      * Retrieve a count of the number of layers available
      *
@@ -536,7 +536,7 @@ public class TiledMap {
     public int getLayerCount() {
         return layers.size();
     }
-    
+
     /**
      * Save parser for strings to ints
      *
@@ -551,7 +551,7 @@ public class TiledMap {
             return 0;
         }
     }
-    
+
     /**
      * Load a TilED map
      *
@@ -562,27 +562,27 @@ public class TiledMap {
      */
     private void load(InputStream in, String tileSetsLocation) {
         tilesLocation = tileSetsLocation;
-        
+
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             factory.setValidating(false);
             DocumentBuilder builder = factory.newDocumentBuilder();
             builder.setEntityResolver((publicId, systemId) -> new InputSource(new ByteArrayInputStream(new byte[0])));
-            
+
             Document doc = builder.parse(in);
             Element docElement = doc.getDocumentElement();
-            
+
             if (docElement.getAttribute("orientation").equals("orthogonal")) {
                 orientation = ORTHOGONAL;
             } else {
                 orientation = ISOMETRIC;
             }
-            
+
             width = parseInt(docElement.getAttribute("width"));
             height = parseInt(docElement.getAttribute("height"));
             tileWidth = parseInt(docElement.getAttribute("tilewidth"));
             tileHeight = parseInt(docElement.getAttribute("tileheight"));
-            
+
             // now read the map properties
             Element propsElement = (Element) docElement.getElementsByTagName("properties").item(0);
             if (propsElement != null) {
@@ -591,51 +591,51 @@ public class TiledMap {
                     props = new Properties();
                     for (int p = 0; p < properties.getLength(); p++) {
                         Element propElement = (Element) properties.item(p);
-                        
+
                         String name = propElement.getAttribute("name");
                         String value = propElement.getAttribute("value");
                         props.setProperty(name, value);
                     }
                 }
             }
-            
+
             if (loadTileSets) {
                 TileSet tileSet = null;
                 TileSet lastSet = null;
-                
+
                 NodeList setNodes = docElement.getElementsByTagName("tileset");
                 for (int i = 0; i < setNodes.getLength(); i++) {
                     Element current = (Element) setNodes.item(i);
-                    
+
                     tileSet = new TileSet(this, current, !headless);
                     tileSet.index = i;
-                    
+
                     if (lastSet != null) {
                         lastSet.setLimit(tileSet.firstGID - 1);
                     }
                     lastSet = tileSet;
-                    
+
                     tileSets.add(tileSet);
                 }
             }
-            
+
             NodeList layerNodes = docElement.getElementsByTagName("layer");
             for (int i = 0; i < layerNodes.getLength(); i++) {
                 Element current = (Element) layerNodes.item(i);
                 Layer layer = new Layer(this, current);
                 layer.index = i;
-                
+
                 layers.add(layer);
             }
-            
+
             // acquire object-groups
             NodeList objectGroupNodes = docElement.getElementsByTagName("objectgroup");
-            
+
             for (int i = 0; i < objectGroupNodes.getLength(); i++) {
                 Element current = (Element) objectGroupNodes.item(i);
                 ObjectGroup objectGroup = new ObjectGroup(current);
                 objectGroup.index = i;
-                
+
                 objectGroups.add(objectGroup);
             }
         } catch (Exception e) {
@@ -643,7 +643,7 @@ public class TiledMap {
             throw new SlickException("Failed to parse tilemap", e);
         }
     }
-    
+
     /**
      * Retrieve the number of tilesets available in this map
      *
@@ -652,7 +652,7 @@ public class TiledMap {
     public int getTileSetCount() {
         return tileSets.size();
     }
-    
+
     /**
      * Get a tileset at a particular index in the list of sets for this map
      *
@@ -663,7 +663,7 @@ public class TiledMap {
     public TileSet getTileSet(int index) {
         return tileSets.get(index);
     }
-    
+
     /**
      * Get a tileset by a given global ID
      *
@@ -674,15 +674,15 @@ public class TiledMap {
     public TileSet getTileSetByGID(int gid) {
         for (int i = 0; i < tileSets.size(); i++) {
             TileSet set = tileSets.get(i);
-            
+
             if (set.contains(gid)) {
                 return set;
             }
         }
-        
+
         return null;
     }
-    
+
     /**
      * Find a tile for a given global tile id
      *
@@ -694,29 +694,29 @@ public class TiledMap {
     public TileSet findTileSet(int gid) {
         for (int i = 0; i < tileSets.size(); i++) {
             TileSet set = tileSets.get(i);
-            
+
             if (set.contains(gid)) {
                 return set;
             }
         }
-        
+
         return null;
     }
-    
+
     /**
      * Overrideable to allow other sprites to be rendered between lines of the
      * map
      *
      * @param visualY
-     *            The visual Y coordinate, i.e. 0->height
+     *            The visual Y coordinate, i.e. 0 to height
      * @param mapY
-     *            The map Y coordinate, i.e. y->y+height
+     *            The map Y coordinate, i.e. y to y+height
      * @param layer
      *            The layer being rendered
      */
     protected void renderedLine(int visualY, int mapY, int layer) {
     }
-    
+
     /**
      * Returns the number of object-groups defined in the map.
      *
@@ -725,7 +725,7 @@ public class TiledMap {
     public int getObjectGroupCount() {
         return objectGroups.size();
     }
-    
+
     /**
      * Returns the number of objects of a specific object-group.
      *
@@ -741,7 +741,7 @@ public class TiledMap {
         }
         return -1;
     }
-    
+
     /**
      * Return the name of a specific object from a specific group.
      *
@@ -761,7 +761,7 @@ public class TiledMap {
         }
         return null;
     }
-    
+
     /**
      * Return the type of an specific object from a specific group.
      *
@@ -781,7 +781,7 @@ public class TiledMap {
         }
         return null;
     }
-    
+
     /**
      * Returns the x-coordinate of a specific object from a specific group.
      *
@@ -801,7 +801,7 @@ public class TiledMap {
         }
         return -1;
     }
-    
+
     /**
      * Returns the y-coordinate of a specific object from a specific group.
      *
@@ -821,7 +821,7 @@ public class TiledMap {
         }
         return -1;
     }
-    
+
     /**
      * Returns the width of a specific object from a specific group.
      *
@@ -841,7 +841,7 @@ public class TiledMap {
         }
         return -1;
     }
-    
+
     /**
      * Returns the height of a specific object from a specific group.
      *
@@ -861,7 +861,7 @@ public class TiledMap {
         }
         return -1;
     }
-    
+
     /**
      * Retrieve the image source property for a given object
      *
@@ -876,18 +876,18 @@ public class TiledMap {
             ObjectGroup grp = objectGroups.get(groupID);
             if (objectID >= 0 && objectID < grp.objects.size()) {
                 GroupObject object = grp.objects.get(objectID);
-                
+
                 if (object == null) {
                     return null;
                 }
-                
+
                 return object.image;
             }
         }
-        
+
         return null;
     }
-    
+
     /**
      * Looks for a property with the given name and returns it's value. If no
      * property is found, def is returned.
@@ -908,20 +908,20 @@ public class TiledMap {
             ObjectGroup grp = objectGroups.get(groupID);
             if (objectID >= 0 && objectID < grp.objects.size()) {
                 GroupObject object = grp.objects.get(objectID);
-                
+
                 if (object == null) {
                     return def;
                 }
                 if (object.props == null) {
                     return def;
                 }
-                
+
                 return object.props.getProperty(propertyName, def);
             }
         }
         return def;
     }
-    
+
     /**
      * A group of objects on the map (objects layer)
      *
@@ -938,10 +938,10 @@ public class TiledMap {
         public int width;
         /** The height of this layer */
         public int height;
-        
+
         /** the properties of this group */
         public Properties props;
-        
+
         /**
          * Create a new group based on the XML definition
          *
@@ -953,7 +953,7 @@ public class TiledMap {
             width = Integer.parseInt(element.getAttribute("width"));
             height = Integer.parseInt(element.getAttribute("height"));
             objects = new ArrayList<>();
-            
+
             // now read the layer properties
             Element propsElement = (Element) element.getElementsByTagName("properties").item(0);
             if (propsElement != null) {
@@ -962,14 +962,14 @@ public class TiledMap {
                     props = new Properties();
                     for (int p = 0; p < properties.getLength(); p++) {
                         Element propElement = (Element) properties.item(p);
-                        
+
                         String name = propElement.getAttribute("name");
                         String value = propElement.getAttribute("value");
                         props.setProperty(name, value);
                     }
                 }
             }
-            
+
             NodeList objectNodes = element.getElementsByTagName("object");
             for (int i = 0; i < objectNodes.getLength(); i++) {
                 Element objElement = (Element) objectNodes.item(i);
@@ -979,7 +979,7 @@ public class TiledMap {
             }
         }
     }
-    
+
     /**
      * An object from a object-group on the map
      *
@@ -1002,10 +1002,10 @@ public class TiledMap {
         public int height;
         /** The image source */
         private String image;
-        
+
         /** the properties of this group */
         public Properties props;
-        
+
         /**
          * Create a new group based on the XML definition
          *
@@ -1019,12 +1019,12 @@ public class TiledMap {
             y = Integer.parseInt(element.getAttribute("y"));
             width = Integer.parseInt(element.getAttribute("width"));
             height = Integer.parseInt(element.getAttribute("height"));
-            
+
             Element imageElement = (Element) element.getElementsByTagName("image").item(0);
             if (imageElement != null) {
                 image = imageElement.getAttribute("source");
             }
-            
+
             // now read the layer properties
             Element propsElement = (Element) element.getElementsByTagName("properties").item(0);
             if (propsElement != null) {
@@ -1033,7 +1033,7 @@ public class TiledMap {
                     props = new Properties();
                     for (int p = 0; p < properties.getLength(); p++) {
                         Element propElement = (Element) properties.item(p);
-                        
+
                         String name = propElement.getAttribute("name");
                         String value = propElement.getAttribute("value");
                         props.setProperty(name, value);
@@ -1042,5 +1042,5 @@ public class TiledMap {
             }
         }
     }
-    
+
 }

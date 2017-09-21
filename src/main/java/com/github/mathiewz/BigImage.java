@@ -5,12 +5,12 @@ import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
 import org.lwjgl.BufferUtils;
+import org.lwjgl.opengl.GL11;
 
 import com.github.mathiewz.opengl.ImageData;
 import com.github.mathiewz.opengl.ImageDataFactory;
 import com.github.mathiewz.opengl.LoadableImageData;
 import com.github.mathiewz.opengl.Texture;
-import com.github.mathiewz.opengl.renderer.SGL;
 import com.github.mathiewz.util.OperationNotSupportedException;
 import com.github.mathiewz.util.ResourceLoader;
 
@@ -30,7 +30,7 @@ import com.github.mathiewz.util.ResourceLoader;
  * @author kevin
  */
 public class BigImage extends Image {
-
+    
     /**
      * Get the maximum size of an image supported by the underlying
      * hardware.
@@ -40,14 +40,14 @@ public class BigImage extends Image {
      */
     public static final int getMaxSingleImageSize() {
         IntBuffer buffer = BufferUtils.createIntBuffer(16);
-        GL.glGetInteger(SGL.GL_MAX_TEXTURE_SIZE, buffer);
-
+        GL.glGetInteger(GL11.GL_MAX_TEXTURE_SIZE, buffer);
+        
         return buffer.get(0);
     }
-
+    
     /** The last image that we put into "in use" mode */
     private static Image lastBind;
-
+    
     /** The images building up this sub-image */
     private Image[][] images;
     /** The number of images on the xaxis */
@@ -58,14 +58,14 @@ public class BigImage extends Image {
     private int realWidth;
     /** The real hieght of the whole image - maintained even when scaled */
     private int realHeight;
-
+    
     /**
      * Create a new big image. Empty contructor for cloning only
      */
     private BigImage() {
         inited = true;
     }
-
+    
     /**
      * Create a new big image by loading it from the specified reference
      *
@@ -75,7 +75,7 @@ public class BigImage extends Image {
     public BigImage(String ref) {
         this(ref, Image.FILTER_NEAREST);
     }
-
+    
     /**
      * Create a new big image by loading it from the specified reference
      *
@@ -85,10 +85,10 @@ public class BigImage extends Image {
      *            The image filter to apply (@see #Image.FILTER_NEAREST)
      */
     public BigImage(String ref, int filter) {
-
+        
         build(ref, filter, getMaxSingleImageSize());
     }
-
+    
     /**
      * Create a new big image by loading it from the specified reference
      *
@@ -102,7 +102,7 @@ public class BigImage extends Image {
     public BigImage(String ref, int filter, int tileSize) {
         build(ref, filter, tileSize);
     }
-
+    
     /**
      * Create a new big image by loading it from the specified image data
      *
@@ -116,7 +116,7 @@ public class BigImage extends Image {
     public BigImage(LoadableImageData data, ByteBuffer imageBuffer, int filter) {
         build(data, imageBuffer, filter, getMaxSingleImageSize());
     }
-
+    
     /**
      * Create a new big image by loading it from the specified image data
      *
@@ -132,7 +132,7 @@ public class BigImage extends Image {
     public BigImage(LoadableImageData data, ByteBuffer imageBuffer, int filter, int tileSize) {
         build(data, imageBuffer, filter, tileSize);
     }
-
+    
     /**
      * Get a sub tile of this big image. Useful for debugging
      *
@@ -145,7 +145,7 @@ public class BigImage extends Image {
     public Image getTile(int x, int y) {
         return images[x][y];
     }
-
+    
     /**
      * Create a new big image by loading it from the specified reference
      *
@@ -165,7 +165,7 @@ public class BigImage extends Image {
             throw new SlickException("Failed to load: " + ref, e);
         }
     }
-
+    
     /**
      * Create an big image from a image data source.
      *
@@ -181,10 +181,10 @@ public class BigImage extends Image {
     private void build(final LoadableImageData data, final ByteBuffer imageBuffer, int filter, int tileSize) {
         final int dataWidth = data.getTexWidth();
         final int dataHeight = data.getTexHeight();
-
+        
         realWidth = width = data.getWidth();
         realHeight = height = data.getHeight();
-
+        
         if (dataWidth <= tileSize && dataHeight <= tileSize) {
             images = new Image[1][1];
             ImageData tempData = new ImageData() {
@@ -192,27 +192,27 @@ public class BigImage extends Image {
                 public int getDepth() {
                     return data.getDepth();
                 }
-
+                
                 @Override
                 public int getHeight() {
                     return dataHeight;
                 }
-
+                
                 @Override
                 public ByteBuffer getImageBufferData() {
                     return imageBuffer;
                 }
-
+                
                 @Override
                 public int getTexHeight() {
                     return dataHeight;
                 }
-
+                
                 @Override
                 public int getTexWidth() {
                     return dataWidth;
                 }
-
+                
                 @Override
                 public int getWidth() {
                     return dataWidth;
@@ -224,60 +224,60 @@ public class BigImage extends Image {
             inited = true;
             return;
         }
-
+        
         xcount = (realWidth - 1) / tileSize + 1;
         ycount = (realHeight - 1) / tileSize + 1;
-
+        
         images = new Image[xcount][ycount];
         int components = data.getDepth() / 8;
-
+        
         for (int x = 0; x < xcount; x++) {
             for (int y = 0; y < ycount; y++) {
                 final int imageWidth = Math.min(realWidth - x * tileSize, tileSize);
                 final int imageHeight = Math.min(realHeight - y * tileSize, tileSize);
-
+                
                 final int xSize = tileSize;
                 final int ySize = tileSize;
-
+                
                 final ByteBuffer subBuffer = BufferUtils.createByteBuffer(tileSize * tileSize * components);
                 int xo = x * tileSize * components;
-
+                
                 byte[] byteData = new byte[xSize * components];
                 for (int i = 0; i < ySize; i++) {
                     int yo = (y * tileSize + i) * dataWidth * components;
                     imageBuffer.position(yo + xo);
-
+                    
                     imageBuffer.get(byteData, 0, xSize * components);
                     subBuffer.put(byteData);
                 }
-
+                
                 subBuffer.flip();
                 ImageData imgData = new ImageData() {
                     @Override
                     public int getDepth() {
                         return data.getDepth();
                     }
-
+                    
                     @Override
                     public int getHeight() {
                         return imageHeight;
                     }
-
+                    
                     @Override
                     public int getWidth() {
                         return imageWidth;
                     }
-
+                    
                     @Override
                     public ByteBuffer getImageBufferData() {
                         return subBuffer;
                     }
-
+                    
                     @Override
                     public int getTexHeight() {
                         return ySize;
                     }
-
+                    
                     @Override
                     public int getTexWidth() {
                         return xSize;
@@ -286,10 +286,10 @@ public class BigImage extends Image {
                 images[x][y] = new Image(imgData, filter);
             }
         }
-
+        
         inited = true;
     }
-
+    
     /**
      * Not supported in BigImage
      *
@@ -299,7 +299,7 @@ public class BigImage extends Image {
     public void bind() {
         throw new OperationNotSupportedException("Can't bind big images yet");
     }
-
+    
     /**
      * Not supported in BigImage
      *
@@ -309,7 +309,7 @@ public class BigImage extends Image {
     public Image copy() {
         throw new OperationNotSupportedException("Can't copy big images yet");
     }
-
+    
     /**
      * @see com.github.mathiewz.Image#draw()
      */
@@ -317,7 +317,7 @@ public class BigImage extends Image {
     public void draw() {
         draw(0, 0);
     }
-
+    
     /**
      * @see com.github.mathiewz.Image#draw(float, float, com.github.mathiewz.Color)
      */
@@ -325,7 +325,7 @@ public class BigImage extends Image {
     public void draw(float x, float y, Color filter) {
         draw(x, y, width, height, filter);
     }
-
+    
     /**
      * @see com.github.mathiewz.Image#draw(float, float, float, com.github.mathiewz.Color)
      */
@@ -333,7 +333,7 @@ public class BigImage extends Image {
     public void draw(float x, float y, float scale, Color filter) {
         draw(x, y, width * scale, height * scale, filter);
     }
-
+    
     /**
      * @see com.github.mathiewz.Image#draw(float, float, float, float, com.github.mathiewz.Color)
      */
@@ -341,32 +341,32 @@ public class BigImage extends Image {
     public void draw(float x, float y, float width, float height, Color filter) {
         float sx = width / realWidth;
         float sy = height / realHeight;
-
+        
         GL.glTranslatef(x, y, 0);
         GL.glScalef(sx, sy, 1);
-
+        
         float xp = 0;
         float yp = 0;
-
+        
         for (int tx = 0; tx < xcount; tx++) {
             yp = 0;
             for (int ty = 0; ty < ycount; ty++) {
                 Image image = images[tx][ty];
-
+                
                 image.draw(xp, yp, image.getWidth(), image.getHeight(), filter);
-
+                
                 yp += image.getHeight();
                 if (ty == ycount - 1) {
                     xp += image.getWidth();
                 }
             }
-
+            
         }
-
+        
         GL.glScalef(1.0f / sx, 1.0f / sy, 1);
         GL.glTranslatef(-x, -y, 0);
     }
-
+    
     /**
      * @see com.github.mathiewz.Image#draw(float, float, float, float, float, float, float, float)
      */
@@ -374,15 +374,15 @@ public class BigImage extends Image {
     public void draw(float x, float y, float x2, float y2, float srcx, float srcy, float srcx2, float srcy2) {
         int srcwidth = (int) (srcx2 - srcx);
         int srcheight = (int) (srcy2 - srcy);
-
+        
         Image subImage = getSubImage((int) srcx, (int) srcy, srcwidth, srcheight);
-
+        
         int width = (int) (x2 - x);
         int height = (int) (y2 - y);
-
+        
         subImage.draw(x, y, width, height);
     }
-
+    
     /**
      * @see com.github.mathiewz.Image#draw(float, float, float, float, float, float)
      */
@@ -390,10 +390,10 @@ public class BigImage extends Image {
     public void draw(float x, float y, float srcx, float srcy, float srcx2, float srcy2) {
         int srcwidth = (int) (srcx2 - srcx);
         int srcheight = (int) (srcy2 - srcy);
-
+        
         draw(x, y, srcwidth, srcheight, srcx, srcy, srcx2, srcy2);
     }
-
+    
     /**
      * @see com.github.mathiewz.Image#draw(float, float, float, float)
      */
@@ -401,7 +401,7 @@ public class BigImage extends Image {
     public void draw(float x, float y, float width, float height) {
         draw(x, y, width, height, Color.white);
     }
-
+    
     /**
      * @see com.github.mathiewz.Image#draw(float, float, float)
      */
@@ -409,7 +409,7 @@ public class BigImage extends Image {
     public void draw(float x, float y, float scale) {
         draw(x, y, scale, Color.white);
     }
-
+    
     /**
      * @see com.github.mathiewz.Image#draw(float, float)
      */
@@ -417,7 +417,7 @@ public class BigImage extends Image {
     public void draw(float x, float y) {
         draw(x, y, Color.white);
     }
-
+    
     /**
      * @see com.github.mathiewz.Image#drawEmbedded(float, float, float, float)
      */
@@ -425,12 +425,12 @@ public class BigImage extends Image {
     public void drawEmbedded(float x, float y, float width, float height) {
         float xp = 0;
         float yp = 0;
-
+        
         for (int tx = 0; tx < xcount; tx++) {
             yp = 0;
             for (int ty = 0; ty < ycount; ty++) {
                 Image image = images[tx][ty];
-
+                
                 if (lastBind == null || image.getTexture() != lastBind.getTexture()) {
                     if (lastBind != null) {
                         lastBind.endUse();
@@ -439,16 +439,16 @@ public class BigImage extends Image {
                     lastBind.startUse();
                 }
                 image.drawEmbedded(xp + x, yp + y, image.getWidth(), image.getHeight());
-
+                
                 yp += image.getHeight();
                 if (ty == ycount - 1) {
                     xp += image.getWidth();
                 }
             }
-
+            
         }
     }
-
+    
     /**
      * @see com.github.mathiewz.Image#drawFlash(float, float, float, float)
      */
@@ -456,32 +456,32 @@ public class BigImage extends Image {
     public void drawFlash(float x, float y, float width, float height) {
         float sx = width / realWidth;
         float sy = height / realHeight;
-
+        
         GL.glTranslatef(x, y, 0);
         GL.glScalef(sx, sy, 1);
-
+        
         float xp = 0;
         float yp = 0;
-
+        
         for (int tx = 0; tx < xcount; tx++) {
             yp = 0;
             for (int ty = 0; ty < ycount; ty++) {
                 Image image = images[tx][ty];
-
+                
                 image.drawFlash(xp, yp, image.getWidth(), image.getHeight());
-
+                
                 yp += image.getHeight();
                 if (ty == ycount - 1) {
                     xp += image.getWidth();
                 }
             }
-
+            
         }
-
+        
         GL.glScalef(1.0f / sx, 1.0f / sy, 1);
         GL.glTranslatef(-x, -y, 0);
     }
-
+    
     /**
      * @see com.github.mathiewz.Image#drawFlash(float, float)
      */
@@ -489,7 +489,7 @@ public class BigImage extends Image {
     public void drawFlash(float x, float y) {
         drawFlash(x, y, width, height);
     }
-
+    
     /**
      * Not supported in BigImage
      *
@@ -502,7 +502,7 @@ public class BigImage extends Image {
         }
         lastBind = null;
     }
-
+    
     /**
      * Not supported in BigImage
      *
@@ -511,7 +511,7 @@ public class BigImage extends Image {
     @Override
     public void startUse() {
     }
-
+    
     /**
      * Not supported in BigImage
      *
@@ -521,7 +521,7 @@ public class BigImage extends Image {
     public void ensureInverted() {
         throw new OperationNotSupportedException("Doesn't make sense for tiled operations");
     }
-
+    
     /**
      * Not supported in BigImage
      *
@@ -531,14 +531,14 @@ public class BigImage extends Image {
     public Color getColor(int x, int y) {
         throw new OperationNotSupportedException("Can't use big images as buffers");
     }
-
+    
     /**
      * @see com.github.mathiewz.Image#getFlippedCopy(boolean, boolean)
      */
     @Override
     public Image getFlippedCopy(boolean flipHorizontal, boolean flipVertical) {
         BigImage image = new BigImage();
-
+        
         image.images = images;
         image.xcount = xcount;
         image.ycount = ycount;
@@ -546,32 +546,32 @@ public class BigImage extends Image {
         image.height = height;
         image.realWidth = realWidth;
         image.realHeight = realHeight;
-
+        
         if (flipHorizontal) {
             Image[][] images = image.images;
             image.images = new Image[xcount][ycount];
-
+            
             for (int x = 0; x < xcount; x++) {
                 for (int y = 0; y < ycount; y++) {
                     image.images[x][y] = images[xcount - 1 - x][y].getFlippedCopy(true, false);
                 }
             }
         }
-
+        
         if (flipVertical) {
             Image[][] images = image.images;
             image.images = new Image[xcount][ycount];
-
+            
             for (int x = 0; x < xcount; x++) {
                 for (int y = 0; y < ycount; y++) {
                     image.images[x][y] = images[x][ycount - 1 - y].getFlippedCopy(false, true);
                 }
             }
         }
-
+        
         return image;
     }
-
+    
     /**
      * Not supported in BigImage
      *
@@ -581,7 +581,7 @@ public class BigImage extends Image {
     public Graphics getGraphics() {
         throw new OperationNotSupportedException("Can't use big images as offscreen buffers");
     }
-
+    
     /**
      * @see com.github.mathiewz.Image#getScaledCopy(float)
      */
@@ -589,14 +589,14 @@ public class BigImage extends Image {
     public Image getScaledCopy(float scale) {
         return getScaledCopy((int) (scale * width), (int) (scale * height));
     }
-
+    
     /**
      * @see com.github.mathiewz.Image#getScaledCopy(int, int)
      */
     @Override
     public Image getScaledCopy(int width, int height) {
         BigImage image = new BigImage();
-
+        
         image.images = images;
         image.xcount = xcount;
         image.ycount = ycount;
@@ -604,55 +604,55 @@ public class BigImage extends Image {
         image.height = height;
         image.realWidth = realWidth;
         image.realHeight = realHeight;
-
+        
         return image;
     }
-
+    
     /**
      * @see com.github.mathiewz.Image#getSubImage(int, int, int, int)
      */
     @Override
     public Image getSubImage(int x, int y, int width, int height) {
         BigImage image = new BigImage();
-
+        
         image.width = width;
         image.height = height;
         image.realWidth = width;
         image.realHeight = height;
         image.images = new Image[xcount][ycount];
-
+        
         float xp = 0;
         float yp = 0;
         int x2 = x + width;
         int y2 = y + height;
-
+        
         int startx = 0;
         int starty = 0;
         boolean foundStart = false;
-
+        
         for (int xt = 0; xt < xcount; xt++) {
             yp = 0;
             starty = 0;
             foundStart = false;
             for (int yt = 0; yt < ycount; yt++) {
                 Image current = images[xt][yt];
-
+                
                 int xp2 = (int) (xp + current.getWidth());
                 int yp2 = (int) (yp + current.getHeight());
-
+                
                 // if the top corner of the subimage is inside the area
                 // we want or the bottom corrent of the image is, then consider using the
                 // image
-
+                
                 // this image contributes to the sub image we're attempt to retrieve
                 int targetX1 = (int) Math.max(x, xp);
                 int targetY1 = (int) Math.max(y, yp);
                 int targetX2 = Math.min(x2, xp2);
                 int targetY2 = Math.min(y2, yp2);
-
+                
                 int targetWidth = targetX2 - targetX1;
                 int targetHeight = targetY2 - targetY1;
-
+                
                 if (targetWidth > 0 && targetHeight > 0) {
                     Image subImage = current.getSubImage((int) (targetX1 - xp), (int) (targetY1 - yp), targetX2 - targetX1, targetY2 - targetY1);
                     foundStart = true;
@@ -660,7 +660,7 @@ public class BigImage extends Image {
                     starty++;
                     image.ycount = Math.max(image.ycount, starty);
                 }
-
+                
                 yp += current.getHeight();
                 if (yt == ycount - 1) {
                     xp += current.getWidth();
@@ -671,10 +671,10 @@ public class BigImage extends Image {
                 image.xcount++;
             }
         }
-
+        
         return image;
     }
-
+    
     /**
      * Not supported in BigImage
      *
@@ -684,7 +684,7 @@ public class BigImage extends Image {
     public Texture getTexture() {
         throw new OperationNotSupportedException("Can't use big images as offscreen buffers");
     }
-
+    
     /**
      * @see com.github.mathiewz.Image#initImpl()
      */
@@ -692,7 +692,7 @@ public class BigImage extends Image {
     protected void initImpl() {
         throw new OperationNotSupportedException("Can't use big images as offscreen buffers");
     }
-
+    
     /**
      * @see com.github.mathiewz.Image#reinit()
      */
@@ -700,7 +700,7 @@ public class BigImage extends Image {
     protected void reinit() {
         throw new OperationNotSupportedException("Can't use big images as offscreen buffers");
     }
-
+    
     /**
      * Not supported in BigImage
      *
@@ -710,7 +710,7 @@ public class BigImage extends Image {
     public void setTexture(Texture texture) {
         throw new OperationNotSupportedException("Can't use big images as offscreen buffers");
     }
-
+    
     /**
      * Get a sub-image that builds up this image. Note that the offsets
      * used will depend on the maximum texture size on the OpenGL hardware
@@ -724,7 +724,7 @@ public class BigImage extends Image {
     public Image getSubImage(int offsetX, int offsetY) {
         return images[offsetX][offsetY];
     }
-
+    
     /**
      * Get a count of the number images that build this image up horizontally
      *
@@ -733,7 +733,7 @@ public class BigImage extends Image {
     public int getHorizontalImageCount() {
         return xcount;
     }
-
+    
     /**
      * Get a count of the number images that build this image up vertically
      *
@@ -742,7 +742,7 @@ public class BigImage extends Image {
     public int getVerticalImageCount() {
         return ycount;
     }
-
+    
     /**
      * @see com.github.mathiewz.Image#toString()
      */
@@ -750,7 +750,7 @@ public class BigImage extends Image {
     public String toString() {
         return "[BIG IMAGE]";
     }
-
+    
     /**
      * Destroy the image and release any native resources.
      * Calls on a destroyed image have undefined results
@@ -764,7 +764,7 @@ public class BigImage extends Image {
             }
         }
     }
-
+    
     /**
      * @see com.github.mathiewz.Image#draw(float, float, float, float, float, float, float, float, com.github.mathiewz.Color)
      */
@@ -772,15 +772,15 @@ public class BigImage extends Image {
     public void draw(float x, float y, float x2, float y2, float srcx, float srcy, float srcx2, float srcy2, Color filter) {
         int srcwidth = (int) (srcx2 - srcx);
         int srcheight = (int) (srcy2 - srcy);
-
+        
         Image subImage = getSubImage((int) srcx, (int) srcy, srcwidth, srcheight);
-
+        
         int width = (int) (x2 - x);
         int height = (int) (y2 - y);
-
+        
         subImage.draw(x, y, width, height, filter);
     }
-
+    
     /**
      * @see com.github.mathiewz.Image#drawCentered(float, float)
      */
@@ -788,7 +788,7 @@ public class BigImage extends Image {
     public void drawCentered(float x, float y) {
         throw new UnsupportedOperationException();
     }
-
+    
     /**
      * @see com.github.mathiewz.Image#drawEmbedded(float, float, float, float, float, float, float, float, com.github.mathiewz.Color)
      */
@@ -796,7 +796,7 @@ public class BigImage extends Image {
     public void drawEmbedded(float x, float y, float x2, float y2, float srcx, float srcy, float srcx2, float srcy2, Color filter) {
         throw new UnsupportedOperationException();
     }
-
+    
     /**
      * @see com.github.mathiewz.Image#drawEmbedded(float, float, float, float, float, float, float, float)
      */
@@ -804,7 +804,7 @@ public class BigImage extends Image {
     public void drawEmbedded(float x, float y, float x2, float y2, float srcx, float srcy, float srcx2, float srcy2) {
         throw new UnsupportedOperationException();
     }
-
+    
     /**
      * @see com.github.mathiewz.Image#drawFlash(float, float, float, float, com.github.mathiewz.Color)
      */
@@ -812,7 +812,7 @@ public class BigImage extends Image {
     public void drawFlash(float x, float y, float width, float height, Color col) {
         throw new UnsupportedOperationException();
     }
-
+    
     /**
      * @see com.github.mathiewz.Image#drawSheared(float, float, float, float)
      */
