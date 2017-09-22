@@ -9,3 +9,7 @@ The main purpose of this repo is to modernize and maintain the slick2D library. 
 * Unit testing
 * API Best Practices
 * New features
+
+## Javadoc
+
+All the javadoc of the current working version can be found [here](https://mathiewz.github.io/modernized-slick/)
