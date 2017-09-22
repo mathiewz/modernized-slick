@@ -3,6 +3,7 @@ package com.github.mathiewz.slick;
 import java.io.IOException;
 import java.util.Properties;
 
+import org.apache.commons.lang3.StringUtils;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.Sys;
 import org.lwjgl.input.Cursor;
@@ -303,18 +304,18 @@ public abstract class GameContainer implements GUIContext {
      *
      * @return The build number of slick
      */
-    public static int getBuildVersion() {
+    public static String getBuildVersion() {
         try {
             Properties props = new Properties();
-            props.load(ResourceLoader.getResourceAsStream("version"));
+            props.load(ResourceLoader.getResourceAsStream("info.properties"));
             
-            int build = Integer.parseInt(props.getProperty("build"));
-            Log.info("Slick Build #" + build);
+            String build = props.getProperty("version");
+            Log.info("Modernized slick v" + build);
             
             return build;
         } catch (Exception e) {
-            Log.error("Unable to determine Slick build number");
-            return -1;
+            Log.error("Unable to determine build number", e);
+            return StringUtils.EMPTY;
         }
     }
     
@@ -615,7 +616,7 @@ public abstract class GameContainer implements GUIContext {
             }
         }
         
-        input.poll(width, height);
+        input.poll(height);
         
         Music.poll(delta);
         if (!paused) {

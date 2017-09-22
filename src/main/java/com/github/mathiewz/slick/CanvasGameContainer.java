@@ -19,7 +19,7 @@ public class CanvasGameContainer extends Canvas {
     protected Container container;
     /** The game being held in this container */
     protected Game game;
-
+    
     /**
      * Create a new panel
      *
@@ -29,7 +29,7 @@ public class CanvasGameContainer extends Canvas {
     public CanvasGameContainer(Game game) {
         this(game, false);
     }
-
+    
     /**
      * Create a new panel
      *
@@ -41,16 +41,16 @@ public class CanvasGameContainer extends Canvas {
      */
     public CanvasGameContainer(Game game, boolean shared) {
         super();
-
+        
         this.game = game;
         setIgnoreRepaint(true);
         requestFocus();
         setSize(500, 500);
-
+        
         container = new Container(game, shared);
         container.setForceExit(false);
     }
-
+    
     /**
      * Start the game container rendering
      *
@@ -58,14 +58,12 @@ public class CanvasGameContainer extends Canvas {
     public void start() {
         SwingUtilities.invokeLater(() -> {
             try {
-                Input.disableControllers();
-
                 try {
                     Display.setParent(CanvasGameContainer.this);
                 } catch (LWJGLException e1) {
                     throw new SlickException("Failed to setParent of canvas", e1);
                 }
-
+                
                 container.setup();
                 scheduleUpdate();
             } catch (SlickException e2) {
@@ -74,7 +72,7 @@ public class CanvasGameContainer extends Canvas {
             }
         });
     }
-
+    
     /**
      * Schedule an update on the EDT
      */
@@ -82,7 +80,7 @@ public class CanvasGameContainer extends Canvas {
         if (!isVisible()) {
             return;
         }
-
+        
         SwingUtilities.invokeLater(() -> {
             try {
                 container.gameLoop();
@@ -93,7 +91,7 @@ public class CanvasGameContainer extends Canvas {
             scheduleUpdate();
         });
     }
-
+    
     /**
      * A game container to provide the canvas context
      *
@@ -111,15 +109,15 @@ public class CanvasGameContainer extends Canvas {
          */
         public Container(Game game, boolean shared) {
             super(game, CanvasGameContainer.this.getWidth(), CanvasGameContainer.this.getHeight(), false);
-
+            
             width = CanvasGameContainer.this.getWidth();
             height = CanvasGameContainer.this.getHeight();
-
+            
             if (shared) {
                 enableSharedContext();
             }
         }
-
+        
         /**
          * Updated the FPS counter
          */
@@ -127,7 +125,7 @@ public class CanvasGameContainer extends Canvas {
         protected void updateFPS() {
             super.updateFPS();
         }
-
+        
         /**
          * @see com.github.mathiewz.slick.GameContainer#running()
          */
@@ -135,7 +133,7 @@ public class CanvasGameContainer extends Canvas {
         protected boolean running() {
             return super.running() && isDisplayable();
         }
-
+        
         /**
          * @see com.github.mathiewz.slick.GameContainer#getHeight()
          */
@@ -143,7 +141,7 @@ public class CanvasGameContainer extends Canvas {
         public int getHeight() {
             return CanvasGameContainer.this.getHeight();
         }
-
+        
         /**
          * @see com.github.mathiewz.slick.GameContainer#getWidth()
          */
@@ -151,13 +149,13 @@ public class CanvasGameContainer extends Canvas {
         public int getWidth() {
             return CanvasGameContainer.this.getWidth();
         }
-
+        
         /**
          * Check the dimensions of the canvas match the display
          */
         public void checkDimensions() {
             if (width != CanvasGameContainer.this.getWidth() || height != CanvasGameContainer.this.getHeight()) {
-
+                
                 try {
                     setDisplayMode(CanvasGameContainer.this.getWidth(), CanvasGameContainer.this.getHeight(), false);
                 } catch (SlickException e) {

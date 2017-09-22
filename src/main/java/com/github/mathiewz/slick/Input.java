@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Controller;
@@ -20,6 +23,9 @@ import com.github.mathiewz.slick.util.Log;
  * @author kevin
  */
 public class Input {
+    
+    private static final List<String> blackListedControllers = Arrays.asList("Keyboard", "Mouse");
+    
     /** The controller index to pass to check all controllers */
     public static final int ANY_CONTROLLER = -1;
 
@@ -279,15 +285,7 @@ public class Input {
     public static final int KEY_LALT = KEY_LMENU;
     /** A helper for right ALT */
     public static final int KEY_RALT = KEY_RMENU;
-
-    /** Control index */
-    private static final int LEFT = 0;
-    /** Control index */
-    private static final int RIGHT = 1;
-    /** Control index */
-    private static final int UP = 2;
-    /** Control index */
-    private static final int DOWN = 3;
+    
     /** Control index */
     private static final int BUTTON1 = 4;
 
@@ -298,8 +296,6 @@ public class Input {
     /** The middle mouse button indicator */
     public static final int MOUSE_MIDDLE_BUTTON = 2;
 
-    /** True if the controllers system has been initialised */
-    private static boolean controllersInited = false;
     /** The list of controllers */
     private static ArrayList<Controller> controllers = new ArrayList<>();
 
@@ -376,12 +372,38 @@ public class Input {
     /** The pixel distance the mouse can move to accept a mouse click */
     private int mouseClickTolerance = 5;
 
-    /**
-     * Disables support for controllers. This means the jinput JAR and native libs
-     * are not required.
-     */
-    public static void disableControllers() {
-        controllersInited = true;
+    private enum DirectionsEnum {
+        LEFT,
+        RIGHT,
+        UP,
+        DOWN;
+
+        private static DirectionsEnum resolve(int index) {
+            return Stream.of(values())
+                    .filter(entry -> entry.ordinal() == index)
+                    .findAny()
+                    .orElse(null);
+        }
+    }
+    
+    static {
+        try {
+            Controllers.create();
+
+            IntStream.range(0, Controllers.getControllerCount())
+                    .mapToObj(Controllers::getController)
+                    .filter(controller -> controller.getButtonCount() >= 3)
+                    .filter(controller -> controller.getButtonCount() < MAX_BUTTONS)
+                    .filter(controller -> blackListedControllers.stream().noneMatch(controller.getName()::contains))
+                    .forEach(controllers::add);
+
+            Log.info("Found " + controllers.size() + " controllers");
+            for (int i = 0; i < controllers.size(); i++) {
+                Log.info(i + " : " + controllers.get(i).getName());
+            }
+        } catch (LWJGLException e) {
+            throw new SlickException("Unable to create controllers", e);
+        }
     }
 
     /**
@@ -762,6 +784,26 @@ public class Input {
     }
 
     /**
+     * Return the first controller found
+     *
+     * @return the first controller found, or null by default
+     */
+    public Controller getFirstController() {
+        return getController(0);
+    }
+
+    /**
+     * Return the controller at the specified index
+     *
+     * @param index
+     *            the index of the controller
+     * @return the controller if it exists, or null by default
+     */
+    public Controller getController(int index) {
+        return index >= controllers.size() ? null : controllers.get(index);
+    }
+
+    /**
      * Get the x position of the mouse cursor
      *
      * @return The x position of the mouse cursor
@@ -811,12 +853,6 @@ public class Input {
      * @return The number of controllers available
      */
     public int getControllerCount() {
-        try {
-            initControllers();
-        } catch (SlickException e) {
-            throw new SlickException("Failed to initialise controllers");
-        }
-
         return controllers.size();
     }
 
@@ -985,75 +1021,6 @@ public class Input {
     }
 
     /**
-     * Check if button 1 is pressed
-     *
-     * @param controller
-     *            The index of the controller to check
-     * @return True if the button is pressed
-     */
-    public boolean isButton1Pressed(int controller) {
-        return isButtonPressed(0, controller);
-    }
-
-    /**
-     * Check if button 2 is pressed
-     *
-     * @param controller
-     *            The index of the controller to check
-     * @return True if the button is pressed
-     */
-    public boolean isButton2Pressed(int controller) {
-        return isButtonPressed(1, controller);
-    }
-
-    /**
-     * Check if button 3 is pressed
-     *
-     * @param controller
-     *            The index of the controller to check
-     * @return True if the button is pressed
-     */
-    public boolean isButton3Pressed(int controller) {
-        return isButtonPressed(2, controller);
-    }
-
-    /**
-     * Initialise the controllers system
-     *
-     */
-    public void initControllers() {
-        if (controllersInited) {
-            return;
-        }
-
-        controllersInited = true;
-        try {
-            Controllers.create();
-            int count = Controllers.getControllerCount();
-
-            for (int i = 0; i < count; i++) {
-                Controller controller = Controllers.getController(i);
-
-                if (controller.getButtonCount() >= 3 && controller.getButtonCount() < MAX_BUTTONS) {
-                    controllers.add(controller);
-                }
-            }
-
-            Log.info("Found " + controllers.size() + " controllers");
-            for (int i = 0; i < controllers.size(); i++) {
-                Log.info(i + " : " + controllers.get(i).getName());
-            }
-        } catch (LWJGLException e) {
-            if (e.getCause() instanceof ClassNotFoundException) {
-                throw new SlickException("Unable to create controller - no jinput found - add jinput.jar to your classpath");
-            }
-            throw new SlickException("Unable to create controllers");
-        } catch (NoClassDefFoundError e) {
-            // forget it, no jinput availble
-        }
-    }
-
-    /**
      * Notification from an event handle that an event has been consumed
      */
     public void consumeEvent() {
@@ -1109,12 +1076,10 @@ public class Input {
     /**
      * Poll the state of the input
      *
-     * @param width
-     *            The width of the game view
      * @param height
      *            The height of the game view
      */
-    public void poll(int width, int height) {
+    public void poll(int height) {
         if (paused) {
             clearControlPressedRecord();
             clearKeyPressedRecord();
@@ -1143,10 +1108,8 @@ public class Input {
         }
         mouseListenersToAdd.clear();
 
-        if (doubleClickTimeout != 0) {
-            if (System.currentTimeMillis() > doubleClickTimeout) {
-                doubleClickTimeout = 0;
-            }
+        if (doubleClickTimeout != 0 && System.currentTimeMillis() > doubleClickTimeout) {
+            doubleClickTimeout = 0;
         }
 
         this.height = height;
@@ -1293,19 +1256,17 @@ public class Input {
             }
         }
 
-        if (controllersInited) {
-            for (int i = 0; i < getControllerCount(); i++) {
-                int count = controllers.get(i).getButtonCount() + 3;
-                count = Math.min(count, 24);
-                for (int c = 0; c <= count; c++) {
-                    if (controls[i][c] && !isControlDwn(c, i)) {
-                        controls[i][c] = false;
-                        fireControlRelease(c, i);
-                    } else if (!controls[i][c] && isControlDwn(c, i)) {
-                        controllerPressed[i][c] = true;
-                        controls[i][c] = true;
-                        fireControlPress(c, i);
-                    }
+        for (int i = 0; i < getControllerCount(); i++) {
+            int count = getController(i).getButtonCount() + 3;
+            count = Math.min(count, 24);
+            for (int c = 0; c <= count; c++) {
+                if (controls[i][c] && !isControlDwn(c, i)) {
+                    controls[i][c] = false;
+                    fireControlRelease(c, i);
+                } else if (!controls[i][c] && isControlDwn(c, i)) {
+                    controllerPressed[i][c] = true;
+                    controls[i][c] = true;
+                    fireControlPress(c, i);
                 }
             }
         }
@@ -1340,21 +1301,6 @@ public class Input {
         if (Display.isCreated()) {
             displayActive = Display.isActive();
         }
-    }
-
-    /**
-     * Enable key repeat for this input context. This will cause keyPressed to get called repeatedly
-     * at a set interval while the key is pressed
-     *
-     * @param initial
-     *            The interval before key repreating starts after a key press
-     * @param interval
-     *            The interval between key repeats in ms
-     * @deprecated
-     */
-    @Deprecated
-    public void enableKeyRepeat(int initial, int interval) {
-        Keyboard.enableRepeatEvents(true);
     }
 
     /**
@@ -1394,7 +1340,7 @@ public class Input {
         for (int i = 0; i < controllerListeners.size(); i++) {
             ControllerListener listener = controllerListeners.get(i);
             if (listener.isAcceptingInput()) {
-                switch (index) {
+                switch (DirectionsEnum.resolve(index)) {
                     case LEFT:
                         listener.controllerLeftPressed(controllerIndex);
                         break;
@@ -1432,7 +1378,7 @@ public class Input {
         for (int i = 0; i < controllerListeners.size(); i++) {
             ControllerListener listener = controllerListeners.get(i);
             if (listener.isAcceptingInput()) {
-                switch (index) {
+                switch (DirectionsEnum.resolve(index)) {
                     case LEFT:
                         listener.controllerLeftReleased(controllerIndex);
                         break;
@@ -1467,7 +1413,7 @@ public class Input {
      * @return True if the control is pressed
      */
     private boolean isControlDwn(int index, int controllerIndex) {
-        switch (index) {
+        switch (DirectionsEnum.resolve(index)) {
             case LEFT:
                 return isControllerLeft(controllerIndex);
             case RIGHT:

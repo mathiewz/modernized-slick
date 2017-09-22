@@ -46,7 +46,7 @@ public class AppletGameContainer extends Applet {
     protected transient Thread gameThread;
     /** Alpha background supported */
     protected boolean alphaSupport = true;
-
+    
     /**
      * @see java.applet.Applet#destroy()
      */
@@ -58,20 +58,20 @@ public class AppletGameContainer extends Applet {
         super.destroy();
         Log.info("Clear up");
     }
-
+    
     /**
      * Clean up the LWJGL resources
      */
     private void destroyLWJGL() {
         container.stopApplet();
-
+        
         try {
             gameThread.join();
         } catch (InterruptedException e) {
             Log.error(e);
         }
     }
-
+    
     /**
      * Start a thread to run LWJGL in
      */
@@ -79,7 +79,7 @@ public class AppletGameContainer extends Applet {
         if (gameThread != null) {
             return;
         }
-
+        
         gameThread = new Thread() {
             @Override
             public void run() {
@@ -96,10 +96,10 @@ public class AppletGameContainer extends Applet {
                 }
             }
         };
-
+        
         gameThread.start();
     }
-
+    
     /**
      * @see java.applet.Applet#init()
      */
@@ -108,10 +108,10 @@ public class AppletGameContainer extends Applet {
         removeAll();
         setLayout(new BorderLayout());
         setIgnoreRepaint(true);
-
+        
         try {
             Game game = (Game) Class.forName(getParameter("game")).newInstance();
-
+            
             container = new Container(game);
             canvas = new ContainerPanel(container);
             displayParent = new Canvas() {
@@ -120,15 +120,15 @@ public class AppletGameContainer extends Applet {
                     super.addNotify();
                     startLWJGL();
                 }
-
+                
                 @Override
                 public final void removeNotify() {
                     destroyLWJGL();
                     super.removeNotify();
                 }
-
+                
             };
-
+            
             displayParent.setSize(getWidth(), getHeight());
             add(displayParent);
             displayParent.setFocusable(true);
@@ -140,7 +140,7 @@ public class AppletGameContainer extends Applet {
             throw new SlickException("Unable to create game container");
         }
     }
-
+    
     /**
      * Create a new panel to display the GL context
      *
@@ -149,7 +149,7 @@ public class AppletGameContainer extends Applet {
     public class ContainerPanel {
         /** The container being displayed on this canvas */
         private final Container container;
-
+        
         /**
          * Create a new panel
          *
@@ -159,7 +159,7 @@ public class AppletGameContainer extends Applet {
         public ContainerPanel(Container container) {
             this.container = container;
         }
-
+        
         /**
          * Create the LWJGL display
          *
@@ -181,12 +181,12 @@ public class AppletGameContainer extends Applet {
                 Display.create();
             }
         }
-
+        
         /**
          * Start the game container
          */
         public void start() {
-
+            
             try {
                 Display.setParent(displayParent);
                 Display.setVSyncEnabled(true);
@@ -200,12 +200,12 @@ public class AppletGameContainer extends Applet {
                     throw new SlickException("Failed to create display", nestedEx);
                 }
             }
-
+            
             initGL();
             displayParent.requestFocus();
             container.runloop();
         }
-
+        
         /**
          * Initialise GL state
          */
@@ -213,7 +213,7 @@ public class AppletGameContainer extends Applet {
             try {
                 InternalTextureLoader.get().clear();
                 SoundStore.get().clear();
-
+                
                 container.initApplet();
             } catch (Exception e) {
                 Log.error(e);
@@ -221,16 +221,16 @@ public class AppletGameContainer extends Applet {
             }
         }
     }
-
+    
     /**
      * A game container to provide the applet context
      *
      * @author kevin
      */
     public class Container extends GameContainer {
-        
+
         private static final String MOUSE_CURSOR_ERROR = "Failed to set mouse cursor";
-        
+
         /**
          * Create a new container wrapped round the game
          *
@@ -239,11 +239,11 @@ public class AppletGameContainer extends Applet {
          */
         public Container(Game game) {
             super(game);
-
+            
             width = AppletGameContainer.this.getWidth();
             height = AppletGameContainer.this.getHeight();
         }
-
+        
         /**
          * Initiliase based on Applet init
          *
@@ -252,16 +252,10 @@ public class AppletGameContainer extends Applet {
             initSystem();
             enterOrtho();
 
-            try {
-                getInput().initControllers();
-            } catch (Exception e) {
-                Log.info("Controllers not available");
-            }
-            
             game.init(this);
             getDelta();
         }
-
+        
         /**
          * Check if the applet is currently running
          *
@@ -270,14 +264,14 @@ public class AppletGameContainer extends Applet {
         public boolean isRunning() {
             return running;
         }
-
+        
         /**
          * Stop the applet play back
          */
         public void stopApplet() {
             running = false;
         }
-
+        
         /**
          * @see com.github.mathiewz.slick.GameContainer#getScreenHeight()
          */
@@ -285,7 +279,7 @@ public class AppletGameContainer extends Applet {
         public int getScreenHeight() {
             return 0;
         }
-
+        
         /**
          * @see com.github.mathiewz.slick.GameContainer#getScreenWidth()
          */
@@ -293,7 +287,7 @@ public class AppletGameContainer extends Applet {
         public int getScreenWidth() {
             return 0;
         }
-
+        
         /**
          * Check if the display created supported alpha in the back buffer
          *
@@ -302,7 +296,7 @@ public class AppletGameContainer extends Applet {
         public boolean supportsAlphaInBackBuffer() {
             return alphaSupport;
         }
-
+        
         /**
          * @see com.github.mathiewz.slick.GameContainer#hasFocus()
          */
@@ -310,7 +304,7 @@ public class AppletGameContainer extends Applet {
         public boolean hasFocus() {
             return true;
         }
-
+        
         /**
          * Returns the Applet Object
          *
@@ -319,7 +313,7 @@ public class AppletGameContainer extends Applet {
         public Applet getApplet() {
             return AppletGameContainer.this;
         }
-
+        
         /**
          * @see com.github.mathiewz.slick.GameContainer#setIcon(java.lang.String)
          */
@@ -327,7 +321,7 @@ public class AppletGameContainer extends Applet {
         public void setIcon(String ref) {
             // unsupported in an applet
         }
-
+        
         /**
          * @see com.github.mathiewz.slick.GameContainer#setMouseGrabbed(boolean)
          */
@@ -335,7 +329,7 @@ public class AppletGameContainer extends Applet {
         public void setMouseGrabbed(boolean grabbed) {
             Mouse.setGrabbed(grabbed);
         }
-
+        
         /**
          * @see com.github.mathiewz.slick.GameContainer#isMouseGrabbed()
          */
@@ -343,7 +337,7 @@ public class AppletGameContainer extends Applet {
         public boolean isMouseGrabbed() {
             return Mouse.isGrabbed();
         }
-
+        
         /**
          * @see com.github.mathiewz.slick.GameContainer#setMouseCursor(java.lang.String,
          *      int, int)
@@ -357,7 +351,7 @@ public class AppletGameContainer extends Applet {
                 throw new SlickException(MOUSE_CURSOR_ERROR, e);
             }
         }
-
+        
         /**
          * Get the closest greater power of 2 to the fold number
          *
@@ -372,7 +366,7 @@ public class AppletGameContainer extends Applet {
             }
             return ret;
         }
-
+        
         /**
          * {@inheritDoc}
          */
@@ -381,19 +375,19 @@ public class AppletGameContainer extends Applet {
             try {
                 Image temp = new Image(get2Fold(image.getWidth()), get2Fold(image.getHeight()));
                 Graphics g = temp.getGraphics();
-
+                
                 ByteBuffer buffer = BufferUtils.createByteBuffer(temp.getWidth() * temp.getHeight() * 4);
                 g.drawImage(image.getFlippedCopy(false, true), 0, 0);
                 g.flush();
                 g.getArea(0, 0, temp.getWidth(), temp.getHeight(), buffer);
-
+                
                 Cursor cursor = CursorLoader.get().getCursor(buffer, hotSpotX, hotSpotY, temp.getWidth(), temp.getHeight());
                 Mouse.setNativeCursor(cursor);
             } catch (Exception e) {
                 throw new SlickException(MOUSE_CURSOR_ERROR, e);
             }
         }
-
+        
         /**
          * @see com.github.mathiewz.slick.GameContainer#setIcons(java.lang.String[])
          */
@@ -401,7 +395,7 @@ public class AppletGameContainer extends Applet {
         public void setIcons(String[] refs) {
             // unsupported in an applet
         }
-
+        
         /**
          * @see com.github.mathiewz.slick.GameContainer#setMouseCursor(com.github.mathiewz.slick.opengl.ImageData, int, int)
          */
@@ -414,7 +408,7 @@ public class AppletGameContainer extends Applet {
                 throw new SlickException(MOUSE_CURSOR_ERROR, e);
             }
         }
-
+        
         /**
          * @see com.github.mathiewz.slick.GameContainer#setMouseCursor(org.lwjgl.input.Cursor, int, int)
          */
@@ -426,7 +420,7 @@ public class AppletGameContainer extends Applet {
                 throw new SlickException(MOUSE_CURSOR_ERROR, e);
             }
         }
-
+        
         /**
          * @see com.github.mathiewz.slick.GameContainer#setDefaultMouseCursor()
          */
@@ -434,33 +428,33 @@ public class AppletGameContainer extends Applet {
         public void setDefaultMouseCursor() {
             // Nothing to do here
         }
-
+        
         @Override
         public boolean isFullscreen() {
             return Display.isFullscreen();
         }
-
+        
         @Override
         public void setFullscreen(boolean fullscreen) {
             if (fullscreen == isFullscreen()) {
                 return;
             }
-
+            
             try {
                 if (fullscreen) {
                     // get current screen resolution
                     int screenWidth = Display.getDisplayMode().getWidth();
                     int screenHeight = Display.getDisplayMode().getHeight();
-
+                    
                     // calculate aspect ratio
                     float gameAspectRatio = (float) width / height;
                     float screenAspectRatio = (float) screenWidth / screenHeight;
-
+                    
                     int newWidth;
                     int newHeight;
-
+                    
                     // get new screen resolution to match aspect ratio
-
+                    
                     if (gameAspectRatio >= screenAspectRatio) {
                         newWidth = screenWidth;
                         newHeight = (int) (height / ((float) width / screenWidth));
@@ -468,21 +462,21 @@ public class AppletGameContainer extends Applet {
                         newWidth = (int) (width / ((float) height / screenHeight));
                         newHeight = screenHeight;
                     }
-
+                    
                     // center new screen
                     int xoffset = (screenWidth - newWidth) / 2;
                     int yoffset = (screenHeight - newHeight) / 2;
-
+                    
                     // scale game to match new resolution
                     GL11.glViewport(xoffset, yoffset, newWidth, newHeight);
-
+                    
                     enterOrtho();
-
+                    
                     // fix input to match new resolution
                     getInput().setOffset(-xoffset * (float) width / newWidth, -yoffset * (float) height / newHeight);
-
+                    
                     getInput().setScale((float) width / newWidth, (float) height / newHeight);
-
+                    
                     width = screenWidth;
                     height = screenHeight;
                     Display.setFullscreen(true);
@@ -493,17 +487,17 @@ public class AppletGameContainer extends Applet {
                     width = AppletGameContainer.this.getWidth();
                     height = AppletGameContainer.this.getHeight();
                     GL11.glViewport(0, 0, width, height);
-
+                    
                     enterOrtho();
-
+                    
                     Display.setFullscreen(false);
                 }
             } catch (LWJGLException e) {
                 Log.error(e);
             }
-
+            
         }
-
+        
         /**
          * The running game loop
          *
@@ -511,17 +505,17 @@ public class AppletGameContainer extends Applet {
         public void runloop() {
             while (running) {
                 int delta = getDelta();
-
+                
                 updateAndRender(delta);
-
+                
                 updateFPS();
                 Display.update();
             }
-
+            
             Display.destroy();
         }
     }
-
+    
     /**
      * A basic console to display an error message if the applet crashes.
      * This will prevent the applet from just freezing in the browser
@@ -531,7 +525,7 @@ public class AppletGameContainer extends Applet {
     public class ConsolePanel extends Panel {
         /** The area display the console output */
         TextArea textArea = new TextArea();
-
+        
         /**
          * Create a new panel to display the console output
          *
@@ -542,24 +536,24 @@ public class AppletGameContainer extends Applet {
             setLayout(new BorderLayout());
             setBackground(Color.black);
             setForeground(Color.white);
-
+            
             Font consoleFont = new Font("Arial", Font.BOLD, 14);
-
+            
             Label slickLabel = new Label("SLICK CONSOLE", Label.CENTER);
             slickLabel.setFont(consoleFont);
             add(slickLabel, BorderLayout.PAGE_START);
-
+            
             StringWriter sw = new StringWriter();
             e.printStackTrace(new PrintWriter(sw));
-
+            
             textArea.setText(sw.toString());
             textArea.setEditable(false);
             add(textArea, BorderLayout.CENTER);
-
+            
             // add a border on both sides of the console
             add(new Panel(), BorderLayout.LINE_START);
             add(new Panel(), BorderLayout.LINE_END);
-
+            
             Panel bottomPanel = new Panel();
             bottomPanel.setLayout(new GridLayout(0, 1));
             Label infoLabel1 = new Label("An error occured while running the applet.", Label.CENTER);
