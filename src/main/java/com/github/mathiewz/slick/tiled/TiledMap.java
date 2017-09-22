@@ -1,18 +1,23 @@
 package com.github.mathiewz.slick.tiled;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
+import java.util.function.Function;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 import com.github.mathiewz.slick.Image;
 import com.github.mathiewz.slick.SlickException;
@@ -84,10 +89,10 @@ public class TiledMap {
      * @param loadTileSets
      *            True if we want to load tilesets - including their image data
      */
-    public TiledMap(String ref, boolean loadTileSets) {
+    public TiledMap(String refArg, boolean loadTileSets) {
         this.loadTileSets = loadTileSets;
-        ref = ref.replace('\\', '/');
-        load(ResourceLoader.getResourceAsStream(ref), ref.substring(0, ref.lastIndexOf("/")));
+        String ref = refArg.replace('\\', '/');
+        load(ResourceLoader.getResourceAsStream(ref), ref.substring(0, ref.lastIndexOf('/')));
     }
 
     /**
@@ -440,8 +445,6 @@ public class TiledMap {
      *            to render something else between lines (@see
      *            {@link #renderedLine(int, int, int)}
      *
-     *            TODO: [Isometric map] Render stuff between lines, concept of
-     *            line differs from ortho maps
      */
     protected void renderIsometricMap(int x, int y, int width, int height, Layer layer, boolean lineByLine) {
         ArrayList<Layer> drawLayers = layers;
@@ -527,13 +530,7 @@ public class TiledMap {
         tilesLocation = tileSetsLocation;
 
         try {
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            factory.setValidating(false);
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            builder.setEntityResolver((publicId, systemId) -> new InputSource(new ByteArrayInputStream(new byte[0])));
-
-            Document doc = builder.parse(in);
-            Element docElement = doc.getDocumentElement();
+            Element docElement = getDocElement(in);
 
             orientation = docElement.getAttribute("orientation").equals("orthogonal") ? OrientationEnum.ORTHOGONAL : OrientationEnum.ISOMETRIC;
 
@@ -542,64 +539,80 @@ public class TiledMap {
             tileWidth = parseInt(docElement.getAttribute("tilewidth"));
             tileHeight = parseInt(docElement.getAttribute("tileheight"));
 
-            // now read the map properties
-            Element propsElement = (Element) docElement.getElementsByTagName("properties").item(0);
-            if (propsElement != null) {
-                NodeList properties = propsElement.getElementsByTagName("property");
-                if (properties != null) {
-                    props = new Properties();
-                    for (int p = 0; p < properties.getLength(); p++) {
-                        Element propElement = (Element) properties.item(p);
-
-                        String name = propElement.getAttribute("name");
-                        String value = propElement.getAttribute("value");
-                        props.setProperty(name, value);
-                    }
-                }
-            }
-
-            if (loadTileSets) {
-                TileSet tileSet = null;
-                TileSet lastSet = null;
-
-                NodeList setNodes = docElement.getElementsByTagName("tileset");
-                for (int i = 0; i < setNodes.getLength(); i++) {
-                    Element current = (Element) setNodes.item(i);
-
-                    tileSet = new TileSet(this, current, !headless);
-                    tileSet.index = i;
-
-                    if (lastSet != null) {
-                        lastSet.setLimit(tileSet.firstGID - 1);
-                    }
-                    lastSet = tileSet;
-
-                    tileSets.add(tileSet);
-                }
-            }
-
-            NodeList layerNodes = docElement.getElementsByTagName("layer");
-            for (int i = 0; i < layerNodes.getLength(); i++) {
-                Element current = (Element) layerNodes.item(i);
-                Layer layer = new Layer(this, current);
-                layer.index = i;
-
-                layers.add(layer);
-            }
-
-            // acquire object-groups
-            NodeList objectGroupNodes = docElement.getElementsByTagName("objectgroup");
-
-            for (int i = 0; i < objectGroupNodes.getLength(); i++) {
-                Element current = (Element) objectGroupNodes.item(i);
-                ObjectGroup objectGroup = new ObjectGroup(current);
-                objectGroup.index = i;
-
-                objectGroups.add(objectGroup);
-            }
+            loadProperties(docElement);
+            loadTileSet(docElement);
+            loadLayer(docElement);
+            loadObjectGroups(docElement);
         } catch (Exception e) {
             Log.error(e);
             throw new SlickException("Failed to parse tilemap", e);
+        }
+    }
+
+    private void loadObjectGroups(Element docElement) {
+        NodeList objectGroupNodes = docElement.getElementsByTagName("objectgroup");
+        for (int i = 0; i < objectGroupNodes.getLength(); i++) {
+            Element current = (Element) objectGroupNodes.item(i);
+            ObjectGroup objectGroup = new ObjectGroup(current);
+            objectGroups.add(objectGroup);
+        }
+    }
+
+    private Element getDocElement(InputStream in) throws ParserConfigurationException, SAXException, IOException {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        factory.setValidating(false);
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        builder.setEntityResolver((publicId, systemId) -> new InputSource(new ByteArrayInputStream(new byte[0])));
+        Document doc = builder.parse(in);
+        return doc.getDocumentElement();
+    }
+    
+    private void loadLayer(Element docElement) {
+        NodeList layerNodes = docElement.getElementsByTagName("layer");
+        for (int i = 0; i < layerNodes.getLength(); i++) {
+            Layer layer = new Layer(this, (Element) layerNodes.item(i));
+            layer.index = i;
+            layers.add(layer);
+        }
+    }
+    
+    private void loadProperties(Element docElement) {
+        Element propsElement = (Element) docElement.getElementsByTagName("properties").item(0);
+        if (propsElement == null) {
+            return;
+        }
+        NodeList properties = propsElement.getElementsByTagName("property");
+        if (properties == null) {
+            return;
+        }
+        props = new Properties();
+        for (int p = 0; p < properties.getLength(); p++) {
+            Element propElement = (Element) properties.item(p);
+
+            String name = propElement.getAttribute("name");
+            String value = propElement.getAttribute("value");
+            props.setProperty(name, value);
+        }
+    }
+    
+    private void loadTileSet(Element docElement) {
+        if (!loadTileSets) {
+            return;
+        }
+        TileSet lastSet = null;
+
+        NodeList setNodes = docElement.getElementsByTagName("tileset");
+        for (int i = 0; i < setNodes.getLength(); i++) {
+            Element current = (Element) setNodes.item(i);
+
+            TileSet tileSet = new TileSet(this, current, !headless);
+            tileSet.index = i;
+
+            if (lastSet != null) {
+                lastSet.setLimit(tileSet.firstGID - 1);
+            }
+            lastSet = tileSet;
+            tileSets.add(tileSet);
         }
     }
 
@@ -624,25 +637,6 @@ public class TiledMap {
     }
 
     /**
-     * Get a tileset by a given global ID
-     *
-     * @param gid
-     *            The global ID of the tileset to retrieve
-     * @return The tileset requested or null if no tileset matches
-     */
-    public TileSet getTileSetByGID(int gid) {
-        for (int i = 0; i < tileSets.size(); i++) {
-            TileSet set = tileSets.get(i);
-
-            if (set.contains(gid)) {
-                return set;
-            }
-        }
-
-        return null;
-    }
-
-    /**
      * Find a tile for a given global tile id
      *
      * @param gid
@@ -651,15 +645,9 @@ public class TiledMap {
      *         defined
      */
     public TileSet findTileSet(int gid) {
-        for (int i = 0; i < tileSets.size(); i++) {
-            TileSet set = tileSets.get(i);
-
-            if (set.contains(gid)) {
-                return set;
-            }
-        }
-
-        return null;
+        return tileSets.stream()
+                .filter(set -> set.contains(gid))
+                .findFirst().orElse(null);
     }
 
     /**
@@ -674,6 +662,7 @@ public class TiledMap {
      *            The layer being rendered
      */
     protected void renderedLine(int visualY, int mapY, int layer) {
+        // Nothing to do here
     }
 
     /**
@@ -694,11 +683,7 @@ public class TiledMap {
      *         occurred.
      */
     public int getObjectCount(int groupID) {
-        if (groupID >= 0 && groupID < objectGroups.size()) {
-            ObjectGroup grp = objectGroups.get(groupID);
-            return grp.objects.size();
-        }
-        return -1;
+        return groupID >= 0 && groupID < objectGroups.size() ? objectGroups.get(groupID).objects.size() : -1;
     }
 
     /**
@@ -711,14 +696,7 @@ public class TiledMap {
      * @return The name of an object or null, when error occurred
      */
     public String getObjectName(int groupID, int objectID) {
-        if (groupID >= 0 && groupID < objectGroups.size()) {
-            ObjectGroup grp = objectGroups.get(groupID);
-            if (objectID >= 0 && objectID < grp.objects.size()) {
-                GroupObject object = grp.objects.get(objectID);
-                return object.name;
-            }
-        }
-        return null;
+        return getObjectAttribute(groupID, objectID, object -> object.name, null);
     }
 
     /**
@@ -731,14 +709,7 @@ public class TiledMap {
      * @return The type of an object or null, when error occurred
      */
     public String getObjectType(int groupID, int objectID) {
-        if (groupID >= 0 && groupID < objectGroups.size()) {
-            ObjectGroup grp = objectGroups.get(groupID);
-            if (objectID >= 0 && objectID < grp.objects.size()) {
-                GroupObject object = grp.objects.get(objectID);
-                return object.type;
-            }
-        }
-        return null;
+        return getObjectAttribute(groupID, objectID, object -> object.type, null);
     }
 
     /**
@@ -751,14 +722,7 @@ public class TiledMap {
      * @return The x-coordinate of an object, or -1, when error occurred
      */
     public int getObjectX(int groupID, int objectID) {
-        if (groupID >= 0 && groupID < objectGroups.size()) {
-            ObjectGroup grp = objectGroups.get(groupID);
-            if (objectID >= 0 && objectID < grp.objects.size()) {
-                GroupObject object = grp.objects.get(objectID);
-                return object.x;
-            }
-        }
-        return -1;
+        return getObjectAttribute(groupID, objectID, object -> object.x, -1);
     }
 
     /**
@@ -771,14 +735,7 @@ public class TiledMap {
      * @return The y-coordinate of an object, or -1, when error occurred
      */
     public int getObjectY(int groupID, int objectID) {
-        if (groupID >= 0 && groupID < objectGroups.size()) {
-            ObjectGroup grp = objectGroups.get(groupID);
-            if (objectID >= 0 && objectID < grp.objects.size()) {
-                GroupObject object = grp.objects.get(objectID);
-                return object.y;
-            }
-        }
-        return -1;
+        return getObjectAttribute(groupID, objectID, object -> object.y, -1);
     }
 
     /**
@@ -791,14 +748,7 @@ public class TiledMap {
      * @return The width of an object, or -1, when error occurred
      */
     public int getObjectWidth(int groupID, int objectID) {
-        if (groupID >= 0 && groupID < objectGroups.size()) {
-            ObjectGroup grp = objectGroups.get(groupID);
-            if (objectID >= 0 && objectID < grp.objects.size()) {
-                GroupObject object = grp.objects.get(objectID);
-                return object.width;
-            }
-        }
-        return -1;
+        return getObjectAttribute(groupID, objectID, object -> object.width, -1);
     }
 
     /**
@@ -811,14 +761,18 @@ public class TiledMap {
      * @return The height of an object, or -1, when error occurred
      */
     public int getObjectHeight(int groupID, int objectID) {
+        return getObjectAttribute(groupID, objectID, object -> object.height, -1);
+    }
+
+    private <T> T getObjectAttribute(int groupID, int objectID, Function<GroupObject, T> getter, T def) {
         if (groupID >= 0 && groupID < objectGroups.size()) {
             ObjectGroup grp = objectGroups.get(groupID);
             if (objectID >= 0 && objectID < grp.objects.size()) {
                 GroupObject object = grp.objects.get(objectID);
-                return object.height;
+                return getter.apply(object);
             }
         }
-        return -1;
+        return def;
     }
 
     /**
@@ -831,20 +785,7 @@ public class TiledMap {
      * @return The image source reference or null if one isn't defined
      */
     public String getObjectImage(int groupID, int objectID) {
-        if (groupID >= 0 && groupID < objectGroups.size()) {
-            ObjectGroup grp = objectGroups.get(groupID);
-            if (objectID >= 0 && objectID < grp.objects.size()) {
-                GroupObject object = grp.objects.get(objectID);
-
-                if (object == null) {
-                    return null;
-                }
-
-                return object.image;
-            }
-        }
-
-        return null;
+        return getObjectAttribute(groupID, objectID, object -> object.image, null);
     }
 
     /**
@@ -863,22 +804,7 @@ public class TiledMap {
      *         no property with that name.
      */
     public String getObjectProperty(int groupID, int objectID, String propertyName, String def) {
-        if (groupID >= 0 && groupID < objectGroups.size()) {
-            ObjectGroup grp = objectGroups.get(groupID);
-            if (objectID >= 0 && objectID < grp.objects.size()) {
-                GroupObject object = grp.objects.get(objectID);
-
-                if (object == null) {
-                    return def;
-                }
-                if (object.props == null) {
-                    return def;
-                }
-
-                return object.props.getProperty(propertyName, def);
-            }
-        }
-        return def;
+        return getObjectAttribute(groupID, objectID, object -> object.props.getProperty(propertyName, def), def);
     }
 
     /**
@@ -887,19 +813,10 @@ public class TiledMap {
      * @author kulpae
      */
     protected class ObjectGroup {
-        /** The index of this group */
-        public int index;
-        /** The name of this group - read from the XML */
-        public String name;
         /** The Objects of this group */
-        public ArrayList<GroupObject> objects;
-        /** The width of this layer */
-        public int width;
-        /** The height of this layer */
-        public int height;
-
+        private List<GroupObject> objects;
         /** the properties of this group */
-        public Properties props;
+        private Properties props;
 
         /**
          * Create a new group based on the XML definition
@@ -908,9 +825,6 @@ public class TiledMap {
          *            The XML element describing the layer
          */
         public ObjectGroup(Element element) {
-            name = element.getAttribute("name");
-            width = Integer.parseInt(element.getAttribute("width"));
-            height = Integer.parseInt(element.getAttribute("height"));
             objects = new ArrayList<>();
 
             // now read the layer properties
@@ -933,7 +847,6 @@ public class TiledMap {
             for (int i = 0; i < objectNodes.getLength(); i++) {
                 Element objElement = (Element) objectNodes.item(i);
                 GroupObject object = new GroupObject(objElement);
-                object.index = i;
                 objects.add(object);
             }
         }
@@ -945,25 +858,23 @@ public class TiledMap {
      * @author kulpae
      */
     protected class GroupObject {
-        /** The index of this object */
-        public int index;
         /** The name of this object - read from the XML */
-        public String name;
+        private String name;
         /** The type of this object - read from the XML */
-        public String type;
+        private String type;
         /** The x-coordinate of this object */
-        public int x;
+        private int x;
         /** The y-coordinate of this object */
-        public int y;
+        private int y;
         /** The width of this object */
-        public int width;
+        private int width;
         /** The height of this object */
-        public int height;
+        private int height;
         /** The image source */
         private String image;
 
         /** the properties of this group */
-        public Properties props;
+        private Properties props;
 
         /**
          * Create a new group based on the XML definition
@@ -993,9 +904,9 @@ public class TiledMap {
                     for (int p = 0; p < properties.getLength(); p++) {
                         Element propElement = (Element) properties.item(p);
 
-                        String name = propElement.getAttribute("name");
+                        String nameAttr = propElement.getAttribute("name");
                         String value = propElement.getAttribute("value");
-                        props.setProperty(name, value);
+                        props.setProperty(nameAttr, value);
                     }
                 }
             }
