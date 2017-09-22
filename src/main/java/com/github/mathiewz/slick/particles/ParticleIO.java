@@ -38,11 +38,11 @@ import com.github.mathiewz.slick.util.ResourceLoader;
  * @author kevin
  */
 public class ParticleIO {
-
+    
     private ParticleIO() {
         // To avoid instantiation
     }
-
+    
     /**
      * Load a set of configured emitters into a single system
      *
@@ -56,7 +56,7 @@ public class ParticleIO {
     public static ParticleSystem loadConfiguredSystem(String ref, Color mask) throws IOException {
         return loadConfiguredSystem(ResourceLoader.getResourceAsStream(ref), null, null, mask);
     }
-
+    
     /**
      * Load a set of configured emitters into a single system
      *
@@ -69,7 +69,7 @@ public class ParticleIO {
     public static ParticleSystem loadConfiguredSystem(String ref) throws IOException {
         return loadConfiguredSystem(ResourceLoader.getResourceAsStream(ref), null, null, null);
     }
-
+    
     /**
      * Load a set of configured emitters into a single system
      *
@@ -82,7 +82,7 @@ public class ParticleIO {
     public static ParticleSystem loadConfiguredSystem(File ref) throws IOException {
         return loadConfiguredSystem(new FileInputStream(ref), null, null, null);
     }
-
+    
     /**
      * Load a set of configured emitters into a single system
      *
@@ -97,7 +97,7 @@ public class ParticleIO {
     public static ParticleSystem loadConfiguredSystem(InputStream ref, Color mask) throws IOException {
         return loadConfiguredSystem(ref, null, null, mask);
     }
-
+    
     /**
      * Load a set of configured emitters into a single system
      *
@@ -110,7 +110,7 @@ public class ParticleIO {
     public static ParticleSystem loadConfiguredSystem(InputStream ref) throws IOException {
         return loadConfiguredSystem(ref, null, null, null);
     }
-
+    
     /**
      * Load a set of configured emitters into a single system
      *
@@ -126,7 +126,7 @@ public class ParticleIO {
     public static ParticleSystem loadConfiguredSystem(String ref, ConfigurableEmitterFactory factory) throws IOException {
         return loadConfiguredSystem(ResourceLoader.getResourceAsStream(ref), factory, null, null);
     }
-
+    
     /**
      * Load a set of configured emitters into a single system
      *
@@ -142,7 +142,7 @@ public class ParticleIO {
     public static ParticleSystem loadConfiguredSystem(File ref, ConfigurableEmitterFactory factory) throws IOException {
         return loadConfiguredSystem(new FileInputStream(ref), factory, null, null);
     }
-
+    
     /**
      * Load a set of configured emitters into a single system
      *
@@ -158,7 +158,7 @@ public class ParticleIO {
     public static ParticleSystem loadConfiguredSystem(InputStream ref, ConfigurableEmitterFactory factory) throws IOException {
         return loadConfiguredSystem(ref, factory, null, null);
     }
-
+    
     /**
      * Load a set of configured emitters into a single system
      *
@@ -182,14 +182,14 @@ public class ParticleIO {
         try {
             DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
             Document document = builder.parse(ref);
-
+            
             Element element = document.getDocumentElement();
             if (!element.getNodeName().equals("system")) {
                 throw new IOException("Not a particle system file");
             }
-
+            
             if (system == null) {
-                system = new ParticleSystem("com/github/mathiewz/slick/data/particle.tga", 2000, mask);
+                system = new ParticleSystem("particle.tga", 2000, mask);
             }
             boolean additive = "true".equals(element.getAttribute("additive"));
             if (additive) {
@@ -199,16 +199,16 @@ public class ParticleIO {
             }
             boolean points = "true".equals(element.getAttribute("points"));
             system.setUsePoints(points);
-
+            
             NodeList list = element.getElementsByTagName("emitter");
             for (int i = 0; i < list.getLength(); i++) {
                 Element em = (Element) list.item(i);
                 ConfigurableEmitter emitter = factory.createEmitter("new");
                 elementToEmitter(em, emitter);
-
+                
                 system.addEmitter(emitter);
             }
-
+            
             system.setRemoveCompletedEmitters(false);
             return system;
         } catch (IOException e) {
@@ -219,7 +219,7 @@ public class ParticleIO {
             throw new IOException("Unable to load particle system config");
         }
     }
-
+    
     /**
      * Save a particle system with only ConfigurableEmitters in to an XML file
      *
@@ -233,7 +233,7 @@ public class ParticleIO {
     public static void saveConfiguredSystem(File file, ParticleSystem system) throws IOException {
         saveConfiguredSystem(new FileOutputStream(file), system);
     }
-
+    
     /**
      * Save a particle system with only ConfigurableEmitters in to an XML file
      *
@@ -248,11 +248,11 @@ public class ParticleIO {
         try {
             DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
             Document document = builder.newDocument();
-
+            
             Element root = document.createElement("system");
             root.setAttribute("additive", String.valueOf(system.getBlendingMode() == ParticleSystem.BLEND_ADDITIVE));
             root.setAttribute("points", String.valueOf(system.usePoints()));
-
+            
             document.appendChild(root);
             for (int i = 0; i < system.getEmitterCount(); i++) {
                 ParticleEmitter current = system.getEmitter(i);
@@ -263,21 +263,21 @@ public class ParticleIO {
                     throw new SlickException("Only ConfigurableEmitter instances can be stored");
                 }
             }
-
+            
             Result result = new StreamResult(new OutputStreamWriter(out, "utf-8"));
             DOMSource source = new DOMSource(document);
-
+            
             TransformerFactory factory = TransformerFactory.newInstance();
             Transformer xformer = factory.newTransformer();
             xformer.setOutputProperty(OutputKeys.INDENT, "yes");
-
+            
             xformer.transform(source, result);
         } catch (Exception e) {
             Log.error(e);
             throw new IOException("Unable to save configured particle system");
         }
     }
-
+    
     /**
      * Load a single emitter from an XML file
      *
@@ -291,7 +291,7 @@ public class ParticleIO {
     public static ConfigurableEmitter loadEmitter(String ref) throws IOException {
         return loadEmitter(ResourceLoader.getResourceAsStream(ref), null);
     }
-
+    
     /**
      * Load a single emitter from an XML file
      *
@@ -303,9 +303,9 @@ public class ParticleIO {
      */
     public static ConfigurableEmitter loadEmitter(File ref) throws IOException {
         return loadEmitter(new FileInputStream(ref), null);
-
+        
     }
-
+    
     /**
      * Load a single emitter from an XML file
      *
@@ -318,7 +318,7 @@ public class ParticleIO {
     public static ConfigurableEmitter loadEmitter(InputStream ref) throws IOException {
         return loadEmitter(ref, null);
     }
-
+    
     /**
      * Load a single emitter from an XML file
      *
@@ -335,7 +335,7 @@ public class ParticleIO {
     public static ConfigurableEmitter loadEmitter(String ref, ConfigurableEmitterFactory factory) throws IOException {
         return loadEmitter(ResourceLoader.getResourceAsStream(ref), factory);
     }
-
+    
     /**
      * Load a single emitter from an XML file
      *
@@ -350,9 +350,9 @@ public class ParticleIO {
      */
     public static ConfigurableEmitter loadEmitter(File ref, ConfigurableEmitterFactory factory) throws IOException {
         return loadEmitter(new FileInputStream(ref), factory);
-
+        
     }
-
+    
     /**
      * Load a single emitter from an XML file
      *
@@ -372,14 +372,14 @@ public class ParticleIO {
         try {
             DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
             Document document = builder.parse(ref);
-
+            
             if (!document.getDocumentElement().getNodeName().equals("emitter")) {
                 throw new IOException("Not a particle emitter file");
             }
-
+            
             ConfigurableEmitter emitter = factory.createEmitter("new");
             elementToEmitter(document.getDocumentElement(), emitter);
-
+            
             return emitter;
         } catch (IOException e) {
             Log.error(e);
@@ -389,7 +389,7 @@ public class ParticleIO {
             throw new IOException("Unable to load emitter");
         }
     }
-
+    
     /**
      * Save a single emitter to the XML file
      *
@@ -403,7 +403,7 @@ public class ParticleIO {
     public static void saveEmitter(File file, ConfigurableEmitter emitter) throws IOException {
         saveEmitter(new FileOutputStream(file), emitter);
     }
-
+    
     /**
      * Save a single emitter to the XML file
      *
@@ -418,22 +418,22 @@ public class ParticleIO {
         try {
             DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
             Document document = builder.newDocument();
-
+            
             document.appendChild(emitterToElement(document, emitter));
             Result result = new StreamResult(new OutputStreamWriter(out, "utf-8"));
             DOMSource source = new DOMSource(document);
-
+            
             TransformerFactory factory = TransformerFactory.newInstance();
             Transformer xformer = factory.newTransformer();
             xformer.setOutputProperty(OutputKeys.INDENT, "yes");
-
+            
             xformer.transform(source, result);
         } catch (Exception e) {
             Log.error(e);
             throw new IOException("Failed to save emitter");
         }
     }
-
+    
     /**
      * Get the first child named as specified from the passed XML element
      *
@@ -448,10 +448,10 @@ public class ParticleIO {
         if (list.getLength() == 0) {
             return null;
         }
-
+        
         return (Element) list.item(0);
     }
-
+    
     /**
      * Convert from an XML element to an configured emitter
      *
@@ -463,7 +463,7 @@ public class ParticleIO {
     private static void elementToEmitter(Element element, ConfigurableEmitter emitter) {
         emitter.name = element.getAttribute("name");
         emitter.setImageName(element.getAttribute("imageName"));
-
+        
         String renderType = element.getAttribute("renderType");
         emitter.usePoints = Particle.INHERIT_POINTS;
         if (renderType.equals("quads")) {
@@ -472,17 +472,17 @@ public class ParticleIO {
         if (renderType.equals("points")) {
             emitter.usePoints = Particle.USE_POINTS;
         }
-
+        
         String useOriented = element.getAttribute("useOriented");
         if (useOriented != null) {
             emitter.useOriented = "true".equals(useOriented);
         }
-
+        
         String useAdditive = element.getAttribute("useAdditive");
         if (useAdditive != null) {
             emitter.useAdditive = "true".equals(useAdditive);
         }
-
+        
         parseRangeElement(getFirstNamedElement(element, "spawnInterval"), emitter.spawnInterval);
         parseRangeElement(getFirstNamedElement(element, "spawnCount"), emitter.spawnCount);
         parseRangeElement(getFirstNamedElement(element, "initialLife"), emitter.initialLife);
@@ -493,7 +493,7 @@ public class ParticleIO {
         parseRangeElement(getFirstNamedElement(element, "speed"), emitter.speed);
         parseRangeElement(getFirstNamedElement(element, "length"), emitter.length);
         parseRangeElement(getFirstNamedElement(element, "emitCount"), emitter.emitCount);
-
+        
         parseValueElement(getFirstNamedElement(element, "spread"), emitter.spread);
         parseValueElement(getFirstNamedElement(element, "angularOffset"), emitter.angularOffset);
         parseValueElement(getFirstNamedElement(element, "growthFactor"), emitter.growthFactor);
@@ -505,7 +505,7 @@ public class ParticleIO {
         parseValueElement(getFirstNamedElement(element, "size"), emitter.size);
         parseValueElement(getFirstNamedElement(element, "velocity"), emitter.velocity);
         parseValueElement(getFirstNamedElement(element, "scaleY"), emitter.scaleY);
-
+        
         Element color = getFirstNamedElement(element, "color");
         NodeList steps = color.getElementsByTagName("step");
         emitter.colors.clear();
@@ -515,14 +515,14 @@ public class ParticleIO {
             float r = Float.parseFloat(step.getAttribute("r"));
             float g = Float.parseFloat(step.getAttribute("g"));
             float b = Float.parseFloat(step.getAttribute("b"));
-
+            
             emitter.addColorPoint(offset, new Color(r, g, b, 1));
         }
-
+        
         // generate new random play length
         emitter.replay();
     }
-
+    
     /**
      * Convert from an emitter to a XML element description
      *
@@ -538,7 +538,7 @@ public class ParticleIO {
         root.setAttribute("imageName", emitter.imageName == null ? "" : emitter.imageName);
         root.setAttribute("useOriented", emitter.useOriented ? "true" : "false");
         root.setAttribute("useAdditive", emitter.useAdditive ? "true" : "false");
-
+        
         if (emitter.usePoints == Particle.INHERIT_POINTS) {
             root.setAttribute("renderType", "inherit");
         }
@@ -548,7 +548,7 @@ public class ParticleIO {
         if (emitter.usePoints == Particle.USE_QUADS) {
             root.setAttribute("renderType", "quads");
         }
-
+        
         root.appendChild(createRangeElement(document, "spawnInterval", emitter.spawnInterval));
         root.appendChild(createRangeElement(document, "spawnCount", emitter.spawnCount));
         root.appendChild(createRangeElement(document, "initialLife", emitter.initialLife));
@@ -559,7 +559,7 @@ public class ParticleIO {
         root.appendChild(createRangeElement(document, "speed", emitter.speed));
         root.appendChild(createRangeElement(document, "length", emitter.length));
         root.appendChild(createRangeElement(document, "emitCount", emitter.emitCount));
-
+        
         root.appendChild(createValueElement(document, "spread", emitter.spread));
         root.appendChild(createValueElement(document, "angularOffset", emitter.angularOffset));
         root.appendChild(createValueElement(document, "growthFactor", emitter.growthFactor));
@@ -571,7 +571,7 @@ public class ParticleIO {
         root.appendChild(createValueElement(document, "size", emitter.size));
         root.appendChild(createValueElement(document, "velocity", emitter.velocity));
         root.appendChild(createValueElement(document, "scaleY", emitter.scaleY));
-
+        
         Element color = document.createElement("color");
         ArrayList<ColorRecord> list = emitter.colors;
         for (int i = 0; i < list.size(); i++) {
@@ -581,15 +581,15 @@ public class ParticleIO {
             step.setAttribute("r", String.valueOf(record.col.r));
             step.setAttribute("g", String.valueOf(record.col.g));
             step.setAttribute("b", String.valueOf(record.col.b));
-
+            
             color.appendChild(step);
         }
-
+        
         root.appendChild(color);
-
+        
         return root;
     }
-
+    
     /**
      * Create an XML element based on a configured range
      *
@@ -606,10 +606,10 @@ public class ParticleIO {
         element.setAttribute("min", String.valueOf(range.getMin()));
         element.setAttribute("max", String.valueOf(range.getMax()));
         element.setAttribute("enabled", String.valueOf(range.isEnabled()));
-
+        
         return element;
     }
-
+    
     /**
      * Create an XML element based on a configured value
      *
@@ -623,7 +623,7 @@ public class ParticleIO {
      */
     private static Element createValueElement(Document document, String name, ConfigurableEmitter.Value value) {
         Element element = document.createElement(name);
-
+        
         // void: now writes the value type
         if (value instanceof SimpleValue) {
             element.setAttribute("type", "simple");
@@ -636,24 +636,24 @@ public class ParticleIO {
             element.setAttribute("min", String.valueOf(((LinearInterpolator) value).getMin()));
             element.setAttribute("max", String.valueOf(((LinearInterpolator) value).getMax()));
             element.setAttribute("active", String.valueOf(((LinearInterpolator) value).isActive()));
-
+            
             ArrayList<Vector2f> curve = ((LinearInterpolator) value).getCurve();
             for (int i = 0; i < curve.size(); i++) {
                 Vector2f point = curve.get(i);
-
+                
                 Element pointElement = document.createElement("point");
                 pointElement.setAttribute("x", String.valueOf(point.getX()));
                 pointElement.setAttribute("y", String.valueOf(point.getY()));
-
+                
                 element.appendChild(pointElement);
             }
         } else {
             Log.warn("unkown value type ignored: " + value.getClass());
         }
-
+        
         return element;
     }
-
+    
     /**
      * Parse an XML element into a configured range
      *
@@ -670,7 +670,7 @@ public class ParticleIO {
         range.setMax(Float.parseFloat(element.getAttribute("max")));
         range.setEnabled("true".equals(element.getAttribute("enabled")));
     }
-
+    
     /**
      * Parse an XML element into a configured value
      *
@@ -683,10 +683,10 @@ public class ParticleIO {
         if (element == null) {
             return;
         }
-
+        
         String type = element.getAttribute("type");
         String v = element.getAttribute("value");
-
+        
         if (type == null || type.length() == 0) {
             // support for old style which did not write the type
             if (value instanceof SimpleValue) {
@@ -706,19 +706,19 @@ public class ParticleIO {
                 String min = element.getAttribute("min");
                 String max = element.getAttribute("max");
                 String active = element.getAttribute("active");
-
+                
                 NodeList points = element.getElementsByTagName("point");
-
+                
                 ArrayList<Vector2f> curve = new ArrayList<>();
                 for (int i = 0; i < points.getLength(); i++) {
                     Element point = (Element) points.item(i);
-
+                    
                     float x = Float.parseFloat(point.getAttribute("x"));
                     float y = Float.parseFloat(point.getAttribute("y"));
-
+                    
                     curve.add(new Vector2f(x, y));
                 }
-
+                
                 ((LinearInterpolator) value).setCurve(curve);
                 ((LinearInterpolator) value).setMin(Integer.parseInt(min));
                 ((LinearInterpolator) value).setMax(Integer.parseInt(max));
