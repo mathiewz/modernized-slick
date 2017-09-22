@@ -404,6 +404,7 @@ public class AppGameContainer extends GameContainer {
             try {
                 Thread.sleep(100);
             } catch (Exception e) {
+                Log.error(e);
             }
         } else {
             try {
@@ -419,10 +420,8 @@ public class AppGameContainer extends GameContainer {
 
         Display.update();
 
-        if (Display.isCloseRequested()) {
-            if (game.closeRequested()) {
-                running = false;
-            }
+        if (Display.isCloseRequested() && game.closeRequested()) {
+            running = false;
         }
     }
 

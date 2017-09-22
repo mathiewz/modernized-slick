@@ -381,8 +381,7 @@ public class Input {
         private static DirectionsEnum resolve(int index) {
             return Stream.of(values())
                     .filter(entry -> entry.ordinal() == index)
-                    .findAny()
-                    .orElse(null);
+                    .findAny().orElse(null);
         }
     }
     
@@ -399,7 +398,7 @@ public class Input {
 
             Log.info("Found " + controllers.size() + " controllers");
             for (int i = 0; i < controllers.size(); i++) {
-                Log.info(i + " : " + controllers.get(i).getName());
+                Log.info(i + " : " + getController(i).getName());
             }
         } catch (LWJGLException e) {
             throw new SlickException("Unable to create controllers", e);
@@ -761,7 +760,7 @@ public class Input {
      *            The key code of the key to check
      * @return True if the key is down
      */
-    public boolean isKeyDown(int code) {
+    public static boolean isKeyDown(int code) {
         return Keyboard.isKeyDown(code);
     }
 
@@ -770,7 +769,7 @@ public class Input {
      *
      * @return The absolute x position of the mouse cursor
      */
-    public int getAbsoluteMouseX() {
+    public static int getAbsoluteMouseX() {
         return Mouse.getX();
     }
 
@@ -788,7 +787,7 @@ public class Input {
      *
      * @return the first controller found, or null by default
      */
-    public Controller getFirstController() {
+    public static Controller getFirstController() {
         return getController(0);
     }
 
@@ -799,7 +798,7 @@ public class Input {
      *            the index of the controller
      * @return the controller if it exists, or null by default
      */
-    public Controller getController(int index) {
+    public static Controller getController(int index) {
         return index >= controllers.size() ? null : controllers.get(index);
     }
 
@@ -828,7 +827,7 @@ public class Input {
      *            The index of the button to check (starting at 0)
      * @return True if the mouse button is down
      */
-    public boolean isMouseButtonDown(int button) {
+    public static boolean isMouseButtonDown(int button) {
         return Mouse.isButtonDown(button);
     }
 
@@ -837,14 +836,8 @@ public class Input {
      *
      * @return True if any mouse button is down
      */
-    private boolean anyMouseDown() {
-        for (int i = 0; i < 3; i++) {
-            if (Mouse.isButtonDown(i)) {
-                return true;
-            }
-        }
-
-        return false;
+    private static boolean anyMouseDown() {
+        return IntStream.range(0, 3).anyMatch(Input::isMouseButtonDown);
     }
 
     /**
@@ -852,7 +845,7 @@ public class Input {
      *
      * @return The number of controllers available
      */
-    public int getControllerCount() {
+    public static int getControllerCount() {
         return controllers.size();
     }
 
@@ -863,8 +856,8 @@ public class Input {
      *            The index of the controller to check
      * @return The number of axis available on the controller
      */
-    public int getAxisCount(int controller) {
-        return controllers.get(controller).getAxisCount();
+    public static int getAxisCount(int controller) {
+        return getController(controller).getAxisCount();
     }
 
     /**
@@ -877,7 +870,7 @@ public class Input {
      * @return The axis value at time of reading
      */
     public float getAxisValue(int controller, int axis) {
-        return controllers.get(controller).getAxisValue(axis);
+        return getController(controller).getAxisValue(axis);
     }
 
     /**
@@ -890,7 +883,7 @@ public class Input {
      * @return The name of the specified axis
      */
     public String getAxisName(int controller, int axis) {
-        return controllers.get(controller).getAxisName(axis);
+        return getController(controller).getAxisName(axis);
     }
 
     /**
@@ -915,7 +908,7 @@ public class Input {
             return false;
         }
 
-        return controllers.get(controller).getXAxisValue() < -0.5f || controllers.get(controller).getPovX() < -0.5f;
+        return getController(controller).getXAxisValue() < -0.5f || getController(controller).getPovX() < -0.5f;
     }
 
     /**
@@ -940,7 +933,7 @@ public class Input {
             return false;
         }
 
-        return controllers.get(controller).getXAxisValue() > 0.5f || controllers.get(controller).getPovX() > 0.5f;
+        return getController(controller).getXAxisValue() > 0.5f || getController(controller).getPovX() > 0.5f;
     }
 
     /**
@@ -964,7 +957,7 @@ public class Input {
 
             return false;
         }
-        return controllers.get(controller).getYAxisValue() < -0.5f || controllers.get(controller).getPovY() < -0.5f;
+        return getController(controller).getYAxisValue() < -0.5f || getController(controller).getPovY() < -0.5f;
     }
 
     /**
@@ -989,7 +982,7 @@ public class Input {
             return false;
         }
 
-        return controllers.get(controller).getYAxisValue() > 0.5f || controllers.get(controller).getPovY() > 0.5f;
+        return getController(controller).getYAxisValue() > 0.5f || getController(controller).getPovY() > 0.5f;
 
     }
 
@@ -1002,7 +995,7 @@ public class Input {
      *            The index of the button to check
      * @return True if the button is pressed
      */
-    public boolean isButtonPressed(int index, int controller) {
+    public static boolean isButtonPressed(int index, int controller) {
         if (controller >= getControllerCount()) {
             return false;
         }
@@ -1017,7 +1010,7 @@ public class Input {
             return false;
         }
 
-        return controllers.get(controller).isButtonPressed(index);
+        return getController(controller).isButtonPressed(index);
     }
 
     /**
@@ -1413,6 +1406,9 @@ public class Input {
      * @return True if the control is pressed
      */
     private boolean isControlDwn(int index, int controllerIndex) {
+        if (index >= BUTTON1) {
+            return isButtonPressed(index - BUTTON1, controllerIndex);
+        }
         switch (DirectionsEnum.resolve(index)) {
             case LEFT:
                 return isControllerLeft(controllerIndex);
@@ -1422,12 +1418,9 @@ public class Input {
                 return isControllerUp(controllerIndex);
             case DOWN:
                 return isControllerDown(controllerIndex);
+            default:
+                break;
         }
-
-        if (index >= BUTTON1) {
-            return isButtonPressed(index - BUTTON1, controllerIndex);
-        }
-
         throw new SlickException("Unknown control index");
     }
 
