@@ -20,7 +20,7 @@ import com.github.mathiewz.slick.util.Log;
 public class Layer {
     /** The code used to decode Base64 encoding */
     private static byte[] baseCodes = new byte[256];
-
+    
     /**
      * Static initialiser for the codes created against Base64
      */
@@ -40,13 +40,13 @@ public class Layer {
         baseCodes['+'] = 62;
         baseCodes['/'] = 63;
     }
-
+    
     /** The map this layer belongs to */
     private final TiledMap map;
     /** The index of this layer */
     public int index;
     /** The name of this layer - read from the XML */
-    public String name;
+    private String name;
     /**
      * The tile data representing this data, index 0 = tileset, index 1 = tile
      * id
@@ -56,10 +56,10 @@ public class Layer {
     public int width;
     /** The height of this layer */
     public int height;
-
+    
     /** the properties of this layer */
     public Properties props;
-
+    
     /**
      * Create a new layer based on the XML definition
      *
@@ -74,7 +74,7 @@ public class Layer {
         width = Integer.parseInt(element.getAttribute("width"));
         height = Integer.parseInt(element.getAttribute("height"));
         data = new int[width][height][3];
-
+        
         // now read the layer properties
         Element propsElement = (Element) element.getElementsByTagName("properties").item(0);
         if (propsElement != null) {
@@ -83,25 +83,25 @@ public class Layer {
                 props = new Properties();
                 for (int p = 0; p < properties.getLength(); p++) {
                     Element propElement = (Element) properties.item(p);
-
+                    
                     String name = propElement.getAttribute("name");
                     String value = propElement.getAttribute("value");
                     props.setProperty(name, value);
                 }
             }
         }
-
+        
         Element dataNode = (Element) element.getElementsByTagName("data").item(0);
         String encoding = dataNode.getAttribute("encoding");
         String compression = dataNode.getAttribute("compression");
-
+        
         if (encoding.equals("base64") && compression.equals("gzip")) {
             try {
                 Node cdata = dataNode.getFirstChild();
                 char[] enc = cdata.getNodeValue().trim().toCharArray();
                 byte[] dec = decodeBase64(enc);
                 GZIPInputStream is = new GZIPInputStream(new ByteArrayInputStream(dec));
-
+                
                 for (int y = 0; y < height; y++) {
                     for (int x = 0; x < width; x++) {
                         int tileId = 0;
@@ -109,14 +109,14 @@ public class Layer {
                         tileId |= is.read() << 8;
                         tileId |= is.read() << 16;
                         tileId |= is.read() << 24;
-
+                        
                         if (tileId == 0) {
                             data[x][y][0] = -1;
                             data[x][y][1] = 0;
                             data[x][y][2] = 0;
                         } else {
                             TileSet set = map.findTileSet(tileId);
-
+                            
                             if (set != null) {
                                 data[x][y][0] = set.index;
                                 data[x][y][1] = tileId - set.firstGID;
@@ -133,7 +133,7 @@ public class Layer {
             throw new SlickException("Unsupport tiled map type: " + encoding + "," + compression + " (only gzip base64 supported)");
         }
     }
-
+    
     /**
      * Get the gloal ID of the tile at the specified location in this layer
      *
@@ -146,7 +146,7 @@ public class Layer {
     public int getTileID(int x, int y) {
         return data[x][y][2];
     }
-
+    
     /**
      * Set the global tile ID at a specified location
      *
@@ -164,13 +164,13 @@ public class Layer {
             data[x][y][2] = 0;
         } else {
             TileSet set = map.findTileSet(tile);
-
+            
             data[x][y][0] = set.index;
             data[x][y][1] = tile - set.firstGID;
             data[x][y][2] = tile;
         }
     }
-
+    
     /**
      * Render a section of this layer
      *
@@ -197,7 +197,7 @@ public class Layer {
     public void render(int x, int y, int sx, int sy, int width, int ty, boolean lineByLine, int mapTileWidth, int mapTileHeight) {
         for (int tileset = 0; tileset < map.getTileSetCount(); tileset++) {
             TileSet set = null;
-
+            
             for (int tx = 0; tx < width; tx++) {
                 if (sx + tx < 0 || sy + ty < 0) {
                     continue;
@@ -205,24 +205,24 @@ public class Layer {
                 if (sx + tx >= this.width || sy + ty >= height) {
                     continue;
                 }
-
+                
                 if (data[sx + tx][sy + ty][0] == tileset) {
                     if (set == null) {
                         set = map.getTileSet(tileset);
                         set.tiles.startUse();
                     }
-
+                    
                     int sheetX = set.getTileX(data[sx + tx][sy + ty][1]);
                     int sheetY = set.getTileY(data[sx + tx][sy + ty][1]);
-
+                    
                     int tileOffsetY = set.tileHeight - mapTileHeight;
-
+                    
                     // set.tiles.renderInUse(x+(tx*set.tileWidth),
                     // y+(ty*set.tileHeight), sheetX, sheetY);
                     set.tiles.renderInUse(x + tx * mapTileWidth, y + ty * mapTileHeight - tileOffsetY, sheetX, sheetY);
                 }
             }
-
+            
             if (lineByLine) {
                 if (set != null) {
                     set.tiles.endUse();
@@ -230,13 +230,13 @@ public class Layer {
                 }
                 map.renderedLine(ty, ty + sy, index);
             }
-
+            
             if (set != null) {
                 set.tiles.endUse();
             }
         }
     }
-
+    
     /**
      * Decode a Base64 string as encoded by TilED
      *
@@ -251,7 +251,7 @@ public class Layer {
                 --temp;
             }
         }
-
+        
         int len = temp / 4 * 3;
         if (temp % 4 == 3) {
             len += 2;
@@ -259,16 +259,16 @@ public class Layer {
         if (temp % 4 == 2) {
             len += 1;
         }
-
+        
         byte[] out = new byte[len];
-
+        
         int shift = 0;
         int accum = 0;
         int index = 0;
-
+        
         for (char element : data) {
             int value = element > 255 ? -1 : baseCodes[element];
-
+            
             if (value >= 0) {
                 accum <<= 6;
                 shift += 6;
@@ -279,11 +279,15 @@ public class Layer {
                 }
             }
         }
-
+        
         if (index != out.length) {
             throw new SlickException("Data length appears to be wrong (wrote " + index + " should be " + out.length + ")");
         }
-
+        
         return out;
+    }
+
+    public String getName() {
+        return name;
     }
 }

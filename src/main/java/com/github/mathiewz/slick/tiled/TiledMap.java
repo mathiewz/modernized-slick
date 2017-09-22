@@ -8,6 +8,7 @@ import java.util.Properties;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -53,17 +54,17 @@ public class TiledMap {
     protected ArrayList<Layer> layers = new ArrayList<>();
     /** The list of object-groups defined in the map */
     protected ArrayList<ObjectGroup> objectGroups = new ArrayList<>();
-
-    /** Indicates a orthogonal map */
-    protected static final int ORTHOGONAL = 1;
-    /** Indicates an isometric map */
-    protected static final int ISOMETRIC = 2;
-
+    
     /** The orientation of this map */
-    protected int orientation;
+    protected OrientationEnum orientation;
 
     /** True if we want to load tilesets - including their image data */
     private boolean loadTileSets = true;
+
+    private enum OrientationEnum {
+        ORTHOGONAL,
+        ISOMETRIC;
+    }
 
     /**
      * Create a new tile map based on a given TMX file
@@ -99,7 +100,7 @@ public class TiledMap {
      *            resources
      */
     public TiledMap(String ref, String tileSetsLocation) {
-        load(ResourceLoader.getResourceAsStream(ref), tileSetsLocation);
+        this(ResourceLoader.getResourceAsStream(ref), tileSetsLocation);
     }
 
     /**
@@ -109,7 +110,7 @@ public class TiledMap {
      *            The input stream to load from
      */
     public TiledMap(InputStream in) {
-        load(in, "");
+        this(in, StringUtils.EMPTY);
     }
 
     /**
@@ -144,12 +145,10 @@ public class TiledMap {
     public int getLayerIndex(String name) {
         for (int i = 0; i < layers.size(); i++) {
             Layer layer = layers.get(i);
-
-            if (layer.name.equals(name)) {
+            if (layer.getName().equals(name)) {
                 return i;
             }
         }
-
         return -1;
     }
 
@@ -168,17 +167,14 @@ public class TiledMap {
      */
     public Image getTileImage(int x, int y, int layerIndex) {
         Layer layer = layers.get(layerIndex);
-
         int tileSetIndex = layer.data[x][y][0];
         if (tileSetIndex >= 0 && tileSetIndex < tileSets.size()) {
             TileSet tileSet = tileSets.get(tileSetIndex);
-
-            int sheetX = tileSet.getTileX(layer.data[x][y][1]);
-            int sheetY = tileSet.getTileY(layer.data[x][y][1]);
-
+            int tile = layer.data[x][y][1];
+            int sheetX = tileSet.getTileX(tile);
+            int sheetY = tileSet.getTileY(tile);
             return tileSet.tiles.getSprite(sheetX, sheetY);
         }
-
         return null;
     }
 
@@ -230,8 +226,7 @@ public class TiledMap {
      * @return The global ID of the tile
      */
     public int getTileId(int x, int y, int layerIndex) {
-        Layer layer = layers.get(layerIndex);
-        return layer.getTileID(x, y);
+        return layers.get(layerIndex).getTileID(x, y);
     }
 
     /**
@@ -247,8 +242,7 @@ public class TiledMap {
      *            The tileid to be set
      */
     public void setTileId(int x, int y, int layerIndex, int tileid) {
-        Layer layer = layers.get(layerIndex);
-        layer.setTileID(x, y, tileid);
+        layers.get(layerIndex).setTileID(x, y, tileid);
     }
 
     /**
@@ -264,10 +258,7 @@ public class TiledMap {
      *         value if none is supplied)
      */
     public String getMapProperty(String propertyName, String def) {
-        if (props == null) {
-            return def;
-        }
-        return props.getProperty(propertyName, def);
+        return props == null ? def : props.getProperty(propertyName, def);
     }
 
     /**
@@ -286,10 +277,7 @@ public class TiledMap {
      */
     public String getLayerProperty(int layerIndex, String propertyName, String def) {
         Layer layer = layers.get(layerIndex);
-        if (layer == null || layer.props == null) {
-            return def;
-        }
-        return layer.props.getProperty(propertyName, def);
+        return layer == null || layer.props == null ? def : layer.props.getProperty(propertyName, def);
     }
 
     /**
@@ -313,11 +301,8 @@ public class TiledMap {
 
         TileSet set = findTileSet(tileID);
 
-        Properties props = set.getProperties(tileID);
-        if (props == null) {
-            return def;
-        }
-        return props.getProperty(propertyName, def);
+        Properties properties = set.getProperties(tileID);
+        return properties == null ? def : properties.getProperty(propertyName, def);
     }
 
     /**
@@ -343,7 +328,7 @@ public class TiledMap {
      *            The layer to render
      */
     public void render(int x, int y, int layer) {
-        render(x, y, 0, 0, getWidth(), getHeight(), layer, false);
+        render(x, y, 0, 0, width, height, layer, false);
     }
 
     /**
@@ -390,18 +375,12 @@ public class TiledMap {
      */
     public void render(int x, int y, int sx, int sy, int width, int height, int l, boolean lineByLine) {
         Layer layer = layers.get(l);
-
-        switch (orientation) {
-            case ORTHOGONAL:
-                for (int ty = 0; ty < height; ty++) {
-                    layer.render(x, y, sx, sy, width, ty, lineByLine, tileWidth, tileHeight);
-                }
-                break;
-            case ISOMETRIC:
-                renderIsometricMap(x, y, sx, sy, width, height, layer, lineByLine);
-                break;
-            default:
-                // log error or something
+        if (orientation == OrientationEnum.ORTHOGONAL) {
+            for (int ty = 0; ty < height; ty++) {
+                layer.render(x, y, sx, sy, width, ty, lineByLine, tileWidth, tileHeight);
+            }
+        } else {
+            renderIsometricMap(x, y, width, height, layer, lineByLine);
         }
     }
 
@@ -426,20 +405,15 @@ public class TiledMap {
      *            {@link #renderedLine(int, int, int)}
      */
     public void render(int x, int y, int sx, int sy, int width, int height, boolean lineByLine) {
-        switch (orientation) {
-            case ORTHOGONAL:
-                for (int ty = 0; ty < height; ty++) {
-                    for (int i = 0; i < layers.size(); i++) {
-                        Layer layer = layers.get(i);
-                        layer.render(x, y, sx, sy, width, ty, lineByLine, tileWidth, tileHeight);
-                    }
+        if (orientation == OrientationEnum.ORTHOGONAL) {
+            for (int ty = 0; ty < height; ty++) {
+                for (int i = 0; i < layers.size(); i++) {
+                    Layer layer = layers.get(i);
+                    layer.render(x, y, sx, sy, width, ty, lineByLine, tileWidth, tileHeight);
                 }
-                break;
-            case ISOMETRIC:
-                renderIsometricMap(x, y, sx, sy, width, height, null, lineByLine);
-                break;
-            default:
-                // log error or something
+            }
+        } else {
+            renderIsometricMap(x, y, width, height, null, lineByLine);
         }
     }
 
@@ -469,7 +443,7 @@ public class TiledMap {
      *            TODO: [Isometric map] Render stuff between lines, concept of
      *            line differs from ortho maps
      */
-    protected void renderIsometricMap(int x, int y, int sx, int sy, int width, int height, Layer layer, boolean lineByLine) {
+    protected void renderIsometricMap(int x, int y, int width, int height, Layer layer, boolean lineByLine) {
         ArrayList<Layer> drawLayers = layers;
         if (layer != null) {
             drawLayers = new ArrayList<>();
@@ -479,53 +453,42 @@ public class TiledMap {
         int maxCount = width * height;
         int allCount = 0;
 
-        boolean allProcessed = false;
-
         int initialLineX = x;
         int initialLineY = y;
 
         int startLineTileX = 0;
         int startLineTileY = 0;
-        while (!allProcessed) {
+        while (allCount < maxCount) {
 
             int currentTileX = startLineTileX;
             int currentTileY = startLineTileY;
             int currentLineX = initialLineX;
 
-            int min = 0;
-            if (height > width) {
-                min = startLineTileY < width - 1 ? startLineTileY : width - currentTileX < height ? width - currentTileX - 1 : width - 1;
-            } else {
-                min = startLineTileY < height - 1 ? startLineTileY : width - currentTileX < height ? width - currentTileX - 1 : height - 1;
-            }
+            int min = getMin(width, height, startLineTileY, currentTileX);
 
             for (int burner = 0; burner <= min; currentTileX++, currentTileY--, burner++) {
-                for (int layerIdx = 0; layerIdx < drawLayers.size(); layerIdx++) {
-                    Layer currentLayer = drawLayers.get(layerIdx);
+                for (Layer currentLayer : drawLayers) {
                     currentLayer.render(currentLineX, initialLineY, currentTileX, currentTileY, 1, 0, lineByLine, tileWidth, tileHeight);
                 }
                 currentLineX += tileWidth;
-
                 allCount++;
             }
 
-            // System.out.println("Line : " + counter++ + " - " + count +
-            // "allcount : " + allCount);
-
-            if (startLineTileY < height - 1) {
-                startLineTileY += 1;
-                initialLineX -= tileWidth / 2;
-                initialLineY += tileHeight / 2;
-            } else {
-                startLineTileX += 1;
-                initialLineX += tileWidth / 2;
-                initialLineY += tileHeight / 2;
-            }
-
-            if (allCount >= maxCount) {
-                allProcessed = true;
-            }
+            int modifier = startLineTileY < height - 1 ? -1 : 1;
+            startLineTileY += 1;
+            initialLineX += modifier * tileWidth / 2;
+            initialLineY += tileHeight / 2;
         }
+    }
+
+    private int getMin(int width, int height, int startLineTileY, int currentTileX) {
+        int value = height > width ? width : height;
+        if (startLineTileY < value - 1) {
+            return startLineTileY;
+        } else if (width - currentTileX < height) {
+            return width - currentTileX - 1;
+        }
+        return value - 1;
     }
 
     /**
@@ -572,11 +535,7 @@ public class TiledMap {
             Document doc = builder.parse(in);
             Element docElement = doc.getDocumentElement();
 
-            if (docElement.getAttribute("orientation").equals("orthogonal")) {
-                orientation = ORTHOGONAL;
-            } else {
-                orientation = ISOMETRIC;
-            }
+            orientation = docElement.getAttribute("orientation").equals("orthogonal") ? OrientationEnum.ORTHOGONAL : OrientationEnum.ISOMETRIC;
 
             width = parseInt(docElement.getAttribute("width"));
             height = parseInt(docElement.getAttribute("height"));
