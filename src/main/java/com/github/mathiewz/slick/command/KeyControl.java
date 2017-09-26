@@ -9,7 +9,7 @@ package com.github.mathiewz.slick.command;
 public class KeyControl implements Control {
     /** The key code that needs to be pressed */
     private final int keycode;
-
+    
     /**
      * Create a new control that caused an command to be fired on a key pressed/released
      *
@@ -19,19 +19,15 @@ public class KeyControl implements Control {
     public KeyControl(int keycode) {
         this.keycode = keycode;
     }
-
+    
     /**
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
     public boolean equals(Object o) {
-        if (o instanceof KeyControl) {
-            return ((KeyControl) o).keycode == keycode;
-        }
-
-        return false;
+        return o instanceof KeyControl ? ((KeyControl) o).keycode == keycode : false;
     }
-
+    
     /**
      * @see java.lang.Object#hashCode()
      */

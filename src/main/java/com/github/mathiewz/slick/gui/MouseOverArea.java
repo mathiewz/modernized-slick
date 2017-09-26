@@ -16,58 +16,58 @@ import com.github.mathiewz.slick.geom.Shape;
 public class MouseOverArea extends AbstractComponent {
     /** The default state */
     private static final int NORMAL = 1;
-
+    
     /** The mouse down state */
     private static final int MOUSE_DOWN = 2;
-
+    
     /** The mouse over state */
     private static final int MOUSE_OVER = 3;
-
+    
     /** The normalImage being displayed in normal state */
     private Image normalImage;
-
+    
     /** The normalImage being displayed in mouseOver state */
     private Image mouseOverImage;
-
+    
     /** The normalImage being displayed in mouseDown state */
     private Image mouseDownImage;
-
+    
     /** The colour used in normal state */
     private Color normalColor = Color.white;
-
+    
     /** The colour used in mouseOver state */
     private Color mouseOverColor = Color.white;
-
+    
     /** The colour used in mouseDown state */
     private Color mouseDownColor = Color.white;
-
+    
     /** The sound for mouse over */
     private Sound mouseOverSound;
-
+    
     /** The sound for mouse down */
     private Sound mouseDownSound;
-
+    
     /** The shape defining the area */
     private final Shape area;
-
+    
     /** The current normalImage being displayed */
     private Image currentImage;
-
+    
     /** The current color being used */
     private Color currentColor;
-
+    
     /** True if the mouse is over the area */
     private boolean over;
-
+    
     /** True if the mouse button is pressed */
     private boolean mouseDown;
-
+    
     /** The state of the area */
     private int state = NORMAL;
-
+    
     /** True if the mouse has been up since last press */
     private boolean mouseUp;
-
+    
     /**
      * Create a new mouse over area
      *
@@ -86,7 +86,7 @@ public class MouseOverArea extends AbstractComponent {
         this(container, image, x, y, image.getWidth(), image.getHeight());
         addListener(listener);
     }
-
+    
     /**
      * Create a new mouse over area
      *
@@ -102,7 +102,7 @@ public class MouseOverArea extends AbstractComponent {
     public MouseOverArea(GUIContext container, Image image, int x, int y) {
         this(container, image, x, y, image.getWidth(), image.getHeight());
     }
-
+    
     /**
      * Create a new mouse over area
      *
@@ -125,7 +125,7 @@ public class MouseOverArea extends AbstractComponent {
         this(container, image, x, y, width, height);
         addListener(listener);
     }
-
+    
     /**
      * Create a new mouse over area
      *
@@ -145,7 +145,7 @@ public class MouseOverArea extends AbstractComponent {
     public MouseOverArea(GUIContext container, Image image, int x, int y, int width, int height) {
         this(container, image, new Rectangle(x, y, width, height));
     }
-
+    
     /**
      * Create a new mouse over area
      *
@@ -158,22 +158,22 @@ public class MouseOverArea extends AbstractComponent {
      */
     public MouseOverArea(GUIContext container, Image image, Shape shape) {
         super(container);
-
+        
         area = shape;
         normalImage = image;
         currentImage = image;
         mouseOverImage = image;
         mouseDownImage = image;
-
+        
         currentColor = normalColor;
-
+        
         state = NORMAL;
         Input input = container.getInput();
         over = area.contains(input.getMouseX(), input.getMouseY());
-        mouseDown = input.isMouseButtonDown(0);
+        mouseDown = Input.isMouseButtonDown(0);
         updateImage();
     }
-
+    
     /**
      * Moves the component.
      *
@@ -188,7 +188,7 @@ public class MouseOverArea extends AbstractComponent {
             area.setY(y);
         }
     }
-
+    
     /**
      * Set the x coordinate of this area
      *
@@ -198,7 +198,7 @@ public class MouseOverArea extends AbstractComponent {
     public void setX(float x) {
         area.setX(x);
     }
-
+    
     /**
      * Set the y coordinate of this area
      *
@@ -208,7 +208,7 @@ public class MouseOverArea extends AbstractComponent {
     public void setY(float y) {
         area.setY(y);
     }
-
+    
     /**
      * Returns the position in the X coordinate
      *
@@ -218,7 +218,7 @@ public class MouseOverArea extends AbstractComponent {
     public int getX() {
         return (int) area.getX();
     }
-
+    
     /**
      * Returns the position in the Y coordinate
      *
@@ -228,7 +228,7 @@ public class MouseOverArea extends AbstractComponent {
     public int getY() {
         return (int) area.getY();
     }
-
+    
     /**
      * Set the normal color used on the image in the default state
      *
@@ -238,7 +238,7 @@ public class MouseOverArea extends AbstractComponent {
     public void setNormalColor(Color color) {
         normalColor = color;
     }
-
+    
     /**
      * Set the color to be used when the mouse is over the area
      *
@@ -248,7 +248,7 @@ public class MouseOverArea extends AbstractComponent {
     public void setMouseOverColor(Color color) {
         mouseOverColor = color;
     }
-
+    
     /**
      * Set the color to be used when the mouse is down the area
      *
@@ -258,7 +258,7 @@ public class MouseOverArea extends AbstractComponent {
     public void setMouseDownColor(Color color) {
         mouseDownColor = color;
     }
-
+    
     /**
      * Set the normal image used on the image in the default state
      *
@@ -268,7 +268,7 @@ public class MouseOverArea extends AbstractComponent {
     public void setNormalImage(Image image) {
         normalImage = image;
     }
-
+    
     /**
      * Set the image to be used when the mouse is over the area
      *
@@ -278,7 +278,7 @@ public class MouseOverArea extends AbstractComponent {
     public void setMouseOverImage(Image image) {
         mouseOverImage = image;
     }
-
+    
     /**
      * Set the image to be used when the mouse is down the area
      *
@@ -288,7 +288,7 @@ public class MouseOverArea extends AbstractComponent {
     public void setMouseDownImage(Image image) {
         mouseDownImage = image;
     }
-
+    
     /**
      * @see com.github.mathiewz.slick.gui.AbstractComponent#render(com.github.mathiewz.slick.gui.GUIContext,
      *      com.github.mathiewz.slick.Graphics)
@@ -296,10 +296,10 @@ public class MouseOverArea extends AbstractComponent {
     @Override
     public void render(GUIContext container, Graphics g) {
         if (currentImage != null) {
-
+            
             int xp = (int) (area.getX() + (getWidth() - currentImage.getWidth()) / 2);
             int yp = (int) (area.getY() + (getHeight() - currentImage.getHeight()) / 2);
-
+            
             currentImage.draw(xp, yp, currentColor);
         } else {
             g.setColor(currentColor);
@@ -307,7 +307,7 @@ public class MouseOverArea extends AbstractComponent {
         }
         updateImage();
     }
-
+    
     /**
      * Update the current normalImage based on the mouse state
      */
@@ -326,11 +326,11 @@ public class MouseOverArea extends AbstractComponent {
                     currentImage = mouseDownImage;
                     currentColor = mouseDownColor;
                     state = MOUSE_DOWN;
-
+                    
                     notifyListeners();
                     mouseUp = false;
                 }
-
+                
                 return;
             } else {
                 mouseUp = true;
@@ -344,11 +344,11 @@ public class MouseOverArea extends AbstractComponent {
                 }
             }
         }
-
+        
         mouseDown = false;
         state = NORMAL;
     }
-
+    
     /**
      * Set the mouse over sound effect
      *
@@ -358,7 +358,7 @@ public class MouseOverArea extends AbstractComponent {
     public void setMouseOverSound(Sound sound) {
         mouseOverSound = sound;
     }
-
+    
     /**
      * Set the mouse down sound effect
      *
@@ -368,7 +368,7 @@ public class MouseOverArea extends AbstractComponent {
     public void setMouseDownSound(Sound sound) {
         mouseDownSound = sound;
     }
-
+    
     /**
      * @see com.github.mathiewz.slick.util.InputAdapter#mouseMoved(int, int, int, int)
      */
@@ -376,7 +376,7 @@ public class MouseOverArea extends AbstractComponent {
     public void mouseMoved(int oldx, int oldy, int newx, int newy) {
         over = area.contains(newx, newy);
     }
-
+    
     /**
      * @see com.github.mathiewz.slick.util.InputAdapter#mouseDragged(int, int, int, int)
      */
@@ -384,7 +384,7 @@ public class MouseOverArea extends AbstractComponent {
     public void mouseDragged(int oldx, int oldy, int newx, int newy) {
         mouseMoved(oldx, oldy, newx, newy);
     }
-
+    
     /**
      * @see com.github.mathiewz.slick.util.InputAdapter#mousePressed(int, int, int)
      */
@@ -395,7 +395,7 @@ public class MouseOverArea extends AbstractComponent {
             mouseDown = true;
         }
     }
-
+    
     /**
      * @see com.github.mathiewz.slick.util.InputAdapter#mouseReleased(int, int, int)
      */
@@ -406,7 +406,7 @@ public class MouseOverArea extends AbstractComponent {
             mouseDown = false;
         }
     }
-
+    
     /**
      * @see com.github.mathiewz.slick.gui.AbstractComponent#getHeight()
      */
@@ -414,7 +414,7 @@ public class MouseOverArea extends AbstractComponent {
     public int getHeight() {
         return (int) (area.getMaxY() - area.getY());
     }
-
+    
     /**
      * @see com.github.mathiewz.slick.gui.AbstractComponent#getWidth()
      */
@@ -422,7 +422,7 @@ public class MouseOverArea extends AbstractComponent {
     public int getWidth() {
         return (int) (area.getMaxX() - area.getX());
     }
-
+    
     /**
      * Check if the mouse is over this area
      *
@@ -431,7 +431,7 @@ public class MouseOverArea extends AbstractComponent {
     public boolean isMouseOver() {
         return over;
     }
-
+    
     /**
      * Set the location of this area
      *

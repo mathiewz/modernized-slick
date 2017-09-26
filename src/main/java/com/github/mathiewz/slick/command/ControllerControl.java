@@ -1,5 +1,8 @@
 package com.github.mathiewz.slick.command;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 /**
  * A control describing input provided from a controller. This allows controls to be
  * mapped to game pad inputs.
@@ -9,14 +12,6 @@ package com.github.mathiewz.slick.command;
 abstract class ControllerControl implements Control {
     /** Indicates a button was pressed */
     protected static final int BUTTON_EVENT = 0;
-    /** Indicates left was pressed */
-    protected static final int LEFT_EVENT = 1;
-    /** Indicates right was pressed */
-    protected static final int RIGHT_EVENT = 2;
-    /** Indicates up was pressed */
-    protected static final int UP_EVENT = 3;
-    /** Indicates down was pressed */
-    protected static final int DOWN_EVENT = 4;
 
     /** The type of event we're looking for */
     private final int event;
@@ -46,16 +41,15 @@ abstract class ControllerControl implements Control {
      */
     @Override
     public boolean equals(Object o) {
-        if (o == null) {
+        if (o == null || !(o instanceof ControllerControl)) {
             return false;
         }
-        if (!(o instanceof ControllerControl)) {
-            return false;
-        }
-
         ControllerControl c = (ControllerControl) o;
-
-        return c.controllerNumber == controllerNumber && c.event == event && c.button == button;
+        return new EqualsBuilder()
+                .append(controllerNumber, c.controllerNumber)
+                .append(event, c.event)
+                .append(button, c.button)
+                .isEquals();
     }
 
     /**
@@ -63,6 +57,10 @@ abstract class ControllerControl implements Control {
      */
     @Override
     public int hashCode() {
-        return event + button + controllerNumber;
+        return new HashCodeBuilder()
+                .append(controllerNumber)
+                .append(event)
+                .append(button)
+                .toHashCode();
     }
 }

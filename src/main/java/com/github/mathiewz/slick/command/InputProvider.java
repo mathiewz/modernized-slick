@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.function.Consumer;
 
 import com.github.mathiewz.slick.Input;
+import com.github.mathiewz.slick.command.ControllerDirectionControl.Direction;
 import com.github.mathiewz.slick.util.InputAdapter;
 
 /**
@@ -163,10 +165,8 @@ public class InputProvider {
      */
     public void unbindCommand(Control control) {
         Command command = commands.remove(control);
-        if (command != null) {
-            if (!commands.values().contains(command)) {
-                commandState.remove(command);
-            }
+        if (command != null && !commands.values().contains(command)) {
+            commandState.remove(command);
         }
     }
 
@@ -344,21 +344,15 @@ public class InputProvider {
          */
         @Override
         public void controllerLeftPressed(int controller) {
-            Command command = commands.get(new ControllerDirectionControl(controller, ControllerDirectionControl.LEFT));
-            if (command != null) {
-                firePressed(command);
-            }
+            controllerDirectionPressed(controller, Direction.LEFT);
         }
-
+        
         /**
          * @see com.github.mathiewz.slick.util.InputAdapter#controllerLeftReleased(int)
          */
         @Override
         public void controllerLeftReleased(int controller) {
-            Command command = commands.get(new ControllerDirectionControl(controller, ControllerDirectionControl.LEFT));
-            if (command != null) {
-                fireReleased(command);
-            }
+            controllerDirectionReleased(controller, Direction.LEFT);
         }
 
         /**
@@ -366,10 +360,7 @@ public class InputProvider {
          */
         @Override
         public void controllerRightPressed(int controller) {
-            Command command = commands.get(new ControllerDirectionControl(controller, ControllerDirectionControl.RIGHT));
-            if (command != null) {
-                firePressed(command);
-            }
+            controllerDirectionPressed(controller, Direction.RIGHT);
         }
 
         /**
@@ -377,10 +368,7 @@ public class InputProvider {
          */
         @Override
         public void controllerRightReleased(int controller) {
-            Command command = commands.get(new ControllerDirectionControl(controller, ControllerDirectionControl.RIGHT));
-            if (command != null) {
-                fireReleased(command);
-            }
+            controllerDirectionReleased(controller, Direction.RIGHT);
         }
 
         /**
@@ -388,10 +376,7 @@ public class InputProvider {
          */
         @Override
         public void controllerUpPressed(int controller) {
-            Command command = commands.get(new ControllerDirectionControl(controller, ControllerDirectionControl.UP));
-            if (command != null) {
-                firePressed(command);
-            }
+            controllerDirectionPressed(controller, Direction.UP);
         }
 
         /**
@@ -399,10 +384,7 @@ public class InputProvider {
          */
         @Override
         public void controllerUpReleased(int controller) {
-            Command command = commands.get(new ControllerDirectionControl(controller, ControllerDirectionControl.UP));
-            if (command != null) {
-                fireReleased(command);
-            }
+            controllerDirectionReleased(controller, Direction.UP);
         }
 
         /**
@@ -410,10 +392,7 @@ public class InputProvider {
          */
         @Override
         public void controllerDownPressed(int controller) {
-            Command command = commands.get(new ControllerDirectionControl(controller, ControllerDirectionControl.DOWN));
-            if (command != null) {
-                firePressed(command);
-            }
+            controllerDirectionPressed(controller, Direction.DOWN);
         }
 
         /**
@@ -421,21 +400,21 @@ public class InputProvider {
          */
         @Override
         public void controllerDownReleased(int controller) {
-            Command command = commands.get(new ControllerDirectionControl(controller, ControllerDirectionControl.DOWN));
-            if (command != null) {
-                fireReleased(command);
-            }
+            controllerDirectionReleased(controller, Direction.DOWN);
         }
-
-        /**
-         * @see com.github.mathiewz.slick.util.InputAdapter#controllerButtonPressed(int,
-         *      int)
-         */
-        @Override
-        public void controllerButtonPressed(int controller, int button) {
-            Command command = commands.get(new ControllerButtonControl(controller, button));
+        
+        private void controllerDirectionPressed(int controller, Direction direction) {
+            controllerDirectionStateChanged(controller, direction, InputProvider.this::firePressed);
+        }
+        
+        private void controllerDirectionReleased(int controller, Direction direction) {
+            controllerDirectionStateChanged(controller, direction, InputProvider.this::fireReleased);
+        }
+        
+        private void controllerDirectionStateChanged(int controller, Direction direction, Consumer<Command> action) {
+            Command command = commands.get(new ControllerDirectionControl(controller, direction));
             if (command != null) {
-                firePressed(command);
+                action.accept(command);
             }
         }
 
@@ -450,5 +429,18 @@ public class InputProvider {
                 fireReleased(command);
             }
         }
-    };
+        
+        /**
+         * @see com.github.mathiewz.slick.util.InputAdapter#controllerButtonPressed(int,
+         *      int)
+         */
+        @Override
+        public void controllerButtonPressed(int controller, int button) {
+            Command command = commands.get(new ControllerButtonControl(controller, button));
+            if (command != null) {
+                firePressed(command);
+            }
+        }
+
+    }
 }
