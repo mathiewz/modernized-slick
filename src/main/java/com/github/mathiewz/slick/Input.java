@@ -23,15 +23,15 @@ import com.github.mathiewz.slick.util.Log;
  * @author kevin
  */
 public class Input {
-    
+
     private static final List<String> blackListedControllers = Arrays.asList("Keyboard", "Mouse");
-    
+
     /** The controller index to pass to check all controllers */
     public static final int ANY_CONTROLLER = -1;
-
+    
     /** The maximum number of buttons on controllers */
     private static final int MAX_BUTTONS = 100;
-
+    
     /** */
     public static final int KEY_ESCAPE = 0x01;
     /** */
@@ -280,25 +280,25 @@ public class Input {
     public static final int KEY_POWER = 0xDE;
     /** */
     public static final int KEY_SLEEP = 0xDF;
-
+    
     /** A helper for left ALT */
     public static final int KEY_LALT = KEY_LMENU;
     /** A helper for right ALT */
     public static final int KEY_RALT = KEY_RMENU;
-    
+
     /** Control index */
     private static final int BUTTON1 = 4;
-
+    
     /** The left mouse button indicator */
     public static final int MOUSE_LEFT_BUTTON = 0;
     /** The right mouse button indicator */
     public static final int MOUSE_RIGHT_BUTTON = 1;
     /** The middle mouse button indicator */
     public static final int MOUSE_MIDDLE_BUTTON = 2;
-
+    
     /** The list of controllers */
     private static ArrayList<Controller> controllers = new ArrayList<>();
-
+    
     /** The last recorded mouse x position */
     private int lastMouseX;
     /** The last recorded mouse y position */
@@ -307,14 +307,14 @@ public class Input {
     protected boolean[] mousePressed = new boolean[10];
     /** THe state of the controller buttons */
     private final boolean[][] controllerPressed = new boolean[100][MAX_BUTTONS];
-
+    
     /** The character values representing the pressed keys */
     protected char[] keys = new char[1024];
     /** True if the key has been pressed since last queries */
     protected boolean[] pressed = new boolean[1024];
     /** The time since the next key repeat to be fired for the key */
     protected long[] nextRepeat = new long[1024];
-
+    
     /** The control states from the controllers */
     private final boolean[][] controls = new boolean[10][MAX_BUTTONS + 10];
     /** True if the event has been consumed */
@@ -333,17 +333,17 @@ public class Input {
     protected ArrayList<ControllerListener> controllerListeners = new ArrayList<>();
     /** The height of the display */
     private int height;
-
+    
     /** True if the display is active */
     private boolean displayActive = true;
-
+    
     /** True if key repeat is enabled */
     private boolean keyRepeat;
     /** The initial delay for key repeat starts */
     private int keyRepeatInitial;
     /** The interval of key repeat */
     private int keyRepeatInterval;
-
+    
     /** True if the input is currently paused */
     private boolean paused;
     /** The scale to apply to screen coordinates */
@@ -354,48 +354,48 @@ public class Input {
     private float xoffset = 0;
     /** The offset to apply to screen coordinates */
     private float yoffset = 0;
-
+    
     /** The delay before determining a single or double click */
     private int doubleClickDelay = 250;
     /** The timer running out for a single click */
     private long doubleClickTimeout = 0;
-
+    
     /** The clicked button */
     private int clickButton;
-
+    
     /** The x position location the mouse was pressed */
     private int pressedX = -1;
-
+    
     /** The x position location the mouse was pressed */
     private int pressedY = -1;
-
+    
     /** The pixel distance the mouse can move to accept a mouse click */
     private int mouseClickTolerance = 5;
-
+    
     private enum DirectionsEnum {
         LEFT,
         RIGHT,
         UP,
         DOWN;
-
+        
         private static DirectionsEnum resolve(int index) {
             return Stream.of(values())
                     .filter(entry -> entry.ordinal() == index)
                     .findAny().orElse(null);
         }
     }
-    
+
     static {
         try {
             Controllers.create();
-
+            
             IntStream.range(0, Controllers.getControllerCount())
                     .mapToObj(Controllers::getController)
                     .filter(controller -> controller.getButtonCount() >= 3)
                     .filter(controller -> controller.getButtonCount() < MAX_BUTTONS)
                     .filter(controller -> blackListedControllers.stream().noneMatch(controller.getName()::contains))
                     .forEach(controllers::add);
-
+            
             Log.info("Found " + controllers.size() + " controllers");
             for (int i = 0; i < controllers.size(); i++) {
                 Log.info(i + " : " + getController(i).getName());
@@ -404,7 +404,7 @@ public class Input {
             throw new SlickException("Unable to create controllers", e);
         }
     }
-
+    
     /**
      * Create a new input with the height of the screen
      *
@@ -414,7 +414,7 @@ public class Input {
     public Input(int height) {
         init(height);
     }
-
+    
     /**
      * Set the double click interval, the time between the first
      * and second clicks that should be interpreted as a
@@ -426,7 +426,7 @@ public class Input {
     public void setDoubleClickInterval(int delay) {
         doubleClickDelay = delay;
     }
-
+    
     /**
      * Set the pixel distance the mouse can move to accept a mouse click.
      * Default is 5.
@@ -437,7 +437,7 @@ public class Input {
     public void setMouseClickTolerance(int mouseClickTolerance) {
         this.mouseClickTolerance = mouseClickTolerance;
     }
-
+    
     /**
      * Set the scaling to apply to screen coordinates
      *
@@ -450,7 +450,7 @@ public class Input {
         this.scaleX = scaleX;
         this.scaleY = scaleY;
     }
-
+    
     /**
      * Set the offset to apply to the screen coodinates
      *
@@ -463,7 +463,7 @@ public class Input {
         this.xoffset = xoffset;
         this.yoffset = yoffset;
     }
-
+    
     /**
      * Reset the transformation being applied to the input to the default
      */
@@ -471,7 +471,7 @@ public class Input {
         setOffset(0, 0);
         setScale(1, 1);
     }
-
+    
     /**
      * Add a listener to be notified of input events
      *
@@ -483,7 +483,7 @@ public class Input {
         addMouseListener(listener);
         addControllerListener(listener);
     }
-
+    
     /**
      * Add a key listener to be notified of key input events
      *
@@ -493,7 +493,7 @@ public class Input {
     public void addKeyListener(KeyListener listener) {
         keyListenersToAdd.add(listener);
     }
-
+    
     /**
      * Add a key listener to be notified of key input events
      *
@@ -507,7 +507,7 @@ public class Input {
         keyListeners.add(listener);
         allListeners.add(listener);
     }
-
+    
     /**
      * Add a mouse listener to be notified of mouse input events
      *
@@ -517,7 +517,7 @@ public class Input {
     public void addMouseListener(MouseListener listener) {
         mouseListenersToAdd.add(listener);
     }
-
+    
     /**
      * Add a mouse listener to be notified of mouse input events
      *
@@ -531,7 +531,7 @@ public class Input {
         mouseListeners.add(listener);
         allListeners.add(listener);
     }
-
+    
     /**
      * Add a controller listener to be notified of controller input events
      *
@@ -545,7 +545,7 @@ public class Input {
         controllerListeners.add(listener);
         allListeners.add(listener);
     }
-
+    
     /**
      * Remove all the listeners from this input
      */
@@ -554,7 +554,7 @@ public class Input {
         removeAllMouseListeners();
         removeAllControllerListeners();
     }
-
+    
     /**
      * Remove all the key listeners from this input
      */
@@ -562,7 +562,7 @@ public class Input {
         allListeners.removeAll(keyListeners);
         keyListeners.clear();
     }
-
+    
     /**
      * Remove all the mouse listeners from this input
      */
@@ -570,7 +570,7 @@ public class Input {
         allListeners.removeAll(mouseListeners);
         mouseListeners.clear();
     }
-
+    
     /**
      * Remove all the controller listeners from this input
      */
@@ -578,7 +578,7 @@ public class Input {
         allListeners.removeAll(controllerListeners);
         controllerListeners.clear();
     }
-
+    
     /**
      * Add a listener to be notified of input events. This listener
      * will get events before others that are currently registered
@@ -588,14 +588,14 @@ public class Input {
      */
     public void addPrimaryListener(InputListener listener) {
         removeListener(listener);
-
+        
         keyListeners.add(0, listener);
         mouseListeners.add(0, listener);
         controllerListeners.add(0, listener);
-
+        
         allListeners.add(listener);
     }
-
+    
     /**
      * Remove a listener that will no longer be notified
      *
@@ -607,7 +607,7 @@ public class Input {
         removeMouseListener(listener);
         removeControllerListener(listener);
     }
-
+    
     /**
      * Remove a key listener that will no longer be notified
      *
@@ -617,7 +617,7 @@ public class Input {
     public void removeKeyListener(KeyListener listener) {
         keyListeners.remove(listener);
     }
-
+    
     /**
      * Remove a controller listener that will no longer be notified
      *
@@ -627,7 +627,7 @@ public class Input {
     public void removeControllerListener(ControllerListener listener) {
         controllerListeners.remove(listener);
     }
-
+    
     /**
      * Remove a mouse listener that will no longer be notified
      *
@@ -637,7 +637,7 @@ public class Input {
     public void removeMouseListener(MouseListener listener) {
         mouseListeners.remove(listener);
     }
-
+    
     /**
      * Initialise the input system
      *
@@ -649,7 +649,7 @@ public class Input {
         lastMouseX = getMouseX();
         lastMouseY = getMouseY();
     }
-
+    
     /**
      * Get the character representation of the key identified by the specified code
      *
@@ -660,7 +660,7 @@ public class Input {
     public static String getKeyName(int code) {
         return Keyboard.getKeyName(code);
     }
-
+    
     /**
      * Check if a particular key has been pressed since this method
      * was last called for the specified key
@@ -674,10 +674,10 @@ public class Input {
             pressed[code] = false;
             return true;
         }
-
+        
         return false;
     }
-
+    
     /**
      * Check if a mouse button has been pressed since last call
      *
@@ -690,10 +690,10 @@ public class Input {
             mousePressed[button] = false;
             return true;
         }
-
+        
         return false;
     }
-
+    
     /**
      * Check if a controller button has been pressed since last
      * time
@@ -705,7 +705,7 @@ public class Input {
     public boolean isControlPressed(int button) {
         return isControlPressed(button, 0);
     }
-
+    
     /**
      * Check if a controller button has been pressed since last
      * time
@@ -721,10 +721,10 @@ public class Input {
             controllerPressed[controller][button] = false;
             return true;
         }
-
+        
         return false;
     }
-
+    
     /**
      * Clear the state for isControlPressed method. This will reset all
      * controls to not pressed
@@ -734,7 +734,7 @@ public class Input {
             Arrays.fill(controllerPressed[i], false);
         }
     }
-
+    
     /**
      * Clear the state for the <code>isKeyPressed</code> method. This will
      * resort in all keys returning that they haven't been pressed, until
@@ -743,7 +743,7 @@ public class Input {
     public void clearKeyPressedRecord() {
         Arrays.fill(pressed, false);
     }
-
+    
     /**
      * Clear the state for the <code>isMousePressed</code> method. This will
      * resort in all mouse buttons returning that they haven't been pressed, until
@@ -752,7 +752,7 @@ public class Input {
     public void clearMousePressedRecord() {
         Arrays.fill(mousePressed, false);
     }
-
+    
     /**
      * Check if a particular key is down
      *
@@ -763,7 +763,7 @@ public class Input {
     public static boolean isKeyDown(int code) {
         return Keyboard.isKeyDown(code);
     }
-
+    
     /**
      * Get the absolute x position of the mouse cursor within the container
      *
@@ -772,7 +772,7 @@ public class Input {
     public static int getAbsoluteMouseX() {
         return Mouse.getX();
     }
-
+    
     /**
      * Get the absolute y position of the mouse cursor within the container
      *
@@ -781,7 +781,7 @@ public class Input {
     public int getAbsoluteMouseY() {
         return height - Mouse.getY();
     }
-
+    
     /**
      * Return the first controller found
      *
@@ -790,7 +790,7 @@ public class Input {
     public static Controller getFirstController() {
         return getController(0);
     }
-
+    
     /**
      * Return the controller at the specified index
      *
@@ -801,7 +801,7 @@ public class Input {
     public static Controller getController(int index) {
         return index >= controllers.size() ? null : controllers.get(index);
     }
-
+    
     /**
      * Get the x position of the mouse cursor
      *
@@ -810,7 +810,7 @@ public class Input {
     public int getMouseX() {
         return (int) (Mouse.getX() * scaleX + xoffset);
     }
-
+    
     /**
      * Get the y position of the mouse cursor
      *
@@ -819,7 +819,7 @@ public class Input {
     public int getMouseY() {
         return (int) ((height - Mouse.getY()) * scaleY + yoffset);
     }
-
+    
     /**
      * Check if a given mouse button is down
      *
@@ -830,7 +830,7 @@ public class Input {
     public static boolean isMouseButtonDown(int button) {
         return Mouse.isButtonDown(button);
     }
-
+    
     /**
      * Check if any mouse button is down
      *
@@ -839,7 +839,7 @@ public class Input {
     private static boolean anyMouseDown() {
         return IntStream.range(0, 3).anyMatch(Input::isMouseButtonDown);
     }
-
+    
     /**
      * Get a count of the number of controlles available
      *
@@ -848,7 +848,7 @@ public class Input {
     public static int getControllerCount() {
         return controllers.size();
     }
-
+    
     /**
      * Get the number of axis that are avaiable on a given controller
      *
@@ -859,7 +859,7 @@ public class Input {
     public static int getAxisCount(int controller) {
         return getController(controller).getAxisCount();
     }
-
+    
     /**
      * Get the value of the axis with the given index
      *
@@ -872,7 +872,7 @@ public class Input {
     public float getAxisValue(int controller, int axis) {
         return getController(controller).getAxisValue(axis);
     }
-
+    
     /**
      * Get the name of the axis with the given index
      *
@@ -885,7 +885,7 @@ public class Input {
     public String getAxisName(int controller, int axis) {
         return getController(controller).getAxisName(axis);
     }
-
+    
     /**
      * Check if the controller has the left direction pressed
      *
@@ -897,20 +897,20 @@ public class Input {
         if (controller >= getControllerCount()) {
             return false;
         }
-
+        
         if (controller == ANY_CONTROLLER) {
             for (int i = 0; i < controllers.size(); i++) {
                 if (isControllerLeft(i)) {
                     return true;
                 }
             }
-
+            
             return false;
         }
-
+        
         return getController(controller).getXAxisValue() < -0.5f || getController(controller).getPovX() < -0.5f;
     }
-
+    
     /**
      * Check if the controller has the right direction pressed
      *
@@ -922,20 +922,20 @@ public class Input {
         if (controller >= getControllerCount()) {
             return false;
         }
-
+        
         if (controller == ANY_CONTROLLER) {
             for (int i = 0; i < controllers.size(); i++) {
                 if (isControllerRight(i)) {
                     return true;
                 }
             }
-
+            
             return false;
         }
-
+        
         return getController(controller).getXAxisValue() > 0.5f || getController(controller).getPovX() > 0.5f;
     }
-
+    
     /**
      * Check if the controller has the up direction pressed
      *
@@ -947,19 +947,19 @@ public class Input {
         if (controller >= getControllerCount()) {
             return false;
         }
-
+        
         if (controller == ANY_CONTROLLER) {
             for (int i = 0; i < controllers.size(); i++) {
                 if (isControllerUp(i)) {
                     return true;
                 }
             }
-
+            
             return false;
         }
         return getController(controller).getYAxisValue() < -0.5f || getController(controller).getPovY() < -0.5f;
     }
-
+    
     /**
      * Check if the controller has the down direction pressed
      *
@@ -971,21 +971,21 @@ public class Input {
         if (controller >= getControllerCount()) {
             return false;
         }
-
+        
         if (controller == ANY_CONTROLLER) {
             for (int i = 0; i < controllers.size(); i++) {
                 if (isControllerDown(i)) {
                     return true;
                 }
             }
-
+            
             return false;
         }
-
+        
         return getController(controller).getYAxisValue() > 0.5f || getController(controller).getPovY() > 0.5f;
-
+        
     }
-
+    
     /**
      * Check if controller button is pressed
      *
@@ -999,27 +999,50 @@ public class Input {
         if (controller >= getControllerCount()) {
             return false;
         }
-
+        
         if (controller == ANY_CONTROLLER) {
             for (int i = 0; i < controllers.size(); i++) {
                 if (isButtonPressed(index, i)) {
                     return true;
                 }
             }
-
+            
             return false;
         }
-
+        
         return getController(controller).isButtonPressed(index);
     }
+    
+    public static void stopControllerVibration() {
+        stopControllerVibration(0);
+    }
 
+    public static void stopControllerVibration(int index) {
+        setControllerVibration(index, 0f);
+    }
+
+    public static void startControllerVibration() {
+        startControllerVibration(0);
+    }
+
+    public static void startControllerVibration(int index) {
+        setControllerVibration(index, 0.5f);
+    }
+
+    private static void setControllerVibration(int controllerIdx, float intensity) {
+        Controller controller = getController(controllerIdx);
+        if (controller != null) {
+            IntStream.range(0, controller.getRumblerCount()).forEach(i -> controller.setRumblerStrength(i, intensity));
+        }
+    }
+    
     /**
      * Notification from an event handle that an event has been consumed
      */
     public void consumeEvent() {
         consumed = true;
     }
-
+    
     /**
      * Hook to allow us to translate any key character into special key
      * codes for easier use.
@@ -1036,10 +1059,10 @@ public class Input {
         if (c == 61 || key == 0) {
             return KEY_EQUALS;
         }
-
+        
         return key;
     }
-
+    
     /**
      * Notification that the mouse has been pressed and hence we
      * should consider what we're doing with double clicking
@@ -1065,7 +1088,7 @@ public class Input {
             }
         }
     }
-
+    
     /**
      * Poll the state of the input
      *
@@ -1077,20 +1100,20 @@ public class Input {
             clearControlPressedRecord();
             clearKeyPressedRecord();
             clearMousePressedRecord();
-
+            
             while (Keyboard.next()) {
             }
             while (Mouse.next()) {
             }
             return;
         }
-
+        
         if (!Display.isActive()) {
             clearControlPressedRecord();
             clearKeyPressedRecord();
             clearMousePressedRecord();
         }
-
+        
         // add any listeners requested since last time
         for (int i = 0; i < keyListenersToAdd.size(); i++) {
             addKeyListenerImpl(keyListenersToAdd.get(i));
@@ -1100,31 +1123,31 @@ public class Input {
             addMouseListenerImpl(mouseListenersToAdd.get(i));
         }
         mouseListenersToAdd.clear();
-
+        
         if (doubleClickTimeout != 0 && System.currentTimeMillis() > doubleClickTimeout) {
             doubleClickTimeout = 0;
         }
-
+        
         this.height = height;
-
+        
         Iterator<ControlledInputReciever> allStarts = allListeners.iterator();
         while (allStarts.hasNext()) {
             ControlledInputReciever listener = allStarts.next();
             listener.inputStarted();
         }
-
+        
         while (Keyboard.next()) {
             if (Keyboard.getEventKeyState()) {
                 int eventKey = resolveEventKey(Keyboard.getEventKey(), Keyboard.getEventCharacter());
-
+                
                 keys[eventKey] = Keyboard.getEventCharacter();
                 pressed[eventKey] = true;
                 nextRepeat[eventKey] = System.currentTimeMillis() + keyRepeatInitial;
-
+                
                 consumed = false;
                 for (int i = 0; i < keyListeners.size(); i++) {
                     KeyListener listener = keyListeners.get(i);
-
+                    
                     if (listener.isAcceptingInput()) {
                         listener.keyPressed(eventKey, Keyboard.getEventCharacter());
                         if (consumed) {
@@ -1135,7 +1158,7 @@ public class Input {
             } else {
                 int eventKey = resolveEventKey(Keyboard.getEventKey(), Keyboard.getEventCharacter());
                 nextRepeat[eventKey] = 0;
-
+                
                 consumed = false;
                 for (int i = 0; i < keyListeners.size(); i++) {
                     KeyListener listener = keyListeners.get(i);
@@ -1148,16 +1171,16 @@ public class Input {
                 }
             }
         }
-
+        
         while (Mouse.next()) {
             if (Mouse.getEventButton() >= 0) {
                 if (Mouse.getEventButtonState()) {
                     consumed = false;
                     mousePressed[Mouse.getEventButton()] = true;
-
+                    
                     pressedX = (int) (xoffset + Mouse.getEventX() * scaleX);
                     pressedY = (int) (yoffset + (height - Mouse.getEventY()) * scaleY);
-
+                    
                     for (int i = 0; i < mouseListeners.size(); i++) {
                         MouseListener listener = mouseListeners.get(i);
                         if (listener.isAcceptingInput()) {
@@ -1170,14 +1193,14 @@ public class Input {
                 } else {
                     consumed = false;
                     mousePressed[Mouse.getEventButton()] = false;
-
+                    
                     int releasedX = (int) (xoffset + Mouse.getEventX() * scaleX);
                     int releasedY = (int) (yoffset + (height - Mouse.getEventY()) * scaleY);
                     if (pressedX != -1 && pressedY != -1 && Math.abs(pressedX - releasedX) < mouseClickTolerance && Math.abs(pressedY - releasedY) < mouseClickTolerance) {
                         considerDoubleClick(Mouse.getEventButton(), releasedX, releasedY);
                         pressedX = pressedY = -1;
                     }
-
+                    
                     for (int i = 0; i < mouseListeners.size(); i++) {
                         MouseListener listener = mouseListeners.get(i);
                         if (listener.isAcceptingInput()) {
@@ -1200,7 +1223,7 @@ public class Input {
                                 } else {
                                     listener.mouseMoved(0, 0, Mouse.getEventDX(), -Mouse.getEventDY());
                                 }
-
+                                
                                 if (consumed) {
                                     break;
                                 }
@@ -1208,7 +1231,7 @@ public class Input {
                         }
                     }
                 }
-
+                
                 int dwheel = Mouse.getEventDWheel();
                 if (dwheel != 0) {
                     consumed = false;
@@ -1224,7 +1247,7 @@ public class Input {
                 }
             }
         }
-
+        
         if (!displayActive || Mouse.isGrabbed()) {
             lastMouseX = getMouseX();
             lastMouseY = getMouseY();
@@ -1248,7 +1271,7 @@ public class Input {
                 lastMouseY = getMouseY();
             }
         }
-
+        
         for (int i = 0; i < getControllerCount(); i++) {
             int count = getController(i).getButtonCount() + 3;
             count = Math.min(count, 24);
@@ -1263,7 +1286,7 @@ public class Input {
                 }
             }
         }
-
+        
         if (keyRepeat) {
             for (int i = 0; i < 1024; i++) {
                 if (pressed[i] && nextRepeat[i] != 0) {
@@ -1272,7 +1295,7 @@ public class Input {
                         consumed = false;
                         for (int j = 0; j < keyListeners.size(); j++) {
                             KeyListener listener = keyListeners.get(j);
-
+                            
                             if (listener.isAcceptingInput()) {
                                 listener.keyPressed(i, keys[i]);
                                 if (consumed) {
@@ -1284,18 +1307,18 @@ public class Input {
                 }
             }
         }
-
+        
         Iterator<ControlledInputReciever> all = allListeners.iterator();
         while (all.hasNext()) {
             ControlledInputReciever listener = all.next();
             listener.inputEnded();
         }
-
+        
         if (Display.isCreated()) {
             displayActive = Display.isActive();
         }
     }
-
+    
     /**
      * Enable key repeat for this input context. Uses the system settings for repeat
      * interval configuration.
@@ -1303,14 +1326,14 @@ public class Input {
     public void enableKeyRepeat() {
         Keyboard.enableRepeatEvents(true);
     }
-
+    
     /**
      * Disable key repeat for this input context
      */
     public void disableKeyRepeat() {
         Keyboard.enableRepeatEvents(false);
     }
-
+    
     /**
      * Check if key repeat is enabled
      *
@@ -1319,7 +1342,7 @@ public class Input {
     public boolean isKeyRepeatEnabled() {
         return Keyboard.areRepeatEventsEnabled();
     }
-
+    
     /**
      * Fire an event indicating that a control has been pressed
      *
@@ -1357,7 +1380,7 @@ public class Input {
             }
         }
     }
-
+    
     /**
      * Fire an event indicating that a control has been released
      *
@@ -1395,7 +1418,7 @@ public class Input {
             }
         }
     }
-
+    
     /**
      * Check if a particular control is currently pressed
      *
@@ -1423,26 +1446,26 @@ public class Input {
         }
         throw new SlickException("Unknown control index");
     }
-
+    
     /**
      * Pauses the polling and sending of input events.
      */
     public void pause() {
         paused = true;
-
+        
         // Reset all polling arrays
         clearKeyPressedRecord();
         clearMousePressedRecord();
         clearControlPressedRecord();
     }
-
+    
     /**
      * Resumes the polling and sending of input events.
      */
     public void resume() {
         paused = false;
     }
-
+    
     /**
      * Notify listeners that the mouse button has been clicked
      *
