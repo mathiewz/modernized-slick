@@ -16,7 +16,7 @@ import com.github.mathiewz.slick.state.StateBasedGame;
  *
  * @author kevin
  */
-public class HorizontalSplitTransition implements Transition {
+public class HorizontalSplitTransition extends Transition {
     /** The renderer to use for all GL operations */
     protected static SGL GL = Renderer.get();
 
@@ -26,8 +26,6 @@ public class HorizontalSplitTransition implements Transition {
     private float offset;
     /** True if the transition is finished */
     private boolean finish;
-    /** The background to draw underneath the previous state (null for none) */
-    private Color background;
 
     /**
      * Create a new transition
@@ -69,12 +67,7 @@ public class HorizontalSplitTransition implements Transition {
     public void postRender(StateBasedGame game, GameContainer container, Graphics g) {
         g.translate(-offset, 0);
         g.setClip((int) -offset, 0, container.getWidth() / 2, container.getHeight());
-        if (background != null) {
-            Color c = g.getColor();
-            g.setColor(background);
-            g.fillRect(0, 0, container.getWidth(), container.getHeight());
-            g.setColor(c);
-        }
+        fillBackground(container, g);
         GL.glPushMatrix();
         prev.render(container, game, g);
         GL.glPopMatrix();
@@ -82,12 +75,7 @@ public class HorizontalSplitTransition implements Transition {
 
         g.translate(offset * 2, 0);
         g.setClip((int) (container.getWidth() / 2 + offset), 0, container.getWidth() / 2, container.getHeight());
-        if (background != null) {
-            Color c = g.getColor();
-            g.setColor(background);
-            g.fillRect(0, 0, container.getWidth(), container.getHeight());
-            g.setColor(c);
-        }
+        fillBackground(container, g);
         GL.glPushMatrix();
         prev.render(container, game, g);
         GL.glPopMatrix();

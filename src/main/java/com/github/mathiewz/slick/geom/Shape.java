@@ -491,55 +491,85 @@ public abstract class Shape implements Serializable {
         
         return result;
     }
-    
+
     /**
      * Check if this shape intersects with the shape provided.
      *
-     * @param shape
-     *            The shape to check if it intersects with this one.
+     * @param shape The shape to check if it intersects with this one.
      * @return True if the shapes do intersect, false otherwise.
      */
     public boolean intersects(Shape shape) {
         /*
          * Intersection formula used:
-         * (x4 - x3)(y1 - y3) - (y4 - y3)(x1 - x3)
+         *      (x4 - x3)(y1 - y3) - (y4 - y3)(x1 - x3)
          * UA = ---------------------------------------
-         * (y4 - y3)(x2 - x1) - (x4 - x3)(y2 - y1)
-         * (x2 - x1)(y1 - y3) - (y2 - y1)(x1 - x3)
+         *      (y4 - y3)(x2 - x1) - (x4 - x3)(y2 - y1)
+         *
+         *      (x2 - x1)(y1 - y3) - (y2 - y1)(x1 - x3)
          * UB = ---------------------------------------
-         * (y4 - y3)(x2 - x1) - (x4 - x3)(y2 - y1)
+         *      (y4 - y3)(x2 - x1) - (x4 - x3)(y2 - y1)
+         *
          * if UA and UB are both between 0 and 1 then the lines intersect.
+         *
          * Source: http://local.wasp.uwa.edu.au/~pbourke/geometry/lineline2d/
          */
         checkPoints();
-        
-        Float[] thisPoints = getPoints();       // (x3, y3) and (x4, y4)
-        Float[] thatPoints = shape.getPoints(); // (x1, y1) and (x2, y2)
-        
-        int length = closed() ? thisPoints.length - 2 : thisPoints.length;
-        int thatLength = shape.closed() ? thatPoints.length - 2 : thatPoints.length;
-        
-        for (int i = 0; i < length; i += 2) {
-            int iNext = i + 2;
-            if (iNext >= thisPoints.length) {
+
+        boolean result = false;
+        Float points[] = getPoints();           // (x3, y3)  and (x4, y4)
+        Float thatPoints[] = shape.getPoints(); // (x1, y1)  and (x2, y2)
+        int length = points.length;
+        int thatLength = thatPoints.length;
+        double unknownA;
+        double unknownB;
+
+        if (!closed()) {
+            length -= 2;
+        }
+        if (!shape.closed()) {
+            thatLength -= 2;
+        }
+
+        // x1 = thatPoints[j]
+        // x2 = thatPoints[j + 2]
+        // y1 = thatPoints[j + 1]
+        // y2 = thatPoints[j + 3]
+        // x3 = points[i]
+        // x4 = points[i + 2]
+        // y3 = points[i + 1]
+        // y4 = points[i + 3]
+        for(int i=0;i<length;i+=2) {
+            int iNext = i+2;
+            if (iNext >= points.length) {
                 iNext = 0;
             }
-            
-            for (int j = 0; j < thatLength; j += 2) {
-                int jNext = j + 2;
+
+            for(int j=0;j<thatLength;j+=2) {
+                int jNext = j+2;
                 if (jNext >= thatPoints.length) {
                     jNext = 0;
                 }
-                
-                double unknownA = ((thisPoints[iNext] - thisPoints[i]) * (double) (thatPoints[j + 1] - thisPoints[i + 1]) - (thisPoints[iNext + 1] - thisPoints[i + 1]) * (thatPoints[j] - thisPoints[i])) / ((thisPoints[iNext + 1] - thisPoints[i + 1]) * (thatPoints[jNext] - thatPoints[j]) - (thisPoints[iNext] - thisPoints[i]) * (thatPoints[jNext + 1] - thatPoints[j + 1]));
-                double unknownB = ((thatPoints[jNext] - thatPoints[j]) * (double) (thatPoints[j + 1] - thisPoints[i + 1]) - (thatPoints[jNext + 1] - thatPoints[j + 1]) * (thatPoints[j] - thisPoints[i])) / ((thisPoints[iNext + 1] - thisPoints[i + 1]) * (thatPoints[jNext] - thatPoints[j]) - (thisPoints[iNext] - thisPoints[i]) * (thatPoints[jNext + 1] - thatPoints[j + 1]));
-                
-                if (unknownA >= 0 && unknownA <= 1 && unknownB >= 0 && unknownB <= 1) {
-                    return true;
+
+                unknownA = (((points[iNext] - points[i]) * (double) (thatPoints[j + 1] - points[i + 1])) -
+                        ((points[iNext+1] - points[i + 1]) * (thatPoints[j] - points[i]))) /
+                        (((points[iNext+1] - points[i + 1]) * (thatPoints[jNext] - thatPoints[j])) -
+                                ((points[iNext] - points[i]) * (thatPoints[jNext+1] - thatPoints[j + 1])));
+                unknownB = (((thatPoints[jNext] - thatPoints[j]) * (double) (thatPoints[j + 1] - points[i + 1])) -
+                        ((thatPoints[jNext+1] - thatPoints[j + 1]) * (thatPoints[j] - points[i]))) /
+                        (((points[iNext+1] - points[i + 1]) * (thatPoints[jNext] - thatPoints[j])) -
+                                ((points[iNext] - points[i]) * (thatPoints[jNext+1] - thatPoints[j + 1])));
+
+                if(unknownA >= 0 && unknownA <= 1 && unknownB >= 0 && unknownB <= 1) {
+                    result = true;
+                    break;
                 }
             }
+            if(result) {
+                break;
+            }
         }
-        return false;
+
+        return result;
     }
     
     /**

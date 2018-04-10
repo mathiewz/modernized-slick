@@ -11,7 +11,7 @@ import com.github.mathiewz.slick.state.StateBasedGame;
  *
  * @author kevin
  */
-public class FadeInTransition implements Transition {
+public class FadeInTransition extends Transition {
     /** The color to fade to */
     private final Color color;
     /** The time it takes to fade in */

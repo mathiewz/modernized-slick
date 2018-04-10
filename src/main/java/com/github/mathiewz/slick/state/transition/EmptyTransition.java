@@ -11,7 +11,7 @@ import com.github.mathiewz.slick.state.StateBasedGame;
  *
  * @author kevin
  */
-public class EmptyTransition implements Transition {
+public class EmptyTransition extends Transition {
 
     /**
      * @see com.github.mathiewz.slick.state.transition.Transition#isComplete()

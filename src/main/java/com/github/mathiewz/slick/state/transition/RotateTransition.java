@@ -14,7 +14,7 @@ import com.github.mathiewz.slick.state.StateBasedGame;
  *
  * @author kevin
  */
-public class RotateTransition implements Transition {
+public class RotateTransition extends Transition {
     /** The previous state */
     private GameState prev;
     /** The current angle of rotation */
@@ -23,8 +23,6 @@ public class RotateTransition implements Transition {
     private boolean finish;
     /** The current scale */
     private float scale = 1;
-    /** The background applied under the previous state if any */
-    private Color background;
 
     /**
      * Create a new transition
@@ -68,12 +66,7 @@ public class RotateTransition implements Transition {
         g.scale(scale, scale);
         g.rotate(0, 0, ang);
         g.translate(-container.getWidth() / 2, -container.getHeight() / 2);
-        if (background != null) {
-            Color c = g.getColor();
-            g.setColor(background);
-            g.fillRect(0, 0, container.getWidth(), container.getHeight());
-            g.setColor(c);
-        }
+        fillBackground(container, g);
         prev.render(container, game, g);
         g.translate(container.getWidth() / 2, container.getHeight() / 2);
         g.rotate(0, 0, -ang);

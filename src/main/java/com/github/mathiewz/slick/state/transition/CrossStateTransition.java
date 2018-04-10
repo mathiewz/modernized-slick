@@ -24,7 +24,7 @@ import com.github.mathiewz.slick.state.StateBasedGame;
  *
  * @author kevin
  */
-public abstract class CrossStateTransition implements Transition {
+public abstract class CrossStateTransition extends Transition {
     /** The second state to cross with */
     private final GameState secondState;
     

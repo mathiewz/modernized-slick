@@ -16,7 +16,7 @@ import com.github.mathiewz.slick.state.StateBasedGame;
  *
  * @author kevin
  */
-public class VerticalSplitTransition implements Transition {
+public class VerticalSplitTransition extends Transition {
     /** The renderer to use for all GL operations */
     protected static SGL GL = Renderer.get();
 
@@ -26,8 +26,7 @@ public class VerticalSplitTransition implements Transition {
     private float offset;
     /** True if the transition is finished */
     private boolean finish;
-    /** The background to draw underneath the previous state (null for none) */
-    private Color background;
+
 
     /**
      * Create a new transition
@@ -69,12 +68,7 @@ public class VerticalSplitTransition implements Transition {
     public void postRender(StateBasedGame game, GameContainer container, Graphics g) {
         g.translate(0, -offset);
         g.setClip(0, (int) -offset, container.getWidth(), container.getHeight() / 2);
-        if (background != null) {
-            Color c = g.getColor();
-            g.setColor(background);
-            g.fillRect(0, 0, container.getWidth(), container.getHeight());
-            g.setColor(c);
-        }
+        fillBackground(container, g);
         GL.glPushMatrix();
         prev.render(container, game, g);
         GL.glPopMatrix();
@@ -83,18 +77,15 @@ public class VerticalSplitTransition implements Transition {
 
         g.translate(0, offset);
         g.setClip(0, (int) (container.getHeight() / 2 + offset), container.getWidth(), container.getHeight() / 2);
-        if (background != null) {
-            Color c = g.getColor();
-            g.setColor(background);
-            g.fillRect(0, 0, container.getWidth(), container.getHeight());
-            g.setColor(c);
-        }
+        fillBackground(container, g);
         GL.glPushMatrix();
         prev.render(container, game, g);
         GL.glPopMatrix();
         g.clearClip();
         g.translate(0, -offset);
     }
+
+
 
     /**
      * @see com.github.mathiewz.slick.state.transition.Transition#preRender(com.github.mathiewz.slick.state.StateBasedGame, com.github.mathiewz.slick.GameContainer, com.github.mathiewz.slick.Graphics)

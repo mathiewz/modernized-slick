@@ -32,11 +32,6 @@ public class ImageBuffer implements ImageData {
     /** The raw data generated for the image */
     private final byte[] rawData;
 
-    /**
-     *
-     * @param width
-     * @param height
-     */
     public ImageBuffer(int width, int height) {
         this.width = width;
         this.height = height;

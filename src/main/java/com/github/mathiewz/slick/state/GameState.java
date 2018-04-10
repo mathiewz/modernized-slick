@@ -16,7 +16,7 @@ public interface GameState extends InputListener {
      *
      * @return The game unique ID of this state
      */
-    public int getID();
+    int getID();
     
     /**
      * Initialise the state. It should load any resources it needs at this stage
@@ -26,7 +26,7 @@ public interface GameState extends InputListener {
      * @param game
      *            The game holding this state
      */
-    public void init(GameContainer container, StateBasedGame game);
+    void init(GameContainer container, StateBasedGame game);
     
     /**
      * Render this state to the game's graphics context
@@ -38,7 +38,7 @@ public interface GameState extends InputListener {
      * @param g
      *            The graphics context to render to
      */
-    public void render(GameContainer container, StateBasedGame game, Graphics g);
+    void render(GameContainer container, StateBasedGame game, Graphics g);
     
     /**
      * Update the state's logic based on the amount of time thats passed
@@ -50,7 +50,7 @@ public interface GameState extends InputListener {
      * @param delta
      *            The amount of time thats passed in millisecond since last update
      */
-    public void update(GameContainer container, StateBasedGame game, int delta);
+    void update(GameContainer container, StateBasedGame game, int delta);
     
     /**
      * Notification that we've entered this game state
@@ -60,7 +60,7 @@ public interface GameState extends InputListener {
      * @param game
      *            The game holding this state
      */
-    public void enter(GameContainer container, StateBasedGame game);
+    void enter(GameContainer container, StateBasedGame game);
     
     /**
      * Notification that we're leaving this game state
@@ -70,5 +70,5 @@ public interface GameState extends InputListener {
      * @param game
      *            The game holding this state
      */
-    public void leave(GameContainer container, StateBasedGame game);
+    void leave(GameContainer container, StateBasedGame game);
 }

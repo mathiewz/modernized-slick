@@ -1,5 +1,6 @@
 package com.github.mathiewz.slick.state.transition;
 
+import com.github.mathiewz.slick.Color;
 import com.github.mathiewz.slick.GameContainer;
 import com.github.mathiewz.slick.Graphics;
 import com.github.mathiewz.slick.state.GameState;
@@ -10,7 +11,11 @@ import com.github.mathiewz.slick.state.StateBasedGame;
  *
  * @author kevin
  */
-public interface Transition {
+public abstract class Transition {
+
+    /** The background to draw underneath the previous state (null for none) */
+    protected Color background;
+
     /**
      * Update the transition. Cause what ever happens in the transition to happen
      *
@@ -21,7 +26,7 @@ public interface Transition {
      * @param delta
      *            The amount of time passed since last update
      */
-    public void update(StateBasedGame game, GameContainer container, int delta);
+    public abstract void update(StateBasedGame game, GameContainer container, int delta);
     
     /**
      * Render the transition before the existing state rendering
@@ -33,7 +38,7 @@ public interface Transition {
      * @param g
      *            The graphics context to use when rendering the transiton
      */
-    public void preRender(StateBasedGame game, GameContainer container, Graphics g);
+    public abstract void preRender(StateBasedGame game, GameContainer container, Graphics g);
     
     /**
      * Render the transition over the existing state rendering
@@ -45,14 +50,14 @@ public interface Transition {
      * @param g
      *            The graphics context to use when rendering the transiton
      */
-    public void postRender(StateBasedGame game, GameContainer container, Graphics g);
+    public abstract void postRender(StateBasedGame game, GameContainer container, Graphics g);
     
     /**
      * Check if this transtion has been completed
      *
      * @return True if the transition has been completed
      */
-    public boolean isComplete();
+    public abstract boolean isComplete();
     
     /**
      * Initialise the transition
@@ -62,5 +67,14 @@ public interface Transition {
      * @param secondState
      *            The second stat we're transitioning to or from (this one won't be rendered)
      */
-    public void init(GameState firstState, GameState secondState);
+    public abstract void init(GameState firstState, GameState secondState);
+
+    protected void fillBackground(GameContainer container, Graphics g) {
+        if (background != null) {
+            Color c = g.getColor();
+            g.setColor(background);
+            g.fillRect(0, 0, container.getWidth(), container.getHeight());
+            g.setColor(c);
+        }
+    }
 }

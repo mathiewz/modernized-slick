@@ -84,7 +84,7 @@ public class TiledMap {
     /**
      * Create a new tile map based on a given TMX file
      *
-     * @param ref
+     * @param refArg
      *            The location of the tile map to load
      * @param loadTileSets
      *            True if we want to load tilesets - including their image data
@@ -429,10 +429,6 @@ public class TiledMap {
      *            The x location to render at
      * @param y
      *            The y location to render at
-     * @param sx
-     *            The x tile location to start rendering
-     * @param sy
-     *            The y tile location to start rendering
      * @param width
      *            The width of the section to render (in tiles)
      * @param height

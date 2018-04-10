@@ -1,11 +1,11 @@
 package com.github.mathiewz.slick.state.transition;
 
-import java.util.ArrayList;
-
 import com.github.mathiewz.slick.GameContainer;
 import com.github.mathiewz.slick.Graphics;
 import com.github.mathiewz.slick.state.GameState;
 import com.github.mathiewz.slick.state.StateBasedGame;
+
+import java.util.ArrayList;
 
 /**
  * A transition thats built of a set of other transitions which are chained
@@ -13,7 +13,7 @@ import com.github.mathiewz.slick.state.StateBasedGame;
  *
  * @author kevin
  */
-public class CombinedTransition implements Transition {
+public class CombinedTransition extends Transition {
     /** The list of transitions to be combined */
     private final ArrayList<Transition> transitions = new ArrayList<>();
 
@@ -39,13 +39,7 @@ public class CombinedTransition implements Transition {
      */
     @Override
     public boolean isComplete() {
-        for (int i = 0; i < transitions.size(); i++) {
-            if (!transitions.get(i).isComplete()) {
-                return false;
-            }
-        }
-
-        return true;
+        return transitions.stream().allMatch(Transition::isComplete);
     }
 
     /**
@@ -63,9 +57,7 @@ public class CombinedTransition implements Transition {
      */
     @Override
     public void preRender(StateBasedGame game, GameContainer container, Graphics g) {
-        for (int i = 0; i < transitions.size(); i++) {
-            transitions.get(i).postRender(game, container, g);
-        }
+        transitions.forEach(transition -> transition.postRender(game, container, g));
     }
 
     /**
@@ -73,13 +65,9 @@ public class CombinedTransition implements Transition {
      */
     @Override
     public void update(StateBasedGame game, GameContainer container, int delta) {
-        for (int i = 0; i < transitions.size(); i++) {
-            Transition t = transitions.get(i);
-
-            if (!t.isComplete()) {
-                t.update(game, container, delta);
-            }
-        }
+        transitions.stream()
+                .filter(t -> !t.isComplete())
+                .forEach(t -> t.update(game, container, delta));
     }
 
     @Override

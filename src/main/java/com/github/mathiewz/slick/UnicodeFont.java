@@ -686,7 +686,8 @@ public class UnicodeFont implements com.github.mathiewz.slick.Font {
     }
 
     /**
-     * Returns the width of the space character.
+     * @return the width of the space character.
+     *
      */
     public int getSpaceWidth() {
         return spaceWidth;

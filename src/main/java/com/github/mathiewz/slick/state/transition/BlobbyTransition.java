@@ -1,7 +1,5 @@
 package com.github.mathiewz.slick.state.transition;
 
-import java.util.ArrayList;
-
 import com.github.mathiewz.slick.Color;
 import com.github.mathiewz.slick.GameContainer;
 import com.github.mathiewz.slick.Graphics;
@@ -11,6 +9,8 @@ import com.github.mathiewz.slick.state.GameState;
 import com.github.mathiewz.slick.state.StateBasedGame;
 import com.github.mathiewz.slick.util.MaskUtil;
 
+import java.util.ArrayList;
+
 /**
  * A transition that causes the previous state to rotate and scale down into
  * the new state.
@@ -19,7 +19,7 @@ import com.github.mathiewz.slick.util.MaskUtil;
  *
  * @author kevin
  */
-public class BlobbyTransition implements Transition {
+public class BlobbyTransition extends Transition {
     /** The renderer to use for all GL operations */
     protected static SGL GL = Renderer.get();
 
@@ -27,14 +27,12 @@ public class BlobbyTransition implements Transition {
     private GameState prev;
     /** True if the state has finished */
     private boolean finish;
-    /** The background applied under the previous state if any */
-    private Color background;
     /** ArrayList blobs */
     private final ArrayList<Blob> blobs = new ArrayList<>();
     /** The time it will run for */
     private int timer = 1000;
     /** The number of blobs to create */
-    private final int blobCount = 10;
+    private static final int BLOB_COUNT = 10;
 
     /**
      * Create a new transition
@@ -85,18 +83,12 @@ public class BlobbyTransition implements Transition {
         prev.render(container, game, g);
 
         MaskUtil.defineMask();
-        for (int i = 0; i < blobs.size(); i++) {
-            blobs.get(i).render(g);
-        }
+
+        blobs.forEach(blob -> blob.render(g));
         MaskUtil.finishDefineMask();
 
         MaskUtil.drawOnMask();
-        if (background != null) {
-            Color c = g.getColor();
-            g.setColor(background);
-            g.fillRect(0, 0, container.getWidth(), container.getHeight());
-            g.setColor(c);
-        }
+        fillBackground(container, g);
     }
 
     /**
@@ -105,14 +97,11 @@ public class BlobbyTransition implements Transition {
     @Override
     public void update(StateBasedGame game, GameContainer container, int delta) {
         if (blobs.size() == 0) {
-            for (int i = 0; i < blobCount; i++) {
+            for (int i = 0; i < BLOB_COUNT; i++) {
                 blobs.add(new Blob(container));
             }
         }
-
-        for (int i = 0; i < blobs.size(); i++) {
-            blobs.get(i).update(delta);
-        }
+        blobs.forEach(blob -> blob.update(delta));
 
         timer -= delta;
         if (timer < 0) {

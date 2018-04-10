@@ -1,8 +1,5 @@
 package com.github.mathiewz.slick.state;
 
-import java.util.HashMap;
-import java.util.Iterator;
-
 import com.github.mathiewz.slick.Game;
 import com.github.mathiewz.slick.GameContainer;
 import com.github.mathiewz.slick.Graphics;
@@ -11,6 +8,8 @@ import com.github.mathiewz.slick.InputListener;
 import com.github.mathiewz.slick.SlickException;
 import com.github.mathiewz.slick.state.transition.EmptyTransition;
 import com.github.mathiewz.slick.state.transition.Transition;
+
+import java.util.HashMap;
 
 /**
  * A state based game isolated different stages of the game (menu, ingame, hiscores, etc) into
@@ -114,7 +113,7 @@ public abstract class StateBasedGame implements Game, InputListener {
      *            The state to be added
      */
     public void addState(GameState state) {
-        states.put(new Integer(state.getID()), state);
+        states.put(state.getID(), state);
         
         if (currentState.getID() == -1) {
             currentState = state;
@@ -129,7 +128,7 @@ public abstract class StateBasedGame implements Game, InputListener {
      * @return The state requested or null if no state with the specified ID exists
      */
     public GameState getState(int id) {
-        return states.get(new Integer(id));
+        return states.get(id);
     }
     
     /**
@@ -177,15 +176,8 @@ public abstract class StateBasedGame implements Game, InputListener {
     public final void init(GameContainer container) {
         this.container = container;
         initStatesList(container);
-        
-        Iterator<GameState> gameStates = states.values().iterator();
-        
-        while (gameStates.hasNext()) {
-            GameState state = gameStates.next();
-            
-            state.init(container, this);
-        }
-        
+        states.values().forEach(state -> state.init(container, this));
+
         if (currentState != null) {
             currentState.enter(container, this);
         }
@@ -556,11 +548,8 @@ public abstract class StateBasedGame implements Game, InputListener {
      */
     @Override
     public boolean isAcceptingInput() {
-        if (transitioning()) {
-            return false;
-        }
-        
-        return currentState.isAcceptingInput();
+        return !transitioning() && currentState.isAcceptingInput();
+
     }
     
     /**

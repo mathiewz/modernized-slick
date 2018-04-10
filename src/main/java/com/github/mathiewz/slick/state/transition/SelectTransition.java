@@ -17,7 +17,7 @@ import com.github.mathiewz.slick.state.StateBasedGame;
  *
  * @author kevin
  */
-public class SelectTransition implements Transition {
+public class SelectTransition extends Transition {
     /** The renderer to use for all GL operations */
     protected static SGL GL = Renderer.get();
 
@@ -83,15 +83,18 @@ public class SelectTransition implements Transition {
     @Override
     public void postRender(StateBasedGame game, GameContainer container, Graphics g) {
         g.resetTransform();
-
         if (!moveBackDone) {
-            g.translate(xp1, yp1);
-            g.scale(scale1, scale1);
-            g.setClip((int) xp1, (int) yp1, (int) (scale1 * container.getWidth()), (int) (scale1 * container.getHeight()));
-            prev.render(container, game, g);
-            g.resetTransform();
-            g.clearClip();
+            render(game, container, g);
         }
+    }
+
+    private void render(StateBasedGame game, GameContainer container, Graphics g) {
+        g.translate(xp1, yp1);
+        g.scale(scale1, scale1);
+        g.setClip((int) xp1, (int) yp1, (int) (scale1 * container.getWidth()), (int) (scale1 * container.getHeight()));
+        prev.render(container, game, g);
+        g.resetTransform();
+        g.clearClip();
     }
 
     /**
@@ -100,14 +103,8 @@ public class SelectTransition implements Transition {
     @Override
     public void preRender(StateBasedGame game, GameContainer container, Graphics g) {
         if (moveBackDone) {
-            g.translate(xp1, yp1);
-            g.scale(scale1, scale1);
-            g.setClip((int) xp1, (int) yp1, (int) (scale1 * container.getWidth()), (int) (scale1 * container.getHeight()));
-            prev.render(container, game, g);
-            g.resetTransform();
-            g.clearClip();
+            render(game, container, g);
         }
-
         g.translate(xp2, yp2);
         g.scale(scale2, scale2);
         g.setClip((int) xp2, (int) yp2, (int) (scale2 * container.getWidth()), (int) (scale2 * container.getHeight()));
