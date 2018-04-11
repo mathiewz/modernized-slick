@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -35,40 +36,38 @@ import com.github.mathiewz.slick.util.ResourceLoader;
  * @author Loads of others!
  */
 public class TiledMap {
-    /** Indicates if we're running on a headless system */
-    private static boolean headless;
 
     /** The width of the map */
-    protected int width;
+    private int width;
     /** The height of the map */
-    protected int height;
+    private int height;
     /** The width of the tiles used on the map */
-    protected int tileWidth;
+    private int tileWidth;
     /** The height of the tiles used on the map */
-    protected int tileHeight;
+    private int tileHeight;
 
     /** The location prefix where we can find tileset images */
     protected String tilesLocation;
 
     /** the properties of the map */
-    protected Properties props;
+    private Properties props;
 
     /** The list of tilesets defined in the map */
-    protected ArrayList<TileSet> tileSets = new ArrayList<>();
+    private ArrayList<TileSet> tileSets = new ArrayList<>();
     /** The list of layers defined in the map */
-    protected ArrayList<Layer> layers = new ArrayList<>();
+    private ArrayList<Layer> layers = new ArrayList<>();
     /** The list of object-groups defined in the map */
-    protected ArrayList<ObjectGroup> objectGroups = new ArrayList<>();
+    private ArrayList<ObjectGroup> objectGroups = new ArrayList<>();
     
     /** The orientation of this map */
-    protected OrientationEnum orientation;
+    private OrientationEnum orientation;
 
     /** True if we want to load tilesets - including their image data */
     private boolean loadTileSets = true;
 
     private enum OrientationEnum {
         ORTHOGONAL,
-        ISOMETRIC;
+        ISOMETRIC
     }
 
     /**
@@ -412,8 +411,7 @@ public class TiledMap {
     public void render(int x, int y, int sx, int sy, int width, int height, boolean lineByLine) {
         if (orientation == OrientationEnum.ORTHOGONAL) {
             for (int ty = 0; ty < height; ty++) {
-                for (int i = 0; i < layers.size(); i++) {
-                    Layer layer = layers.get(i);
+                for (Layer layer : layers) {
                     layer.render(x, y, sx, sy, width, ty, lineByLine, tileWidth, tileHeight);
                 }
             }
@@ -442,7 +440,7 @@ public class TiledMap {
      *            {@link #renderedLine(int, int, int)}
      *
      */
-    protected void renderIsometricMap(int x, int y, int width, int height, Layer layer, boolean lineByLine) {
+    private void renderIsometricMap(int x, int y, int width, int height, Layer layer, boolean lineByLine) {
         ArrayList<Layer> drawLayers = layers;
         if (layer != null) {
             drawLayers = new ArrayList<>();
@@ -601,7 +599,7 @@ public class TiledMap {
         for (int i = 0; i < setNodes.getLength(); i++) {
             Element current = (Element) setNodes.item(i);
 
-            TileSet tileSet = new TileSet(this, current, !headless);
+            TileSet tileSet = new TileSet(this, current, true);
             tileSet.index = i;
 
             if (lastSet != null) {
@@ -692,7 +690,7 @@ public class TiledMap {
      * @return The name of an object or null, when error occurred
      */
     public String getObjectName(int groupID, int objectID) {
-        return getObjectAttribute(groupID, objectID, object -> object.name, null);
+        return getObjectAttribute(groupID, objectID, MapObject::getName, null);
     }
 
     /**
@@ -705,7 +703,7 @@ public class TiledMap {
      * @return The type of an object or null, when error occurred
      */
     public String getObjectType(int groupID, int objectID) {
-        return getObjectAttribute(groupID, objectID, object -> object.type, null);
+        return getObjectAttribute(groupID, objectID, MapObject::getType, null);
     }
 
     /**
@@ -718,7 +716,7 @@ public class TiledMap {
      * @return The x-coordinate of an object, or -1, when error occurred
      */
     public int getObjectX(int groupID, int objectID) {
-        return getObjectAttribute(groupID, objectID, object -> object.x, -1);
+        return getObjectAttribute(groupID, objectID, MapObject::getX, -1);
     }
 
     /**
@@ -731,7 +729,7 @@ public class TiledMap {
      * @return The y-coordinate of an object, or -1, when error occurred
      */
     public int getObjectY(int groupID, int objectID) {
-        return getObjectAttribute(groupID, objectID, object -> object.y, -1);
+        return getObjectAttribute(groupID, objectID, MapObject::getY, -1);
     }
 
     /**
@@ -744,7 +742,7 @@ public class TiledMap {
      * @return The width of an object, or -1, when error occurred
      */
     public int getObjectWidth(int groupID, int objectID) {
-        return getObjectAttribute(groupID, objectID, object -> object.width, -1);
+        return getObjectAttribute(groupID, objectID, MapObject::getWidth, -1);
     }
 
     /**
@@ -757,14 +755,14 @@ public class TiledMap {
      * @return The height of an object, or -1, when error occurred
      */
     public int getObjectHeight(int groupID, int objectID) {
-        return getObjectAttribute(groupID, objectID, object -> object.height, -1);
+        return getObjectAttribute(groupID, objectID, MapObject::getHeight, -1);
     }
 
-    private <T> T getObjectAttribute(int groupID, int objectID, Function<GroupObject, T> getter, T def) {
+    private <T> T getObjectAttribute(int groupID, int objectID, Function<MapObject, T> getter, T def) {
         if (groupID >= 0 && groupID < objectGroups.size()) {
             ObjectGroup grp = objectGroups.get(groupID);
             if (objectID >= 0 && objectID < grp.objects.size()) {
-                GroupObject object = grp.objects.get(objectID);
+                MapObject object = grp.objects.get(objectID);
                 return getter.apply(object);
             }
         }
@@ -781,7 +779,13 @@ public class TiledMap {
      * @return The image source reference or null if one isn't defined
      */
     public String getObjectImage(int groupID, int objectID) {
-        return getObjectAttribute(groupID, objectID, object -> object.image, null);
+        return getObjectAttribute(groupID, objectID, MapObject::getImage, null);
+    }
+
+    public List<MapObject> getObjects(){
+        return objectGroups.stream()
+                .flatMap(group -> group.objects.stream())
+                .collect(Collectors.toList());
     }
 
     /**
@@ -800,7 +804,7 @@ public class TiledMap {
      *         no property with that name.
      */
     public String getObjectProperty(int groupID, int objectID, String propertyName, String def) {
-        return getObjectAttribute(groupID, objectID, object -> object.props.getProperty(propertyName, def), def);
+        return getObjectAttribute(groupID, objectID, object -> object.getProperty(propertyName, def), def);
     }
 
     /**
@@ -808,9 +812,9 @@ public class TiledMap {
      *
      * @author kulpae
      */
-    protected class ObjectGroup {
+    private class ObjectGroup {
         /** The Objects of this group */
-        private List<GroupObject> objects;
+        private List<MapObject> objects;
         /** the properties of this group */
         private Properties props;
 
@@ -820,7 +824,7 @@ public class TiledMap {
          * @param element
          *            The XML element describing the layer
          */
-        public ObjectGroup(Element element) {
+        private ObjectGroup(Element element) {
             objects = new ArrayList<>();
 
             // now read the layer properties
@@ -831,7 +835,6 @@ public class TiledMap {
                     props = new Properties();
                     for (int p = 0; p < properties.getLength(); p++) {
                         Element propElement = (Element) properties.item(p);
-
                         String name = propElement.getAttribute("name");
                         String value = propElement.getAttribute("value");
                         props.setProperty(name, value);
@@ -842,71 +845,15 @@ public class TiledMap {
             NodeList objectNodes = element.getElementsByTagName("object");
             for (int i = 0; i < objectNodes.getLength(); i++) {
                 Element objElement = (Element) objectNodes.item(i);
-                GroupObject object = new GroupObject(objElement);
+                MapObject object = new MapObject(objElement);
                 objects.add(object);
             }
         }
-    }
 
-    /**
-     * An object from a object-group on the map
-     *
-     * @author kulpae
-     */
-    protected class GroupObject {
-        /** The name of this object - read from the XML */
-        private String name;
-        /** The type of this object - read from the XML */
-        private String type;
-        /** The x-coordinate of this object */
-        private int x;
-        /** The y-coordinate of this object */
-        private int y;
-        /** The width of this object */
-        private int width;
-        /** The height of this object */
-        private int height;
-        /** The image source */
-        private String image;
-
-        /** the properties of this group */
-        private Properties props;
-
-        /**
-         * Create a new group based on the XML definition
-         *
-         * @param element
-         *            The XML element describing the layer
-         */
-        public GroupObject(Element element) {
-            name = element.getAttribute("name");
-            type = element.getAttribute("type");
-            x = Integer.parseInt(element.getAttribute("x"));
-            y = Integer.parseInt(element.getAttribute("y"));
-            width = Integer.parseInt(element.getAttribute("width"));
-            height = Integer.parseInt(element.getAttribute("height"));
-
-            Element imageElement = (Element) element.getElementsByTagName("image").item(0);
-            if (imageElement != null) {
-                image = imageElement.getAttribute("source");
-            }
-
-            // now read the layer properties
-            Element propsElement = (Element) element.getElementsByTagName("properties").item(0);
-            if (propsElement != null) {
-                NodeList properties = propsElement.getElementsByTagName("property");
-                if (properties != null) {
-                    props = new Properties();
-                    for (int p = 0; p < properties.getLength(); p++) {
-                        Element propElement = (Element) properties.item(p);
-
-                        String nameAttr = propElement.getAttribute("name");
-                        String value = propElement.getAttribute("value");
-                        props.setProperty(nameAttr, value);
-                    }
-                }
-            }
+        public Properties getProps() {
+            return props;
         }
     }
+
 
 }
